@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(php:*)",
+      "Bash(mysql:*)",
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(touch:*)",
+      "Bash(chmod:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(rm:*)",
+      "Bash(curl:*)",
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": []
+  }
+}

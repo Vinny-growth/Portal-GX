@@ -1,0 +1,631 @@
+<div id="aurum-simulator-container" class="aurum-simulator">
+    <style>
+        .aurum-simulator {
+            font-family: 'Inter', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .aurum-blue-bg { background-color: #002D72; }
+        .aurum-blue-text { color: #002D72; }
+        .btn-aurum {
+            background-color: #002D72;
+            color: white;
+            transition: background-color 0.3s ease;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+        }
+        .btn-aurum:hover { background-color: #001f50; }
+        .sim-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .sim-form-control {
+            border: 1px solid #D1D5DB;
+            padding: 0.625rem 0.75rem;
+            border-radius: 0.375rem;
+            width: 100%;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .sim-form-control:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #002D72;
+            box-shadow: 0 0 0 2px rgba(0, 45, 114, 0.3);
+        }
+        .sim-form-label {
+            display: block;
+            margin-bottom: 0.375rem;
+            font-weight: 500;
+            color: #374151;
+        }
+        .sim-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .sim-modal-content {
+            background-color: white; padding: 2rem; border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 90%; max-width: 500px;
+        }
+        .sim-hidden { display: none; }
+        .sim-input-error { border-color: #EF4444; }
+        .sim-error-message { color: #EF4444; font-size: 0.875rem; margin-top: 0.25rem; }
+        .sim-logo-text {
+            font-size: 2.25rem; font-weight: 700; color: #002D72;
+            text-align: center;
+        }
+        .sim-results-section { margin-bottom: 1.5rem; }
+        .sim-results-section h3 {
+            font-size: 1.25rem; font-weight: 600; color: #002D72;
+            margin-bottom: 0.75rem; padding-bottom: 0.25rem;
+            border-bottom: 2px solid #002D72;
+        }
+        .sim-result-grid-item {
+            background-color: #f9fafb; padding: 0.75rem;
+            border-radius: 0.25rem; border: 1px solid #e5e7eb;
+        }
+        .sim-result-grid-item strong { color: #002D72; }
+        .sim-results-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .sim-grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .sim-btn-full {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .sim-text-center { text-align: center; }
+        .sim-mb-6 { margin-bottom: 1.5rem; }
+        .sim-mt-6 { margin-top: 1.5rem; }
+        .sim-space-y-4 > * + * { margin-top: 1rem; }
+
+        @media (max-width: 640px) {
+            .sim-card { padding: 16px; }
+            .sim-logo-text { font-size: 1.875rem; }
+            h2, .sim-results-section h3 { font-size: 1.125rem; }
+            .sim-modal-content { padding: 1.5rem; }
+        }
+    </style>
+
+    <div id="leadModalOverlay" class="sim-modal-overlay sim-hidden">
+        <div class="sim-modal-content">
+            <h2 class="sim-text-center aurum-blue-text sim-mb-6" style="font-size: 1.5rem; font-weight: 600;">Acesse o Simulador de Custo de Capital</h2>
+            <p class="sim-text-center sim-mb-6" style="color: #666; font-size: 0.875rem;">Preencha seus dados para receber o relatório comparativo da simulação por e-mail e acessar o simulador.</p>
+            <form id="leadForm" class="sim-space-y-4">
+                <?= csrf_field() ?>
+                <div>
+                    <label for="leadName" class="sim-form-label">Nome Completo:</label>
+                    <input type="text" id="leadName" name="name" required placeholder="Seu nome completo" class="sim-form-control">
+                    <p id="leadNameError" class="sim-error-message sim-hidden"></p>
+                </div>
+                <div>
+                    <label for="leadEmail" class="sim-form-label">Email:</label>
+                    <input type="email" id="leadEmail" name="email" required placeholder="seuemail@dominio.com" class="sim-form-control">
+                    <p id="leadEmailError" class="sim-error-message sim-hidden"></p>
+                </div>
+                <div>
+                    <label for="leadPhone" class="sim-form-label">Telefone (com DDD):</label>
+                    <input type="tel" id="leadPhone" name="phone" required placeholder="(XX) XXXXX-XXXX" class="sim-form-control">
+                    <p id="leadPhoneError" class="sim-error-message sim-hidden"></p>
+                </div>
+                <button type="submit" class="btn-aurum sim-btn-full">Acessar Simulador e Receber Relatório</button>
+            </form>
+            <p id="leadFormMessage" class="sim-text-center" style="margin-top: 1rem; font-size: 0.875rem;"></p>
+        </div>
+    </div>
+
+    <div id="simulatorContainer" class="sim-hidden">
+        <header class="sim-mb-6 sim-text-center">
+            <div class="sim-logo-text sim-mb-6">AURUM CAPITAL</div>
+            <p style="font-size: 1.25rem; color: #666;">Simulador Comparativo de Custo de Capital</p>
+        </header>
+
+        <div class="sim-card">
+            <h2 class="aurum-blue-text sim-mb-6" style="font-size: 1.5rem; font-weight: 600;">Dados da Empresa e Necessidade de Crédito</h2>
+            <form id="capitalCostForm" class="sim-grid-2">
+                <?= csrf_field() ?>
+                <div>
+                    <label for="valorNecessidade" class="sim-form-label">Valor da Necessidade (R$):</label>
+                    <input type="number" id="valorNecessidade" class="sim-form-control" step="0.01" required placeholder="Ex: 100000.00">
+                </div>
+                <div>
+                    <label for="numParcelas" class="sim-form-label">Prazo Desejado (meses):</label>
+                    <input type="number" id="numParcelas" class="sim-form-control" step="1" required placeholder="Ex: 36">
+                </div>
+                <div>
+                    <label for="objetivoCredito" class="sim-form-label">Objetivo do Crédito:</label>
+                    <select id="objetivoCredito" class="sim-form-control" required>
+                        <option value="">Selecione...</option>
+                        <option value="giro">Capital de Giro</option>
+                        <option value="capex">Compra de Máquinas / CAPEX</option>
+                        <option value="inovacao">Inovação / P&D</option>
+                        <option value="exportacao">Financiamento à Exportação</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="faturamentoAnual" class="sim-form-label">Faturamento Anual (R$):</label>
+                    <input type="number" id="faturamentoAnual" class="sim-form-control" step="0.01" required placeholder="Ex: 5000000.00">
+                </div>
+                <div>
+                    <label for="ebitdaAnual" class="sim-form-label">EBITDA Anual (R$):</label>
+                    <input type="number" id="ebitdaAnual" class="sim-form-control" step="0.01" required placeholder="Ex: 500000.00">
+                </div>
+                <div>
+                    <label for="dividaBrutaAtual" class="sim-form-label">Dívida Bruta Atual (R$) (Opcional):</label>
+                    <input type="number" id="dividaBrutaAtual" class="sim-form-control" step="0.01" placeholder="Ex: 200000.00">
+                </div>
+                <div style="grid-column: span 2;">
+                    <button type="submit" class="btn-aurum sim-btn-full">Simular Opções de Custo de Capital</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="resultsArea" class="sim-mt-6 sim-hidden">
+            <div class="sim-card">
+                <h2 class="aurum-blue-text sim-mb-6" style="font-size: 1.5rem; font-weight: 600;">Resultado Comparativo da Simulação</h2>
+                <div id="summaryResultsContainer" class="sim-mb-6">
+                </div>
+                <div id="detailedResultsContainer">
+                </div>
+                <p id="generalErrorMessage" style="color: #EF4444; margin-top: 1rem; font-size: 0.875rem;"></p>
+            </div>
+        </div>
+
+        <footer class="sim-text-center sim-mt-6" style="color: #666; font-size: 0.875rem;">
+            <p>&copy; <span id="currentYear"></span> Aurum Capital. Todos os direitos reservados.</p>
+            <p style="margin-top: 0.5rem;">Este simulador fornece estimativas indicativas. As taxas e condições exatas podem variar. Consulte um especialista Aurum Capital.</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- Elementos do DOM ---
+        const leadModalOverlay = document.getElementById('leadModalOverlay');
+        const leadForm = document.getElementById('leadForm');
+        const leadFormMessage = document.getElementById('leadFormMessage');
+        const simulatorContainer = document.getElementById('simulatorContainer');
+        const capitalCostForm = document.getElementById('capitalCostForm');
+        const resultsArea = document.getElementById('resultsArea');
+        const summaryResultsContainer = document.getElementById('summaryResultsContainer');
+        const detailedResultsContainer = document.getElementById('detailedResultsContainer');
+        const generalErrorMessage = document.getElementById('generalErrorMessage');
+        
+        const leadNameInput = document.getElementById('leadName');
+        const leadEmailInput = document.getElementById('leadEmail');
+        const leadPhoneInput = document.getElementById('leadPhone');
+        const leadNameError = document.getElementById('leadNameError');
+        const leadEmailError = document.getElementById('leadEmailError');
+        const leadPhoneError = document.getElementById('leadPhoneError');
+
+        let currentLeadData = null;
+
+        // --- Taxas de Referência (Baseadas no artigo - Maio/2025) ---
+        const REF_CDI_ANUAL = 0.0925; // Ex: 9.25% a.a.
+        const REF_TLP_ANUAL = 0.0610; // Ex: 6.1% a.a. (para BNDES FINEM)
+        const REF_IPCA_ANUAL = 0.0450; // Ex: 4.5% a.a. (estimativa)
+        // IOF
+        const IOF_ALIQUOTA_PRINCIPAL = 0.0038; // 0.38%
+        const IOF_ALIQUOTA_DIARIA_PJ = 0.000041; // 0.0041% ao dia (PJ)
+
+        // --- Funções Utilitárias ---
+        function isValidEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+        function isValidPhone(phone) { return /^\(?\d{2}\)?[\s-]?\d{4,5}-?\d{4}$/.test(phone.replace(/\D/g, '')); }
+        function toggleInputError(input, errorEl, msg, show) {
+            errorEl.textContent = msg;
+            errorEl.classList.toggle('sim-hidden', !show);
+            input.classList.toggle('sim-input-error', show);
+        }
+        function formatCurrency(value, includeSymbol = true) {
+            if (isNaN(value) || value === null) return includeSymbol ? "R$ 0,00" : "0,00";
+            return value.toLocaleString('pt-BR', { style: includeSymbol ? 'currency' : 'decimal', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        function formatPercent(value, decimals = 2) {
+            if (isNaN(value) || value === null) return "N/A";
+            return `${(value * 100).toFixed(decimals)}%`;
+        }
+        function an_to_mon_rate(annual_rate) { return Math.pow(1 + annual_rate, 1/12) - 1; }
+        function mon_to_an_rate(monthly_rate) { return Math.pow(1 + monthly_rate, 12) - 1; }
+        
+        // --- Inicialização ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            if (sessionStorage.getItem('aurumLeadSubmitted') === 'true') {
+                simulatorContainer.classList.remove('sim-hidden');
+                const storedLead = sessionStorage.getItem('aurumLeadData');
+                if (storedLead) currentLeadData = JSON.parse(storedLead);
+            } else {
+                leadModalOverlay.classList.remove('sim-hidden');
+            }
+        });
+
+        // --- Formulário de Lead ---
+        leadForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            leadFormMessage.textContent = 'Enviando seus dados...';
+            leadFormMessage.className = 'sim-text-center'; // Reset class
+            leadFormMessage.style.color = '#666';
+            let isValid = true;
+            const name = leadNameInput.value.trim();
+            const email = leadEmailInput.value.trim();
+            const phone = leadPhoneInput.value.trim();
+
+            [leadNameInput, leadEmailInput, leadPhoneInput].forEach(input => toggleInputError(input, document.getElementById(`${input.id}Error`), '', false));
+
+            if (!name) { toggleInputError(leadNameInput, leadNameError, 'Nome é obrigatório.', true); isValid = false; }
+            if (!email) { toggleInputError(leadEmailInput, leadEmailError, 'Email é obrigatório.', true); isValid = false; }
+            else if (!isValidEmail(email)) { toggleInputError(leadEmailInput, leadEmailError, 'Formato de email inválido.', true); isValid = false; }
+            if (!phone) { toggleInputError(leadPhoneInput, leadPhoneError, 'Telefone é obrigatório.', true); isValid = false; }
+            else if (!isValidPhone(phone)) { toggleInputError(leadPhoneInput, leadPhoneError, 'Formato de telefone inválido. Use (XX) XXXXX-XXXX.', true); isValid = false; }
+
+            if (isValid) {
+                currentLeadData = { name, email, phone, timestamp: new Date().toISOString() };
+                
+                try {
+                    // Preparar os dados para envio
+                    const formData = new FormData(leadForm);
+                    
+                    // Enviar para nosso endpoint personalizado
+                    const response = await fetch('/Ajax/addSimulatorLeadPost', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        const responseText = await response.text();
+                        let result;
+                        try {
+                            result = JSON.parse(responseText);
+                        } catch (e) {
+                            console.error("Erro ao analisar resposta JSON:", e, "Resposta:", responseText);
+                            result = { result: 0, message: "Erro ao processar resposta do servidor" };
+                        }
+                        
+                        if (result && result.result === 1) {
+                            leadFormMessage.textContent = 'Obrigado! Seus dados foram enviados. Carregando simulador...';
+                            leadFormMessage.style.color = '#10B981';
+                            sessionStorage.setItem('aurumLeadSubmitted', 'true');
+                            sessionStorage.setItem('aurumLeadData', JSON.stringify(currentLeadData));
+                            
+                            console.log("Dados do Lead enviados com sucesso:", currentLeadData);
+
+                            setTimeout(() => {
+                                leadModalOverlay.classList.add('sim-hidden');
+                                simulatorContainer.classList.remove('sim-hidden');
+                                simulatorContainer.scrollIntoView({ behavior: 'smooth' });
+                            }, 1500);
+                        } else {
+                            leadFormMessage.textContent = result.message || 'Erro ao enviar seus dados. Tente novamente.';
+                            leadFormMessage.style.color = '#EF4444';
+                            
+                            // Permitir acesso ao simulador mesmo com erro
+                            setTimeout(() => {
+                                sessionStorage.setItem('aurumLeadSubmitted', 'true');
+                                sessionStorage.setItem('aurumLeadData', JSON.stringify(currentLeadData));
+                                leadModalOverlay.classList.add('sim-hidden');
+                                simulatorContainer.classList.remove('sim-hidden');
+                                simulatorContainer.scrollIntoView({ behavior: 'smooth' });
+                            }, 1500);
+                        }
+                    } else {
+                        // Mesmo se der erro, permitimos o acesso ao simulador
+                        console.error("Erro ao enviar dados do lead. Status:", response.status);
+                        leadFormMessage.textContent = 'Erro ao enviar seus dados, mas você pode acessar o simulador.';
+                        leadFormMessage.style.color = '#F59E0B';
+                        
+                        // Permitir acesso ao simulador mesmo com erro
+                        setTimeout(() => {
+                            sessionStorage.setItem('aurumLeadSubmitted', 'true');
+                            sessionStorage.setItem('aurumLeadData', JSON.stringify(currentLeadData));
+                            leadModalOverlay.classList.add('sim-hidden');
+                            simulatorContainer.classList.remove('sim-hidden');
+                            simulatorContainer.scrollIntoView({ behavior: 'smooth' });
+                        }, 1500);
+                    }
+                } catch (error) {
+                    // Erro de rede ou CORS, mas permitimos o acesso ao simulador
+                    console.error("Erro de rede ou CORS ao tentar enviar dados do lead:", error);
+                    leadFormMessage.textContent = 'Erro de rede, mas você pode acessar o simulador.';
+                    leadFormMessage.style.color = '#F59E0B';
+                    
+                    // Permitir acesso ao simulador mesmo com erro
+                    setTimeout(() => {
+                        sessionStorage.setItem('aurumLeadSubmitted', 'true');
+                        sessionStorage.setItem('aurumLeadData', JSON.stringify(currentLeadData));
+                        leadModalOverlay.classList.add('sim-hidden');
+                        simulatorContainer.classList.remove('sim-hidden');
+                        simulatorContainer.scrollIntoView({ behavior: 'smooth' });
+                    }, 1500);
+                }
+
+            } else {
+                leadFormMessage.textContent = 'Por favor, corrija os erros.';
+                leadFormMessage.style.color = '#EF4444';
+            }
+        });
+
+        // --- Lógica do Simulador de Custo de Capital ---
+
+        function calcularParcelaPrice(PV, i_mensal_decimal, n) {
+            if (i_mensal_decimal === 0) return PV / n;
+            return PV * (i_mensal_decimal * Math.pow(1 + i_mensal_decimal, n)) / (Math.pow(1 + i_mensal_decimal, n) - 1);
+        }
+
+        function calculateIRR(cashFlows, guess = 0.01, maxIterations = 1000, tolerance = 1e-7) {
+            let rate = guess;
+            for (let iter = 0; iter < maxIterations; iter++) {
+                let npv = 0;
+                let derivative = 0;
+                for (let t = 0; t < cashFlows.length; t++) {
+                    npv += cashFlows[t] / Math.pow(1 + rate, t);
+                    if (t > 0) derivative -= (t * cashFlows[t]) / Math.pow(1 + rate, t + 1);
+                }
+                if (Math.abs(npv) < tolerance) return rate;
+                if (derivative === 0) return null;
+                let newRate = rate - npv / derivative;
+                const rateChange = newRate - rate;
+                if (Math.abs(rateChange) > 0.5) newRate = rate + Math.sign(rateChange) * 0.5;
+                rate = newRate;
+                if (rate <= -1) return null;
+            }
+            return null; // Não convergiu
+        }
+        
+        function calcularIOF(valor, prazoMeses) {
+            const prazoDias = Math.min(prazoMeses * 30, 365); // Limite de 365 dias para IOF diário
+            const iofPrincipal = valor * IOF_ALIQUOTA_PRINCIPAL;
+            const iofAdicional = valor * IOF_ALIQUOTA_DIARIA_PJ * prazoDias;
+            return iofPrincipal + iofAdicional;
+        }
+
+        capitalCostForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            resultsArea.classList.add('sim-hidden');
+            summaryResultsContainer.innerHTML = '';
+            detailedResultsContainer.innerHTML = '';
+            generalErrorMessage.textContent = '';
+
+            const valorNecessidade = parseFloat(document.getElementById('valorNecessidade').value);
+            const numParcelas = parseInt(document.getElementById('numParcelas').value);
+            const objetivoCredito = document.getElementById('objetivoCredito').value;
+            const faturamentoAnual = parseFloat(document.getElementById('faturamentoAnual').value);
+            const ebitdaAnual = parseFloat(document.getElementById('ebitdaAnual').value);
+            const dividaBrutaAtual = parseFloat(document.getElementById('dividaBrutaAtual').value) || 0;
+
+            if (isNaN(valorNecessidade) || valorNecessidade <= 0 ||
+                isNaN(numParcelas) || numParcelas <= 0 || !objetivoCredito ||
+                isNaN(faturamentoAnual) || faturamentoAnual <=0 || isNaN(ebitdaAnual) ) { // EBITDA pode ser negativo
+                generalErrorMessage.textContent = "Por favor, preencha todos os campos obrigatórios da empresa e necessidade com valores válidos.";
+                resultsArea.classList.remove('sim-hidden'); // Para mostrar a mensagem de erro
+                return;
+            }
+
+            let simulatedLines = [];
+
+            // --- Linha: Capital de Giro Bancário (Exemplo) ---
+            if (objetivoCredito === 'giro' || objetivoCredito === 'capex') { // Capex também pode usar giro
+                const spreadAnual = 0.040; // Ex: CDI + 4.0 p.p. (média de 3-5 p.p. do artigo)
+                const taxaNominalAnual = REF_CDI_ANUAL + spreadAnual;
+                const taxaNominalMensal = an_to_mon_rate(taxaNominalAnual);
+                
+                const iof = calcularIOF(valorNecessidade, numParcelas);
+                const tacGiro = valorNecessidade * 0.01 > 500 ? valorNecessidade * 0.01 : 500; // Ex: 1% ou min R$500
+                const valorLiberado = valorNecessidade - iof - tacGiro;
+                
+                const parcela = calcularParcelaPrice(valorNecessidade, taxaNominalMensal, numParcelas);
+                
+                const cashFlows = [valorLiberado];
+                for (let i = 0; i < numParcelas; i++) cashFlows.push(-parcela);
+                
+                const cetMensalDecimal = calculateIRR(cashFlows);
+                simulatedLines.push({
+                    nome: "Capital de Giro Bancário (Estimado)",
+                    taxaNominalAnual: formatPercent(taxaNominalAnual),
+                    parcela: formatCurrency(parcela),
+                    iof: formatCurrency(iof),
+                    tac: formatCurrency(tacGiro),
+                    valorLiberado: formatCurrency(valorLiberado),
+                    cetMensal: cetMensalDecimal !== null ? formatPercent(cetMensalDecimal, 4) : "N/A",
+                    cetAnual: cetMensalDecimal !== null ? formatPercent(mon_to_an_rate(cetMensalDecimal), 4) : "N/A",
+                });
+            }
+
+            // --- Linha: FIDC Padrão (Exemplo para Giro) ---
+            if (objetivoCredito === 'giro') {
+                const spreadAnualFIDC = 0.009; // Ex: CDI + 0.9 p.p.
+                const taxaNominalAnualFIDC = REF_CDI_ANUAL + spreadAnualFIDC;
+                const taxaNominalMensalFIDC = an_to_mon_rate(taxaNominalAnualFIDC);
+                const iofFIDC = calcularIOF(valorNecessidade, numParcelas);
+                const custoEstruturacaoFIDC = valorNecessidade * 0.015; // Ex: 1.5% flat
+                const valorLiberadoFIDC = valorNecessidade - iofFIDC - custoEstruturacaoFIDC;
+
+                const parcelaFIDC = calcularParcelaPrice(valorNecessidade, taxaNominalMensalFIDC, numParcelas);
+                const cashFlowsFIDC = [valorLiberadoFIDC];
+                for (let i = 0; i < numParcelas; i++) cashFlowsFIDC.push(-parcelaFIDC);
+
+                const cetMensalDecimalFIDC = calculateIRR(cashFlowsFIDC);
+                 simulatedLines.push({
+                    nome: "FIDC Padrão (Estimado)",
+                    taxaNominalAnual: formatPercent(taxaNominalAnualFIDC),
+                    parcela: formatCurrency(parcelaFIDC),
+                    iof: formatCurrency(iofFIDC),
+                    custoEstruturacao: formatCurrency(custoEstruturacaoFIDC),
+                    valorLiberado: formatCurrency(valorLiberadoFIDC),
+                    cetMensal: cetMensalDecimalFIDC !== null ? formatPercent(cetMensalDecimalFIDC, 4) : "N/A",
+                    cetAnual: cetMensalDecimalFIDC !== null ? formatPercent(mon_to_an_rate(cetMensalDecimalFIDC), 4) : "N/A",
+                });
+            }
+            
+            // --- Linha: Nota Promissória (Exemplo para Giro, curto prazo) ---
+            if (objetivoCredito === 'giro' && numParcelas <= 12) { 
+                const spreadAnualNP = 0.012; // Ex: CDI + 1.2 p.p.
+                const taxaNominalAnualNP = REF_CDI_ANUAL + spreadAnualNP;
+                const taxaNominalMensalNP = an_to_mon_rate(taxaNominalAnualNP);
+                const custoEstruturacaoNP = valorNecessidade * 0.005; // Ex: 0.5% flat
+                const valorLiberadoNP = valorNecessidade - custoEstruturacaoNP; // IOF Isento
+
+                const parcelaNP = calcularParcelaPrice(valorNecessidade, taxaNominalMensalNP, numParcelas);
+                const cashFlowsNP = [valorLiberadoNP];
+                for (let i = 0; i < numParcelas; i++) cashFlowsNP.push(-parcelaNP);
+                
+                const cetMensalDecimalNP = calculateIRR(cashFlowsNP);
+                simulatedLines.push({
+                    nome: "Nota Promissória Comercial (Estimada)",
+                    taxaNominalAnual: formatPercent(taxaNominalAnualNP),
+                    parcela: formatCurrency(parcelaNP),
+                    iof: "Isento",
+                    custoEstruturacao: formatCurrency(custoEstruturacaoNP),
+                    valorLiberado: formatCurrency(valorLiberadoNP),
+                    cetMensal: cetMensalDecimalNP !== null ? formatPercent(cetMensalDecimalNP, 4) : "N/A",
+                    cetAnual: cetMensalDecimalNP !== null ? formatPercent(mon_to_an_rate(cetMensalDecimalNP), 4) : "N/A",
+                });
+            }
+
+            // --- Linha: BNDES FINEM (Exemplo para CAPEX) ---
+            if (objetivoCredito === 'capex' && valorNecessidade >= 1000000) { 
+                const spreadAnualBNDES = 0.025; 
+                const taxaNominalAnualBNDES = REF_TLP_ANUAL + spreadAnualBNDES; 
+                const taxaNominalMensalBNDES = an_to_mon_rate(taxaNominalAnualBNDES);
+                const iofBNDES = calcularIOF(valorNecessidade, numParcelas);
+                const custoAnaliseBNDES = valorNecessidade * 0.005; 
+                const valorLiberadoBNDES = valorNecessidade - iofBNDES - custoAnaliseBNDES;
+                
+                const parcelaBNDES = calcularParcelaPrice(valorNecessidade, taxaNominalMensalBNDES, numParcelas);
+                const cashFlowsBNDES = [valorLiberadoBNDES];
+                for (let i = 0; i < numParcelas; i++) cashFlowsBNDES.push(-parcelaBNDES);
+
+                const cetMensalDecimalBNDES = calculateIRR(cashFlowsBNDES);
+                 simulatedLines.push({
+                    nome: "BNDES FINEM (Estimado)",
+                    taxaNominalAnual: formatPercent(taxaNominalAnualBNDES),
+                    parcela: formatCurrency(parcelaBNDES),
+                    iof: formatCurrency(iofBNDES),
+                    custoAnalise: formatCurrency(custoAnaliseBNDES),
+                    valorLiberado: formatCurrency(valorLiberadoBNDES),
+                    cetMensal: cetMensalDecimalBNDES !== null ? formatPercent(cetMensalDecimalBNDES, 4) : "N/A",
+                    cetAnual: cetMensalDecimalBNDES !== null ? formatPercent(mon_to_an_rate(cetMensalDecimalBNDES), 4) : "N/A",
+                });
+            }
+            
+            // --- Linha: Cartão BNDES (Exemplo para CAPEX, valores menores) ---
+             if (objetivoCredito === 'capex' && valorNecessidade <= 2000000) { 
+                const spreadAnualCartao = 0.012; // IPCA + 1.2%
+                const taxaNominalAnualCartao = REF_IPCA_ANUAL + spreadAnualCartao;
+                const taxaNominalMensalCartao = an_to_mon_rate(taxaNominalAnualCartao);
+                const iofCartao = calcularIOF(valorNecessidade, numParcelas);
+                const valorLiberadoCartao = valorNecessidade - iofCartao; 
+                
+                const parcelaCartao = calcularParcelaPrice(valorNecessidade, taxaNominalMensalCartao, numParcelas);
+                const cashFlowsCartao = [valorLiberadoCartao];
+                for (let i = 0; i < numParcelas; i++) cashFlowsCartao.push(-parcelaCartao);
+
+                const cetMensalDecimalCartao = calculateIRR(cashFlowsCartao);
+                 simulatedLines.push({
+                    nome: "Cartão BNDES 4.0 (Estimado)",
+                    taxaNominalAnual: `${formatPercent(REF_IPCA_ANUAL)} (IPCA) + ${formatPercent(spreadAnualCartao)} = ${formatPercent(taxaNominalAnualCartao)}`,
+                    parcela: formatCurrency(parcelaCartao),
+                    iof: formatCurrency(iofCartao),
+                    valorLiberado: formatCurrency(valorLiberadoCartao),
+                    cetMensal: cetMensalDecimalCartao !== null ? formatPercent(cetMensalDecimalCartao, 4) : "N/A",
+                    cetAnual: cetMensalDecimalCartao !== null ? formatPercent(mon_to_an_rate(cetMensalDecimalCartao), 4) : "N/A",
+                });
+            }
+
+            // --- Exibir Resultados ---
+            if (simulatedLines.length === 0) {
+                generalErrorMessage.textContent = "Nenhuma linha de crédito foi simulada para os critérios fornecidos. Tente ajustar o objetivo ou os valores.";
+            } else {
+                simulatedLines.forEach(line => {
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.classList.add('sim-results-section');
+                    let content = `<h3>${line.nome}</h3><div class="sim-grid-2">`;
+                    content += `<div class="sim-result-grid-item"><span style="display:block; font-size:0.875rem; color:#666;">Taxa Nominal Anual:</span> <strong>${line.taxaNominalAnual}</strong></div>`;
+                    content += `<div class="sim-result-grid-item"><span style="display:block; font-size:0.875rem; color:#666;">Parcela Estimada:</span> <strong>${line.parcela}</strong></div>`;
+                    if(line.iof) content += `<div class="sim-result-grid-item"><span style="display:block; font-size:0.875rem; color:#666;">IOF Estimado:</span> <strong>${line.iof}</strong></div>`;
+                    if(line.tac) content += `<div class="sim-result-grid-item"><span style="display:block; font-size:0.875rem; color:#666;">TAC Estimada:</span> <strong>${line.tac}</strong></div>`;
+                    if(line.custoEstruturacao) content += `<div class="sim-result-grid-item"><span style="display:block; font-size:0.875rem; color:#666;">Custo Estruturação:</span> <strong>${line.custoEstruturacao}</strong></div>`;
+                    if(line.custoAnalise) content += `<div class="sim-result-grid-item"><span style="display:block; font-size:0.875rem; color:#666;">Custo Análise:</span> <strong>${line.custoAnalise}</strong></div>`;
+                    content += `<div class="sim-result-grid-item"><span style="display:block; font-size:0.875rem; color:#666;">Valor Líquido Liberado:</span> <strong>${line.valorLiberado}</strong></div>`;
+                    content += `<div class="sim-result-grid-item" style="background-color:#EBF4FF; border-color:#BEE3F8;"><span style="display:block; font-size:0.875rem; color:#666;">CET Mensal Estimado:</span> <strong class="aurum-blue-text" style="font-size:1.125rem;">${line.cetMensal}</strong></div>`;
+                    content += `<div class="sim-result-grid-item" style="background-color:#EBF4FF; border-color:#BEE3F8;"><span style="display:block; font-size:0.875rem; color:#666;">CET Anual Estimado:</span> <strong class="aurum-blue-text" style="font-size:1.125rem;">${line.cetAnual}</strong></div>`;
+                    content += `</div>`;
+                    sectionDiv.innerHTML = content;
+                    detailedResultsContainer.appendChild(sectionDiv);
+                });
+            }
+
+            if (ebitdaAnual !== 0 && ebitdaAnual !== null) { 
+                const dbEbitdaAntes = dividaBrutaAtual / ebitdaAnual;
+                const dbEbitdaDepois = (dividaBrutaAtual + valorNecessidade) / ebitdaAnual;
+                summaryResultsContainer.innerHTML = `
+                    <h3 class="aurum-blue-text" style="font-size:1.25rem; font-weight:600; margin-bottom:0.75rem; padding-bottom:0.25rem; border-bottom:2px solid #002D72;">Impacto Estimado na Alavancagem</h3>
+                    <div class="sim-results-summary-grid">
+                        <div class="sim-result-grid-item"><span style="display:block; font-size:0.875rem; color:#666;">Dívida Bruta / EBITDA (Antes):</span> <strong>${isFinite(dbEbitdaAntes) ? dbEbitdaAntes.toFixed(2) + 'x' : 'N/A'}</strong></div>
+                        <div class="sim-result-grid-item"><span style="display:block; font-size:0.875rem; color:#666;">Dívida Bruta / EBITDA (Depois):</span> <strong>${isFinite(dbEbitdaDepois) ? dbEbitdaDepois.toFixed(2) + 'x' : 'N/A'}</strong></div>
+                    </div>`;
+            } else {
+                 summaryResultsContainer.innerHTML = `<p style="font-size:0.875rem; color:#666;">EBITDA não informado ou zero, não foi possível calcular o impacto na alavancagem.</p>`;
+            }
+
+            resultsArea.classList.remove('sim-hidden');
+            resultsArea.scrollIntoView({ behavior: 'smooth' });
+
+            if (currentLeadData && currentLeadData.email) {
+                // Preparar dados para salvar no banco de dados
+                const simData = {
+                    leadInfo: currentLeadData,
+                    companyInputs: {
+                        valorNecessidade: formatCurrency(valorNecessidade),
+                        numParcelas,
+                        objetivoCredito,
+                        faturamentoAnual: formatCurrency(faturamentoAnual),
+                        ebitdaAnual: formatCurrency(ebitdaAnual),
+                        dividaBrutaAtual: formatCurrency(dividaBrutaAtual)
+                    },
+                    simulatedLines,
+                    impactoDBEBITDA: summaryResultsContainer.innerText 
+                };
+                
+                // Atualizar o lead no banco com os dados da simulação
+                try {
+                    // Preparar os dados para envio
+                    const formData = new FormData(capitalCostForm);
+                    formData.append('name', currentLeadData.name);
+                    formData.append('email', currentLeadData.email);
+                    formData.append('phone', currentLeadData.phone);
+                    formData.append('sim_data', JSON.stringify(simData));
+                    
+                    const response = await fetch('/Ajax/addSimulatorLeadPost', {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    });
+                    
+                    console.log("Atualização de lead com dados da simulação:", response.ok ? "Sucesso" : "Falha");
+                } catch (error) {
+                    console.error("Erro ao atualizar lead com dados da simulação:", error);
+                }
+            }
+        });
+    </script>
+</div>

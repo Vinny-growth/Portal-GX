@@ -1,0 +1,7 @@
+writable/
+vendor/
+.env
+*.log
+*.tmp
+.DS_Store
+Thumb.db
