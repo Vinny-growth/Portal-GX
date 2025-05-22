@@ -23,6 +23,23 @@ Portal corporativo da GX Capital, incluindo simuladores financeiros e sistema de
    - Análise de impacto em diferentes moedas
    - Visualização de resultados
 
+## Funcionalidades Recentes
+
+1. **API para Captura de Leads** (`/tmp/api_direct.php`)
+   - Recebe e processa dados do formulário do simulador
+   - Armazena informações no banco de dados sem depender do framework
+   - Suporta diferentes tipos de simuladores
+
+2. **Sistema de Gerenciamento de Leads**
+   - Interface administrativa em `/admin/simulator-leads`
+   - Sistema de status para acompanhamento (Novo, Contatado, Qualificado, etc.)
+   - Visualização detalhada dos dados da simulação
+
+3. **Formulário Modal no Simulador**
+   - Aparece automaticamente após a simulação
+   - Design responsivo e intuitivo
+   - Integração perfeita com a API de leads
+
 ## Administração de Leads
 
 O sistema inclui uma interface administrativa para gerenciar leads capturados, com:
