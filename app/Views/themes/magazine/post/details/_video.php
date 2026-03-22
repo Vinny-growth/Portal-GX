@@ -18,7 +18,7 @@
 <?php elseif (!empty($post->video_embed_code)): ?>
     <div class="post-image post-video">
         <div class="ratio ratio-16x9">
-            <iframe src="<?= $post->video_embed_code; ?>" allowfullscreen></iframe>
+            <iframe src="<?= $post->video_embed_code; ?>" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
     </div>
 <?php endif; ?>

@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="<?= base_url('assets/admin/plugins/file-uploader/css/jquery.dm-uploader.min.css'); ?>"/>
     <link rel="stylesheet" href="<?= base_url('assets/admin/plugins/file-uploader/css/styles-1.0.css'); ?>"/>
     <link rel="stylesheet" href="<?= base_url('assets/admin/css/custom-2.4.min.css'); ?>">
+    <link rel="stylesheet" href="<?= base_url('assets/admin/css/dashboard.css'); ?>">
     <script src="<?= base_url('assets/admin/js/jquery.min.js'); ?>"></script>
     <script src="<?= base_url('assets/admin/plugins/overlay-scrollbars/OverlayScrollbars.min.js'); ?>"></script>
     <script>$(function () {
@@ -30,7 +31,7 @@
     <?php if ($activeLang->text_direction == 'rtl'): ?>
         <link href="<?= base_url('assets/admin/css/rtl-2.4.min.css'); ?>" rel="stylesheet"/>
     <?php endif; ?>
-    <script>var VrConfig = {baseURL: '<?= base_url(); ?>', csrfTokenName: '<?= csrf_token() ?>', sysLangId: '<?= $activeLang->id; ?>', directionality: "<?= $activeLang->text_direction == 'rtl' ? 'rtl' : 'ltr'; ?>", textSelectImage: "<?= clrDQuotes(trans("select_image")); ?>", textSelect: "<?= clrDQuotes(trans("select")); ?>", textOk: "<?= clrDQuotes(trans("ok")); ?>", textYes: "<?= clrDQuotes(trans("yes")); ?>", textCancel: "<?= clrDQuotes(trans("cancel")); ?>", textEnter2Characters: "<?= clrDQuotes(trans("enter_2_characters")); ?>", textSearching: "<?= clrDQuotes(trans("searching")); ?>", textNoResult: "<?= clrDQuotes(trans("search_noresult")); ?>", textProcessing: "<?= clrDQuotes(trans("txt_processing")); ?>", textTopicEmpty: "<?= clrDQuotes(trans("msg_topic_empty")); ?>"};</script>
+    <script>var VrConfig = {baseURL: '<?= base_url(); ?>', csrfTokenName: '<?= csrf_token() ?>', sysLangId: '<?= $activeLang->id; ?>', directionality: "<?= $activeLang->text_direction == 'rtl' ? 'rtl' : 'ltr'; ?>", textSelectImage: "<?= clrDQuotes(trans("select_image")); ?>", textSelect: "<?= clrDQuotes(trans("select")); ?>", textOk: "<?= clrDQuotes(trans("ok")); ?>", textYes: "<?= clrDQuotes(trans("yes")); ?>", textCancel: "<?= clrDQuotes(trans("cancel")); ?>", textEnter2Characters: "<?= clrDQuotes(trans("enter_2_characters")); ?>", textSearching: "<?= clrDQuotes(trans("searching")); ?>", textNoResult: "<?= clrDQuotes(trans("search_noresult")); ?>", textProcessing: "<?= clrDQuotes(trans("txt_processing")); ?>", textTopicEmpty: "<?= clrDQuotes(trans("msg_topic_empty")); ?>", themeColor: "<?= esc($activeTheme->theme_color); ?>", blockColor: "<?= esc($activeTheme->block_color); ?>", megaColor: "<?= ($activeTheme->theme != 'classic') ? esc($activeTheme->mega_menu_color) : ''; ?>"};</script>
     <script>
         function setAjaxData(object = null) {
             var data = {
@@ -115,6 +116,11 @@
                     <li class="nav-home">
                         <a href="<?= adminUrl(); ?>"><i class="fa fa-home"></i><span><?= trans("home"); ?></span></a>
                     </li>
+                    <?php if (hasPermission('admin_panel')): ?>
+                        <li class="nav-dashboard">
+                            <a href="<?= adminUrl('dashboard'); ?>"><i class="fa fa-tachometer"></i><span>Dashboard Analytics</span></a>
+                        </li>
+                    <?php endif; ?>
                     <?php if (hasPermission('navigation')): ?>
                         <li class="nav-navigation">
                             <a href="<?= adminUrl('navigation?lang=' . $activeLang->id); ?>"><i class="fa fa-th"></i><span><?= trans("navigation"); ?></span></a>
@@ -128,6 +134,14 @@
                     if (hasPermission('pages')): ?>
                         <li class="nav-pages">
                             <a href="<?= adminUrl('pages'); ?>"><i class="fa fa-file-text"></i><span><?= trans("pages"); ?></span></a>
+                        </li>
+                        <li class="nav-cms-pages">
+                            <a href="<?= adminUrl('cms-pages'); ?>"><i class="fa fa-magic"></i><span>Páginas (CMS Visual)</span></a>
+                        </li>
+                    <?php endif;
+                    if (!hasPermission('pages') && hasPermission('admin_panel')): ?>
+                        <li class="nav-cms-pages">
+                            <a href="<?= adminUrl('cms-pages'); ?>"><i class="fa fa-magic"></i><span>Páginas (CMS Visual)</span></a>
                         </li>
                     <?php endif;
                     if (hasPermission('add_post')): ?>
@@ -154,18 +168,42 @@
                                 <li class="nav-drafts"><a href="<?= adminUrl('drafts'); ?>"><?= trans("drafts"); ?></a></li>
                             </ul>
                         </li>
+                        <li class="nav-content-ai">
+                            <a href="<?= adminUrl('content-ai'); ?>"><i class="fa fa-magic"></i><span>Central de Conteudos IA</span></a>
+                        </li>
                     <?php endif;
                     if (hasPermission('rss_feeds')): ?>
                         <li class="nav-feeds"><a href="<?= adminUrl('feeds'); ?>"><i class="fa fa-rss" aria-hidden="true"></i><span><?= trans("rss_feeds"); ?></span></a></li>
                     <?php endif;
                     if (hasPermission('categories')): ?>
                         <li class="nav-categories"><a href="<?= adminUrl('categories'); ?>"><i class="fa fa-folder-open" aria-hidden="true"></i><span><?= trans("categories"); ?></span></a></li>
+                        <li class="nav-tags"><a href="<?= adminUrl('tags'); ?>"><i class="fa fa-tags" aria-hidden="true"></i><span><?= trans("tags"); ?></span></a></li>
                     <?php endif;
                     if (hasPermission('widgets')): ?>
                         <li class="nav-widgets"><a href="<?= adminUrl('widgets'); ?>"><i class="fa fa-th" aria-hidden="true"></i><span><?= trans("widgets"); ?></span></a></li>
                     <?php endif;
                     if (hasPermission('polls')): ?>
                         <li class="nav-polls"><a href="<?= adminUrl('polls'); ?>"><i class="fa fa-list" aria-hidden="true"></i><span><?= trans("polls"); ?></span></a></li>
+                    <?php endif;
+                    if (hasPermission('pages')): ?>
+                        <li class="nav-bio-links">
+                            <a href="<?= adminUrl('bio-links'); ?>"><i class="fa fa-link" aria-hidden="true"></i><span>Bio Links</span></a>
+                        </li>
+                        <li class="nav-web-stories">
+                            <a href="<?= adminUrl('web-stories'); ?>"><i class="fa fa-images" aria-hidden="true"></i><span>Web Stories</span></a>
+                        </li>
+                        <li class="treeview<?php isAdminNavActive(['wealth','wealth-settings','wealth-tokens','wealth-appointments','wealth-cms','wealth-export']); ?>">
+                            <a href="#"><i class="fa fa-line-chart"></i> <span>Wealth Manager</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li class="nav-wealth"><a href="<?= adminUrl('wealth'); ?>">Visão Geral</a></li>
+                                <li class="nav-wealth-settings"><a href="<?= adminUrl('wealth/settings'); ?>">Configurações</a></li>
+                                <li class="nav-wealth-tokens"><a href="<?= adminUrl('wealth/tokens'); ?>">Tokens</a></li>
+                                <li class="nav-wealth-appointments"><a href="<?= adminUrl('wealth/appointments'); ?>">Agendamentos</a></li>
+                                <li class="nav-wealth-cms"><a href="<?= adminUrl('wealth/cms'); ?>">CMS</a></li>
+                                <li class="nav-wealth-export"><a href="<?= adminUrl('wealth/export'); ?>">Exportação</a></li>
+                                <li class="nav-wealth-logs"><a href="<?= adminUrl('wealth/logs'); ?>">Logs/Auditoria</a></li>
+                            </ul>
+                        </li>
                     <?php endif;
                     if (hasPermission('gallery')): ?>
                         <li class="treeview<?php isAdminNavActive(['gallery-images', 'gallery-albums', 'gallery-categories', 'update-gallery-image', 'update-gallery-album', 'update-gallery-category', 'gallery-add-image']); ?>">

@@ -143,7 +143,7 @@
                     </div>
                     <div class="form-group">
                         <label><?= trans("tag"); ?></label>
-                        <input type="text" name="tag" value="" class="form-control" required>
+                        <input type="text" name="tag" value="" class="form-control" placeholder="<?= trans('tag'); ?>" required>
                     </div>
                 </div>
                 <div class="modal-footer">

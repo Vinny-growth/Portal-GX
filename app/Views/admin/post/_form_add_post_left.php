@@ -210,7 +210,7 @@
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <textarea id="editor_recipe_info" class="tinyMCE form-control" name="recipe_info"></textarea>
+                        <textarea id="editor_recipe_info" class="tinyMCE form-control" name="recipe_info" placeholder="<?= trans('content'); ?>"></textarea>
                     </div>
                 </div>
             </div>

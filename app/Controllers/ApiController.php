@@ -8,16 +8,6 @@ use CodeIgniter\API\ResponseTrait;
 class ApiController extends BaseController
 {
     use ResponseTrait;
-    
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
-    {
-        parent::initController($request, $response, $logger);
-        // Desabilitar verificação CSRF para essa classe inteira
-        if (isset($this->request)) {
-            $this->request->getPost(); // Força a inicialização da coleção POST
-            $this->request->isValidCSRF = true; // Define que a validação CSRF foi aprovada
-        }
-    }
 
     /**
      * Endpoint aberto para receber leads do simulador
@@ -28,8 +18,18 @@ class ApiController extends BaseController
         // Log para depuração
         log_message('info', 'API: Requisição recebida em saveSimulatorLead');
         
-        // Permitir CORS
-        $this->response->setHeader('Access-Control-Allow-Origin', '*');
+        $origin = $this->request->getHeaderLine('Origin');
+        $allowedOrigins = $this->getAllowedOrigins();
+        if ($origin !== '' && !in_array($origin, $allowedOrigins, true)) {
+            return $this->respond([
+                'status' => 'error',
+                'message' => 'Origem não permitida'
+            ], 403);
+        }
+        if ($origin !== '') {
+            $this->response->setHeader('Access-Control-Allow-Origin', $origin);
+            $this->response->setHeader('Vary', 'Origin');
+        }
         $this->response->setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
         $this->response->setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
         
@@ -44,6 +44,11 @@ class ApiController extends BaseController
         $phone = $this->request->getPost('phone');
         $simData = $this->request->getPost('sim_data');
         $observations = $this->request->getPost('observations');
+        $company = $this->request->getPost('company');
+        $origin = $this->request->getPost('origem') ?: $this->request->getPost('origin');
+        $utmSource = $this->request->getPost('utm_source') ?: $this->request->getGet('utm_source');
+        $utmMedium = $this->request->getPost('utm_medium') ?: $this->request->getGet('utm_medium');
+        $utmCampaign = $this->request->getPost('utm_campaign') ?: $this->request->getGet('utm_campaign');
         
         // Log dos dados recebidos
         log_message('info', 'API: Dados recebidos: ' . json_encode([
@@ -77,7 +82,12 @@ class ApiController extends BaseController
             'email' => $email,
             'phone' => $phone,
             'sim_data' => $simData,
-            'observations' => $observations
+            'observations' => $observations,
+            'company' => $company,
+            'origem' => $origin,
+            'utm_source' => $utmSource,
+            'utm_medium' => $utmMedium,
+            'utm_campaign' => $utmCampaign
         ];
         
         try {
@@ -117,5 +127,44 @@ class ApiController extends BaseController
                 'message' => 'Erro interno do servidor: ' . $e->getMessage()
             ]);
         }
+    }
+
+    private function getAllowedOrigins(): array
+    {
+        $origins = [];
+
+        $baseOrigin = $this->normalizeOrigin(base_url());
+        if ($baseOrigin !== '') {
+            $origins[] = $baseOrigin;
+        }
+
+        $envOrigins = getenv('SIMULATOR_ALLOWED_ORIGINS') ?: '';
+        if ($envOrigins !== '') {
+            foreach (explode(',', $envOrigins) as $origin) {
+                $origin = trim($origin);
+                if ($origin !== '') {
+                    $origins[] = $origin;
+                }
+            }
+        }
+
+        return array_values(array_unique($origins));
+    }
+
+    private function normalizeOrigin(string $url): string
+    {
+        $url = rtrim($url, '/');
+        if ($url === '') {
+            return '';
+        }
+        $parts = parse_url($url);
+        if (empty($parts['scheme']) || empty($parts['host'])) {
+            return '';
+        }
+        $origin = $parts['scheme'] . '://' . $parts['host'];
+        if (!empty($parts['port'])) {
+            $origin .= ':' . $parts['port'];
+        }
+        return $origin;
     }
 }

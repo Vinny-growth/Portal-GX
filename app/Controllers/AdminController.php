@@ -744,9 +744,11 @@ class AdminController extends BaseAdminController
     {
         checkPermission('comments_contact');
         $data['title'] = trans("approved_comments");
-        $data['comments'] = $this->commonModel->getCommentsPaginated(1);
+        $data['comments'] = $this->commonModel->getCommentsPaginated(1, 15, 0);
         $data['topButtonText'] = trans("pending_comments");
         $data['topButtonURL'] = adminUrl('pending-comments');
+        $data['showApproveButton'] = false;
+        $data['pager'] = (object)['links' => ''];
 
         echo view('admin/includes/_header', $data);
         echo view('admin/comments', $data);
@@ -760,9 +762,11 @@ class AdminController extends BaseAdminController
     {
         checkPermission('comments_contact');
         $data['title'] = trans("pending_comments");
-        $data['comments'] = $this->commonModel->getCommentsPaginated(0);
+        $data['comments'] = $this->commonModel->getCommentsPaginated(0, 15, 0);
         $data['topButtonText'] = trans("approved_comments");
         $data['topButtonURL'] = adminUrl('comments');
+        $data['showApproveButton'] = true;
+        $data['pager'] = (object)['links' => ''];
 
         echo view('admin/includes/_header', $data);
         echo view('admin/comments', $data);
@@ -828,6 +832,9 @@ class AdminController extends BaseAdminController
         $data['title'] = trans("newsletter");
         $newsletterModel = new NewsletterModel();
         $data['subscribers'] = $newsletterModel->getSubscribers();
+        $data['usersCount'] = $this->authModel->getUserCount();
+        $data['subscribersCount'] = $newsletterModel->getSubscribersCount();
+        $data['generalSettings'] = $this->generalSettings;
 
         echo view('admin/includes/_header', $data);
         echo view('admin/newsletter/newsletter', $data);
@@ -906,6 +913,9 @@ class AdminController extends BaseAdminController
         $data['title'] = trans("users");
         $data['users'] = $this->authModel->getUsers();
         $data['userRoles'] = $this->authModel->getUserRoles();
+        $data['activeLang'] = $this->activeLang;
+        // Add pager object with empty links to prevent error
+        $data['pager'] = (object)['links' => ''];
 
         echo view('admin/includes/_header', $data);
         echo view('admin/users/users', $data);
@@ -1191,6 +1201,31 @@ class AdminController extends BaseAdminController
     {
         checkSuperAdmin();
         $data['title'] = trans("seo_tools");
+        
+        // Get selected language id
+        $data['selectedLangId'] = inputGet('lang');
+        if (empty($data['selectedLangId'])) {
+            $data['selectedLangId'] = $this->activeLang->id;
+        }
+        
+        // Load settings and models
+        $settingsModel = new \App\Models\SettingsModel();
+        $sitemapModel = new \App\Models\SitemapModel();
+        
+        // Get active languages
+        $data['activeLanguages'] = Globals::$languages;
+        
+        // Get SEO settings for selected language and general settings
+        $data['seoSettings'] = $settingsModel->getSeoSettings($data['selectedLangId']);
+        
+        // Get general settings
+        $data['generalSettings'] = $this->generalSettings;
+        
+        // Get number of sitemaps
+        $data['numSitemaps'] = count(glob(FCPATH . 'sitemap*.xml'));
+        if ($data['numSitemaps'] < 1) {
+            $data['numSitemaps'] = 1;
+        }
 
         echo view('admin/includes/_header', $data);
         echo view('admin/seo_tools', $data);
@@ -1234,7 +1269,7 @@ class AdminController extends BaseAdminController
     {
         checkSuperAdmin();
         $sitemapModel = new SitemapModel();
-        $data = $sitemapModel->generateSitemap();
+        $data = $sitemapModel->generateSitemap(0);
         $data["baseURL"] = base_url();
         $xml = view('admin/generate_sitemap', $data);
         $url = base_url();
@@ -1276,7 +1311,37 @@ class AdminController extends BaseAdminController
     {
         checkSuperAdmin();
         $data['title'] = trans("ad_spaces");
-
+        $langId = inputGet('lang');
+        $data['langId'] = $langId;
+        if (empty($data['langId'])) {
+            $data['langId'] = $this->activeLang->id;
+        }
+        
+        $adSpaceKey = inputGet('ad_space');
+        if (empty($adSpaceKey)) {
+            $adSpaceKey = 'header';
+        }
+        $data['adSpaceKey'] = $adSpaceKey;
+        
+        $data['activeLanguages'] = Globals::$languages;
+        $data['arrayAdSpaces'] = [
+            'header' => trans('header_desktop'),
+            'header_mobile' => trans('header_mobile'),
+            'index_top' => trans('index_top'),
+            'index_bottom' => trans('index_bottom'),
+            'post_top' => trans('post_top'),
+            'post_bottom' => trans('post_bottom'),
+            'sidebar_1' => trans('sidebar') . ' 1',
+            'sidebar_2' => trans('sidebar') . ' 2'
+        ];
+        
+        $data['adSpace'] = $this->commonModel->getAdSpace($data['langId'], $adSpaceKey);
+        
+        // Initialize CategoryModel
+        $categoryModel = new \App\Models\CategoryModel();
+        $data['categories'] = $categoryModel->getCategories();
+        $data['activeLang'] = $this->activeLang;
+        
         echo view('admin/includes/_header', $data);
         echo view('admin/ad_spaces', $data);
         echo view('admin/includes/_footer');
@@ -1418,6 +1483,43 @@ class AdminController extends BaseAdminController
     {
         checkSuperAdmin();
         $data['title'] = trans("social_login_settings");
+        
+        // Clone generalSettings to avoid modifying the original object
+        $generalSettings = clone $this->generalSettings;
+        
+        // Add missing properties
+        if (!isset($generalSettings->facebook_app_id)) {
+            $generalSettings->facebook_app_id = '';
+        }
+        if (!isset($generalSettings->facebook_app_secret)) {
+            $generalSettings->facebook_app_secret = '';
+        }
+        if (!isset($generalSettings->facebook_login)) {
+            $generalSettings->facebook_login = 0;
+        }
+        if (!isset($generalSettings->google_client_id)) {
+            $generalSettings->google_client_id = '';
+        }
+        if (!isset($generalSettings->google_client_secret)) {
+            $generalSettings->google_client_secret = '';
+        }
+        if (!isset($generalSettings->google_login)) {
+            $generalSettings->google_login = 0;
+        }
+        if (!isset($generalSettings->vk_app_id)) {
+            $generalSettings->vk_app_id = '';
+        }
+        if (!isset($generalSettings->vk_secure_key)) {
+            $generalSettings->vk_secure_key = '';
+        }
+        if (!isset($generalSettings->vk_redirect_url)) {
+            $generalSettings->vk_redirect_url = '';
+        }
+        if (!isset($generalSettings->vk_login)) {
+            $generalSettings->vk_login = 0;
+        }
+        
+        $data['generalSettings'] = $generalSettings;
 
         echo view('admin/includes/_header', $data);
         echo view('admin/social_login_settings', $data);
@@ -1528,6 +1630,33 @@ class AdminController extends BaseAdminController
         checkSuperAdmin();
         $data['title'] = trans("font_settings");
         $data["fonts"] = $this->settingsModel->getFonts();
+        
+        // Add active languages
+        $data['activeLanguages'] = isset($GLOBALS['languages']) ? $GLOBALS['languages'] : [];
+        if (empty($data['activeLanguages'])) {
+            $languageModel = new \App\Models\LanguageModel();
+            $data['activeLanguages'] = $languageModel->getActiveLanguages();
+        }
+        
+        // Add active language
+        $data['activeLang'] = $this->activeLang;
+        
+        // Add fontUpdate object if show parameter is present
+        if (inputGet('show') == 'update') {
+            $fontId = inputGet('id');
+            if (!empty($fontId)) {
+                $data['fontUpdate'] = $this->settingsModel->getFont($fontId);
+            } else {
+                $data['fontUpdate'] = (object)[
+                    'lang_id' => 0,
+                    'font_name' => '',
+                    'font_url' => '',
+                    'font_family' => '',
+                    'css_style' => ''
+                ];
+            }
+        }
+        
         echo view('admin/includes/_header', $data);
         echo view('admin/font_settings', $data);
         echo view('admin/includes/_footer');
@@ -1544,6 +1673,16 @@ class AdminController extends BaseAdminController
         if (empty($data['font'])) {
             return redirect()->to(adminUrl('font-settings'));
         }
+        
+        // Add active languages
+        $data['activeLanguages'] = isset($GLOBALS['languages']) ? $GLOBALS['languages'] : [];
+        if (empty($data['activeLanguages'])) {
+            $languageModel = new \App\Models\LanguageModel();
+            $data['activeLanguages'] = $languageModel->getActiveLanguages();
+        }
+        
+        // Add fontUpdate for backward compatibility
+        $data['fontUpdate'] = $data['font'];
 
         echo view('admin/includes/_header', $data);
         echo view('admin/edit_font', $data);
@@ -1619,6 +1758,40 @@ class AdminController extends BaseAdminController
     {
         checkSuperAdmin();
         $data['title'] = trans("route_settings");
+        
+        // Get routes or create default routes if none exist
+        $routes = $this->settingsModel->getRoutes();
+        if (empty($routes)) {
+            $routes = (object)[
+                'admin' => 'admin',
+                'profile' => 'profile',
+                'tag' => 'tag',
+                'reading_list' => 'reading-list',
+                'settings' => 'settings',
+                'social_accounts' => 'social-accounts',
+                'preferences' => 'preferences',
+                'visual_settings' => 'visual-settings',
+                'change_password' => 'change-password',
+                'forgot_password' => 'forgot-password',
+                'reset_password' => 'reset-password',
+                'delete_account' => 'delete-account',
+                'register' => 'register',
+                'posts' => 'posts',
+                'search' => 'search',
+                'logout' => 'logout',
+                'cookies_warning' => 'cookies-warning',
+                'contact' => 'contact',
+                'gallery' => 'gallery',
+                'gallery_album' => 'gallery-album',
+                'rss_feeds' => 'rss-feeds',
+                'terms_conditions' => 'terms-conditions',
+                'select_membership_plan' => 'select-membership-plan',
+                'paypal' => 'paypal',
+                'stripe' => 'stripe'
+            ];
+        }
+        
+        $data['routes'] = $routes;
 
         echo view('admin/includes/_header', $data);
         echo view('admin/route_settings', $data);
@@ -1657,6 +1830,55 @@ class AdminController extends BaseAdminController
     {
         checkSuperAdmin();
         $data['title'] = trans("preferences");
+        
+        // Clone generalSettings to avoid modifying the original object
+        $generalSettings = clone $this->generalSettings;
+        
+        // Add missing properties
+        if (!isset($generalSettings->date_format)) {
+            $generalSettings->date_format = 'Y-m-d H:i:s';
+        }
+        if (!isset($generalSettings->pagination_per_page)) {
+            $generalSettings->pagination_per_page = 15;
+        }
+        if (!isset($generalSettings->file_manager_show_files)) {
+            $generalSettings->file_manager_show_files = 20;
+        }
+        if (!isset($generalSettings->maintenance_mode_status)) {
+            $generalSettings->maintenance_mode_status = 0;
+        }
+        if (!isset($generalSettings->maintenance_mode_title)) {
+            $generalSettings->maintenance_mode_title = 'Site em Manutenção';
+        }
+        if (!isset($generalSettings->maintenance_mode_description)) {
+            $generalSettings->maintenance_mode_description = 'O site está temporariamente em manutenção. Volte em breve!';
+        }
+        if (!isset($generalSettings->comment_system)) {
+            $generalSettings->comment_system = 1;
+        }
+        if (!isset($generalSettings->comment_approval_system)) {
+            $generalSettings->comment_approval_system = 0;
+        }
+        if (!isset($generalSettings->emoji_reactions)) {
+            $generalSettings->emoji_reactions = 1;
+        }
+        if (!isset($generalSettings->reward_system)) {
+            $generalSettings->reward_system = 0;
+        }
+        if (!isset($generalSettings->registration_system)) {
+            $generalSettings->registration_system = 1;
+        }
+        if (!isset($generalSettings->email_verification)) {
+            $generalSettings->email_verification = 0;
+        }
+        if (!isset($generalSettings->audio_enabled)) {
+            $generalSettings->audio_enabled = 0;
+        }
+        if (!isset($generalSettings->rss_content_type)) {
+            $generalSettings->rss_content_type = 'summary';
+        }
+        
+        $data['generalSettings'] = $generalSettings;
 
         echo view('admin/includes/_header', $data);
         echo view('admin/preferences', $data);
@@ -1670,7 +1892,11 @@ class AdminController extends BaseAdminController
     {
         checkSuperAdmin();
         $settingsModel = new SettingsModel();
-        if ($settingsModel->updatePreferences()) {
+        $form = inputPost('form');
+        if (empty($form)) {
+            $form = 'general';
+        }
+        if ($settingsModel->updatePreferences($form)) {
             setSuccessMessage("msg_updated");
         } else {
             setErrorMessage("msg_error");
@@ -1724,6 +1950,136 @@ class AdminController extends BaseAdminController
     }
 
     /**
+     * Validate OpenAI API Key (AJAX)
+     */
+    public function validateOpenAIKeyPost()
+    {
+        checkSuperAdmin();
+
+        $key = trim(inputPost('openai_api_key') ?? '');
+        if (empty($key)) {
+            $envKey = getenv('OPENAI_API_KEY');
+            if (!empty($envKey)) {
+                $key = $envKey;
+            } else {
+                // fallback to AI Writer key if available
+                $ai = aiWriter();
+                if (!empty($ai) && !empty($ai->apiKey)) {
+                    $key = $ai->apiKey;
+                }
+            }
+        }
+
+        if (empty($key)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Nenhuma chave encontrada. Informe a chave ou salve no .env.',
+            ]);
+        }
+
+        // Minimal validation against OpenAI API (models endpoint)
+        $ch = curl_init('https://api.openai.com/v1/models');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $key,
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erro de conexão: ' . $error,
+            ]);
+        }
+
+        if ($httpCode === 200) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Chave válida e aceita pela API.',
+            ]);
+        }
+
+        // Try to extract error message
+        $msg = 'HTTP ' . $httpCode;
+        $decoded = json_decode($response, true);
+        if (is_array($decoded) && isset($decoded['error']['message'])) {
+            $msg .= ' - ' . $decoded['error']['message'];
+        }
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Chave inválida ou sem permissão: ' . $msg,
+        ]);
+    }
+
+    /**
+     * Validate AI Writer API Key (AJAX)
+     */
+    public function validateAIWriterKeyPost()
+    {
+        checkSuperAdmin();
+
+        $key = trim(inputPost('api_key') ?? '');
+        if (empty($key)) {
+            $ai = aiWriter();
+            if (!empty($ai) && !empty($ai->apiKey)) {
+                $key = $ai->apiKey;
+            }
+        }
+
+        if (empty($key)) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Nenhuma chave encontrada para o AI Writer.',
+            ]);
+        }
+
+        $ch = curl_init('https://api.openai.com/v1/models');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $key,
+            'Content-Type: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Erro de conexão: ' . $error,
+            ]);
+        }
+
+        if ($httpCode === 200) {
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Chave do AI Writer válida.',
+            ]);
+        }
+
+        $msg = 'HTTP ' . $httpCode;
+        $decoded = json_decode($response, true);
+        if (is_array($decoded) && isset($decoded['error']['message'])) {
+            $msg .= ' - ' . $decoded['error']['message'];
+        }
+
+        return $this->response->setJSON([
+            'success' => false,
+            'message' => 'Chave inválida: ' . $msg,
+        ]);
+    }
+
+    /**
      * Maintenance Mode Post
      */
     public function maintenanceModePost()
@@ -1745,6 +2101,105 @@ class AdminController extends BaseAdminController
     {
         checkSuperAdmin();
         $data['title'] = trans("general_settings");
+        
+        // Buscar configurações diretamente do banco de dados
+        $settingsModel = new \App\Models\SettingsModel();
+        $generalSettings = $settingsModel->getGeneralSettings();
+        
+        if (empty($generalSettings)) {
+            $generalSettings = new \stdClass();
+        }
+        
+        // Adicionar propriedades que possam estar faltando
+        if (!isset($generalSettings->application_name)) {
+            $generalSettings->application_name = 'GX Capital';
+        }
+        if (!isset($generalSettings->timezone)) {
+            $generalSettings->timezone = 'America/Sao_Paulo';
+        }
+        if (!isset($generalSettings->logo)) {
+            $generalSettings->logo = '';
+        }
+        if (!isset($generalSettings->favicon)) {
+            $generalSettings->favicon = '';
+        }
+        if (!isset($generalSettings->copyright)) {
+            $generalSettings->copyright = 'Copyright © ' . date('Y') . ' GX Capital - All Rights Reserved.';
+        }
+        // Decodificar informações de contato do JSON
+        $contactInfo = [];
+        if (!empty($generalSettings->contact_info)) {
+            $contactInfo = json_decode($generalSettings->contact_info, true);
+        }
+        
+        // Definir informações de contato (usando JSON como fonte principal)
+        $generalSettings->contact_address = $contactInfo['contact_address'] ?? '';
+        $generalSettings->contact_email = $contactInfo['contact_email'] ?? '';
+        $generalSettings->contact_phone = $contactInfo['contact_phone'] ?? '';
+        $generalSettings->contact_text = $contactInfo['contact_text'] ?? '';
+        // Decodificar URLs das redes sociais do JSON
+        $socialUrls = [];
+        if (!empty($generalSettings->social_media_urls)) {
+            $socialUrls = json_decode($generalSettings->social_media_urls, true);
+        }
+        
+        // Definir URLs das redes sociais (usando JSON ou valores individuais como fallback)
+        $generalSettings->facebook_url = $socialUrls['facebook_url'] ?? $generalSettings->facebook_url ?? '';
+        $generalSettings->twitter_url = $socialUrls['twitter_url'] ?? '';
+        $generalSettings->instagram_url = $socialUrls['instagram_url'] ?? '';
+        $generalSettings->pinterest_url = $socialUrls['pinterest_url'] ?? '';
+        $generalSettings->linkedin_url = $socialUrls['linkedin_url'] ?? '';
+        $generalSettings->vk_url = $socialUrls['vk_url'] ?? '';
+        $generalSettings->telegram_url = $socialUrls['telegram_url'] ?? '';
+        $generalSettings->youtube_url = $socialUrls['youtube_url'] ?? '';
+        
+        // Decodificar configurações de cookies do JSON
+        $cookiesSettings = [];
+        if (!empty($generalSettings->cookies_settings)) {
+            $cookiesSettings = json_decode($generalSettings->cookies_settings, true);
+        }
+        
+        // Definir configurações de cookies (usando JSON como fonte principal)
+        $generalSettings->cookies_warning = $cookiesSettings['cookies_warning'] ?? $generalSettings->cookies_warning ?? 0;
+        $generalSettings->cookies_warning_text = $cookiesSettings['cookies_warning_text'] ?? $generalSettings->cookies_warning_text ?? '';
+        
+        // Decodificar configurações da Meta Conversions API do JSON
+        $metaApiSettings = [];
+        if (!empty($generalSettings->meta_conversions_api)) {
+            $metaApiSettings = json_decode($generalSettings->meta_conversions_api, true);
+        }
+        
+        // Definir configurações da Meta API (usando JSON como fonte principal)
+        $generalSettings->meta_pixel_id = $metaApiSettings['pixel_id'] ?? '';
+        $generalSettings->meta_access_token = $metaApiSettings['access_token'] ?? '';
+        $generalSettings->meta_test_event_code = $metaApiSettings['test_event_code'] ?? '';
+        $generalSettings->meta_api_enabled = $metaApiSettings['api_enabled'] ?? 0;
+        $generalSettings->meta_test_mode = $metaApiSettings['test_mode'] ?? 0;
+        $generalSettings->meta_track_events = $metaApiSettings['track_events'] ?? [];
+        
+        if (!isset($generalSettings->custom_header_codes)) {
+            $generalSettings->custom_header_codes = '';
+        }
+        if (!isset($generalSettings->custom_footer_codes)) {
+            $generalSettings->custom_footer_codes = '';
+        }
+        
+        // Definir as funções que serão usadas na view
+        $data['getLogo'] = function() use ($generalSettings) {
+            if (!empty($generalSettings->logo) && file_exists(FCPATH . $generalSettings->logo)) {
+                return base_url($generalSettings->logo);
+            }
+            return base_url("assets/img/logo.svg");
+        };
+        
+        $data['getFavicon'] = function() use ($generalSettings) {
+            if (!empty($generalSettings->favicon) && file_exists(FCPATH . $generalSettings->favicon)) {
+                return base_url($generalSettings->favicon);
+            }
+            return base_url("assets/img/favicon.png");
+        };
+        
+        $data['generalSettings'] = $generalSettings;
 
         echo view('admin/includes/_header', $data);
         echo view('admin/general_settings', $data);
@@ -1759,6 +2214,115 @@ class AdminController extends BaseAdminController
         checkSuperAdmin();
         $settingsModel = new SettingsModel();
         if ($settingsModel->updateGeneralSettings()) {
+            setSuccessMessage("msg_updated");
+        } else {
+            setErrorMessage("msg_error");
+        }
+        return redirect()->to(adminUrl('general-settings'));
+    }
+
+    /**
+     * Cookies Warning Post
+     */
+    public function cookiesWarningPost()
+    {
+        checkSuperAdmin();
+        
+        if ($this->settingsModel->updateCookiesSettings()) {
+            setSuccessMessage("msg_updated");
+        } else {
+            setErrorMessage("msg_error");
+        }
+        return redirect()->to(adminUrl('general-settings'));
+    }
+    
+    /**
+     * Contact Settings Post
+     */
+    public function contactSettingsPost()
+    {
+        checkSuperAdmin();
+        
+        // Coletar informações de contato
+        $contactInfo = [
+            'contact_address' => inputPost('contact_address'),
+            'contact_email' => inputPost('contact_email'),
+            'contact_phone' => inputPost('contact_phone'),
+            'contact_text' => inputPost('contact_text')
+        ];
+        
+        $data = [
+            'contact_info' => json_encode($contactInfo)
+        ];
+        
+        if ($this->settingsModel->builderGeneral->where('id', 1)->update($data)) {
+            setSuccessMessage("msg_updated");
+        } else {
+            setErrorMessage("msg_error");
+        }
+        return redirect()->to(adminUrl('general-settings'));
+    }
+    
+    /**
+     * Social Media Settings Post
+     */
+    public function socialMediaSettingsPost()
+    {
+        checkSuperAdmin();
+        
+        // Coletar URLs das redes sociais
+        $socialUrls = [
+            'facebook_url' => inputPost('facebook_url'),
+            'twitter_url' => inputPost('twitter_url'),
+            'instagram_url' => inputPost('instagram_url'),
+            'pinterest_url' => inputPost('pinterest_url'),
+            'linkedin_url' => inputPost('linkedin_url'),
+            'vk_url' => inputPost('vk_url'),
+            'telegram_url' => inputPost('telegram_url'),
+            'youtube_url' => inputPost('youtube_url')
+        ];
+        
+        // Atualizar facebook_url individual (para compatibilidade)
+        $data = [
+            'facebook_url' => inputPost('facebook_url'),
+            'social_media_urls' => json_encode($socialUrls)
+        ];
+        
+        if ($this->settingsModel->builderGeneral->where('id', 1)->update($data)) {
+            setSuccessMessage("msg_updated");
+        } else {
+            setErrorMessage("msg_error");
+        }
+        return redirect()->to(adminUrl('general-settings'));
+    }
+    
+    /**
+     * Custom Header Codes Post
+     */
+    public function customHeaderCodesPost()
+    {
+        checkSuperAdmin();
+        $data = [
+            'custom_header_codes' => inputPost('custom_header_codes'),
+            'custom_footer_codes' => inputPost('custom_footer_codes')
+        ];
+        
+        if ($this->settingsModel->builderGeneral->where('id', 1)->update($data)) {
+            setSuccessMessage("msg_updated");
+        } else {
+            setErrorMessage("msg_error");
+        }
+        return redirect()->to(adminUrl('general-settings'));
+    }
+
+    /**
+     * Meta Conversions API Settings Post
+     */
+    public function metaConversionsApiPost()
+    {
+        checkSuperAdmin();
+        
+        if ($this->settingsModel->updateMetaConversionsApiSettings()) {
             setSuccessMessage("msg_updated");
         } else {
             setErrorMessage("msg_error");

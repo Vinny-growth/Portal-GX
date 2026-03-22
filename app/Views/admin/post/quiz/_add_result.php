@@ -38,7 +38,7 @@
                         <div class="right">
                             <div id="editor_<?= $resultUniqueID; ?>">
                                 <label class="control-label"><?= trans("description"); ?></label>
-                                <textarea class="tinyMCEQuiz form-control" name="result_description[]"></textarea>
+                                <textarea class="tinyMCEQuiz form-control" name="result_description[]" placeholder="<?= trans('description'); ?>"></textarea>
                             </div>
                         </div>
                     </div>

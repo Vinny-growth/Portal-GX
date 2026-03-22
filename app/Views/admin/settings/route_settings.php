@@ -19,7 +19,7 @@
                                 </div>
                                 <div class="col-sm-6 col-xs-6">
                                     <div class="form-group">
-                                        <input type="text" class="form-control" name="<?= esc($key); ?>" value="<?= esc($value); ?>" maxlength="100" required>
+                                        <input type="text" class="form-control" name="<?= esc($key); ?>" value="<?= esc($value); ?>" placeholder="<?= esc($key); ?>" maxlength="100" required>
                                     </div>
                                 </div>
                             </div>
@@ -37,5 +37,4 @@
         </div>
     </div>
 </div>
-
 

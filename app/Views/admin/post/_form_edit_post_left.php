@@ -214,7 +214,7 @@
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <textarea id="editor_recipe_info" class="tinyMCE form-control" name="recipe_info"><?= $post->recipe_info; ?></textarea>
+                        <textarea id="editor_recipe_info" class="tinyMCE form-control" name="recipe_info" placeholder="<?= trans('content'); ?>"><?= $post->recipe_info; ?></textarea>
                     </div>
                 </div>
             </div>

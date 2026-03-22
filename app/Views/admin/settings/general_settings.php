@@ -164,7 +164,7 @@ endif; ?>
 
                         <div class="form-group">
                             <label class="control-label"><?= trans('contact_text'); ?></label>
-                            <textarea class="tinyMCE form-control" name="contact_text"><?= $settings->contact_text; ?></textarea>
+                            <textarea class="tinyMCE form-control" name="contact_text" placeholder="<?= trans('contact_text'); ?>"><?= $settings->contact_text; ?></textarea>
                         </div>
                     </div>
 
@@ -198,7 +198,7 @@ endif; ?>
 
                         <div class="form-group">
                             <label class="control-label"><?= trans('cookies_warning_text'); ?></label>
-                            <textarea class="form-control tinyMCE" name="cookies_warning_text"><?= $settings->cookies_warning_text; ?></textarea>
+                            <textarea class="form-control tinyMCE" name="cookies_warning_text" placeholder="<?= trans('cookies_warning_text'); ?>"><?= $settings->cookies_warning_text; ?></textarea>
                         </div>
                     </div>
 

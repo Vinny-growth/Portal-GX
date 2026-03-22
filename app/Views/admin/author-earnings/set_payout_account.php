@@ -37,7 +37,7 @@
                             <div class="tab-pane active" id="tab_paypal">
                                 <div class="form-group">
                                     <label class="control-label"><?= trans("paypal_email_address"); ?>*</label>
-                                    <input type="email" name="paypal_email" class="form-control form-input" maxlength="255" value="<?= esc(userPayoutMethod(user(), 'paypal_email')); ?>" required>
+                                    <input type="email" name="paypal_email" class="form-control form-input" maxlength="255" value="<?= esc(userPayoutMethod(user(), 'paypal_email')); ?>" placeholder="<?= trans('paypal_email_address'); ?>" required>
                                 </div>
                                 <div class="form-group text-right">
                                     <button type="submit" name="submit" value="paypal" class="btn btn-primary"><?= trans("save_changes"); ?></button>
@@ -47,7 +47,7 @@
                             <div class="tab-pane active" id="tab_bitcoin">
                                 <div class="form-group">
                                     <label class="control-label"><?= trans("bitcoin_address"); ?>*</label>
-                                    <input type="text" name="btc_address" class="form-control form-input" maxlength="500" value="<?= esc(userPayoutMethod(user(), 'btc_address')); ?>" required>
+                                    <input type="text" name="btc_address" class="form-control form-input" maxlength="500" value="<?= esc(userPayoutMethod(user(), 'btc_address')); ?>" placeholder="<?= trans('bitcoin_address'); ?>" required>
                                 </div>
                                 <div class="form-group text-right">
                                     <button type="submit" name="submit" value="bitcoin" class="btn btn-primary"><?= trans("save_changes"); ?></button>
@@ -57,23 +57,23 @@
                             <div class="tab-pane iban" id="tab_iban">
                                 <div class="form-group">
                                     <label class="control-label"><?= trans("full_name"); ?>*</label>
-                                    <input type="text" name="iban_full_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'iban_full_name')); ?>" required>
+                                    <input type="text" name="iban_full_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'iban_full_name')); ?>" placeholder="<?= trans('full_name'); ?>" required>
                                 </div>
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-12 col-md-6 m-b-sm-15">
                                             <label class="control-label"><?= trans("country"); ?>*</label>
-                                            <input type="text" name="iban_country" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'iban_country')); ?>" required>
+                                            <input type="text" name="iban_country" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'iban_country')); ?>" placeholder="<?= trans('country'); ?>" required>
                                         </div>
                                         <div class="col-12 col-md-6">
                                             <label class="control-label"><?= trans("bank_name"); ?>*</label>
-                                            <input type="text" name="iban_bank_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'iban_bank_name')); ?>" required>
+                                            <input type="text" name="iban_bank_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'iban_bank_name')); ?>" placeholder="<?= trans('bank_name'); ?>" required>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label"><?= trans("iban_long"); ?>(<?= trans("iban"); ?>)*</label>
-                                    <input type="text" name="iban_number" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'iban_number')); ?>" required>
+                                    <input type="text" name="iban_number" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'iban_number')); ?>" placeholder="<?= trans('iban'); ?>" required>
                                 </div>
                                 <div class="form-group text-right">
                                     <button type="submit" name="submit" value="iban" class="btn btn-primary"><?= trans("save_changes"); ?></button>
@@ -83,17 +83,17 @@
                             <div class="tab-pane active" id="tab_swift">
                                 <div class="form-group">
                                     <label class="control-label"><?= trans("full_name"); ?>*</label>
-                                    <input type="text" name="swift_full_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_full_name')); ?>" required>
+                                    <input type="text" name="swift_full_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_full_name')); ?>" placeholder="<?= trans('full_name'); ?>" required>
                                 </div>
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-12 col-md-6 m-b-sm-15">
                                             <label class="control-label"><?= trans("country"); ?>*</label>
-                                            <input type="text" name="swift_country" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_country')); ?>" required>
+                                            <input type="text" name="swift_country" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_country')); ?>" placeholder="<?= trans('country'); ?>" required>
                                         </div>
                                         <div class="col-12 col-md-6">
                                             <label class="control-label"><?= trans("state"); ?>*</label>
-                                            <input type="text" name="swift_state" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_state')); ?>" required>
+                                            <input type="text" name="swift_state" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_state')); ?>" placeholder="<?= trans('state'); ?>" required>
                                         </div>
                                     </div>
                                 </div>
@@ -101,27 +101,27 @@
                                     <div class="row">
                                         <div class="col-12 col-md-6 m-b-sm-15">
                                             <label class="control-label"><?= trans("city"); ?>*</label>
-                                            <input type="text" name="swift_city" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_city')); ?>" required>
+                                            <input type="text" name="swift_city" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_city')); ?>" placeholder="<?= trans('city'); ?>" required>
                                         </div>
                                         <div class="col-12 col-md-6">
                                             <label class="control-label"><?= trans("postcode"); ?>*</label>
-                                            <input type="text" name="swift_postcode" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_postcode')); ?>" required>
+                                            <input type="text" name="swift_postcode" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_postcode')); ?>" placeholder="<?= trans('postcode'); ?>" required>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label"><?= trans("address"); ?>*</label>
-                                    <input type="text" name="swift_address" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_address')); ?>" required>
+                                    <input type="text" name="swift_address" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_address')); ?>" placeholder="<?= trans('address'); ?>" required>
                                 </div>
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-12 col-md-6 m-b-sm-15">
                                             <label class="control-label"><?= trans("bank_account_holder_name"); ?>*</label>
-                                            <input type="text" name="swift_bank_account_holder_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_bank_account_holder_name')); ?>" required>
+                                            <input type="text" name="swift_bank_account_holder_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_bank_account_holder_name')); ?>" placeholder="<?= trans('bank_account_holder_name'); ?>" required>
                                         </div>
                                         <div class="col-12 col-md-6">
                                             <label class="control-label"><?= trans("bank_name"); ?>*</label>
-                                            <input type="text" name="swift_bank_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_bank_name')); ?>" required>
+                                            <input type="text" name="swift_bank_name" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_bank_name')); ?>" placeholder="<?= trans('bank_name'); ?>" required>
                                         </div>
                                     </div>
                                 </div>
@@ -129,21 +129,21 @@
                                     <div class="row">
                                         <div class="col-12 col-md-6 m-b-sm-15">
                                             <label class="control-label"><?= trans("bank_branch_country"); ?>*</label>
-                                            <input type="text" name="swift_bank_branch_country" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_bank_branch_country')); ?>" required>
+                                            <input type="text" name="swift_bank_branch_country" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_bank_branch_country')); ?>" placeholder="<?= trans('bank_branch_country'); ?>" required>
                                         </div>
                                         <div class="col-12 col-md-6">
                                             <label class="control-label"><?= trans("bank_branch_city"); ?>*</label>
-                                            <input type="text" name="swift_bank_branch_city" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_bank_branch_city')); ?>" required>
+                                            <input type="text" name="swift_bank_branch_city" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_bank_branch_city')); ?>" placeholder="<?= trans('bank_branch_city'); ?>" required>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label"><?= trans("swift_iban"); ?>*</label>
-                                    <input type="text" name="swift_iban" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_iban')); ?>" required>
+                                    <input type="text" name="swift_iban" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_iban')); ?>" placeholder="<?= trans('swift_iban'); ?>" required>
                                 </div>
                                 <div class="form-group">
                                     <label class="control-label"><?= trans("swift_code"); ?>*</label>
-                                    <input type="text" name="swift_code" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_code')); ?>" required>
+                                    <input type="text" name="swift_code" class="form-control form-input" value="<?= esc(userPayoutMethod(user(), 'swift_code')); ?>" placeholder="<?= trans('swift_code'); ?>" required>
                                 </div>
                                 <div class="form-group text-right">
                                     <button type="submit" name="submit" value="swift" class="btn btn-primary"><?= trans("save_changes"); ?></button>

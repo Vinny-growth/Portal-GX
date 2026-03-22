@@ -2,8 +2,21 @@
     <div class="col-sm-12 col-xs-12">
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title"><?= trans("update_page"); ?></h3>
+                <div class="left"><h3 class="box-title"><?= trans("update_page"); ?></h3></div>
+                <div class="right">
+                    <a href="<?= adminUrl('cms-pages'); ?>" class="btn btn-default" style="margin-right:8px;"><i class="fa fa-magic"></i> CMS Visual</a>
+                    <a href="<?= adminUrl('pages/visual/'.(int)$page->id); ?>" class="btn btn-info" style="margin-right:8px;"><i class="fa fa-magic"></i> Abrir Visual desta página</a>
+                    <a href="<?= adminUrl('pages'); ?>" class="btn btn-success btn-add-new"><i class="fa fa-bars"></i><?= trans("pages"); ?></a>
+                </div>
             </div>
+            <div style="padding:0 15px 10px;">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#tab-config" aria-controls="tab-config" role="tab" data-toggle="tab">Configurações</a></li>
+                    <li role="presentation"><a href="#tab-visual" aria-controls="tab-visual" role="tab" data-toggle="tab">Visual (CMS)</a></li>
+                </ul>
+            </div>
+            <div class="tab-content" style="padding: 0 15px 15px;">
+                <div role="tabpanel" class="tab-pane active" id="tab-config">
             <form action="<?= base_url('Admin/editPagePost'); ?>" method="post">
                 <?= csrf_field(); ?>
                 <input type="hidden" name="id" value="<?= esc($page->id); ?>">
@@ -138,7 +151,7 @@
                                         <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#file_manager_image" data-image-type="editor"><i class="fa fa-image"></i>&nbsp;&nbsp;&nbsp;<?= trans("add_image"); ?></button>
                                     </div>
                                 </div>
-                                <textarea class="tinyMCE form-control" name="page_content"><?= $page->page_content; ?></textarea>
+                                <textarea class="tinyMCE form-control" name="page_content" placeholder="<?= trans('content'); ?>"><?= $page->page_content; ?></textarea>
                             </div>
                         </div>
                     <?php else: ?>
@@ -149,6 +162,12 @@
                     <button type="submit" class="btn btn-primary pull-right"><?= trans('save_changes'); ?></button>
                 </div>
             </form>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="tab-visual" style="min-height:600px;">
+                    <p class="text-muted" style="margin:10px 0 8px;">Construtor Visual embutido abaixo. Caso não carregue, <a target="_blank" href="<?= adminUrl('pages/visual/'.(int)$page->id); ?>">abra em nova aba</a>.</p>
+                    <iframe src="<?= adminUrl('pages/visual/'.(int)$page->id); ?>" style="width:100%; min-height:700px; border:1px solid #e5e5e5; border-radius:6px; background:#fff;"></iframe>
+                </div>
+            </div>
         </div>
     </div>
 </div>

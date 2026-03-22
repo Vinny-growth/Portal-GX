@@ -1,0 +1,2 @@
+<?= view('wealth/schedule'); ?>
+

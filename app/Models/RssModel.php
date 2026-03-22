@@ -167,6 +167,19 @@ class RssModel extends BaseModel
         $rssParser = new \RssParser();
         $feed = $this->getFeed($feedId);
         if (!empty($feed)) {
+            // Guard: prevent self-import from this site's own feeds (e.g., /gnews/feed)
+            try {
+                $siteBaseUrl = config('App')->baseURL ?? '';
+                $selfHost = !empty($siteBaseUrl) ? parse_url($siteBaseUrl, PHP_URL_HOST) : '';
+                $feedHost = !empty($feed->feed_url) ? parse_url($feed->feed_url, PHP_URL_HOST) : '';
+                if (!empty($selfHost) && !empty($feedHost) && strtolower($selfHost) === strtolower($feedHost)) {
+                    // Avoid importing from our own domain to prevent duplicate posts
+                    log_message('error', 'RSS self-import prevented. Feed ID: ' . $feed->id . ' URL: ' . $feed->feed_url);
+                    return false;
+                }
+            } catch (\Throwable $e) {
+                // In case of parse_url issues, proceed without hard failure
+            }
             $response = $rssParser->getFeeds($feed->feed_url);
             $i = 0;
             if (!empty($response)) {
@@ -178,7 +191,17 @@ class RssModel extends BaseModel
                     $description = $this->characterConvert($item->get_description());
                     $content = $this->characterConvert($item->get_content());
                     $titleHash = md5($title ?? '');
-                    $numRows = $this->db->table('posts')->where('title', cleanStr($title))->orWhere('title_hash', cleanStr($titleHash))->countAllResults();
+                    // Stronger duplicate detection: title OR title_hash OR slug OR post_url
+                    $postLink = $item->get_link();
+                    $slugGuess = strSlug($title);
+                    $builder = $this->db->table('posts');
+                    $builder->groupStart()
+                        ->where('title', cleanStr($title))
+                        ->orWhere('title_hash', cleanStr($titleHash))
+                        ->orWhere('slug', cleanStr($slugGuess))
+                        ->orWhere('post_url', cleanStr($postLink))
+                    ->groupEnd();
+                    $numRows = $builder->countAllResults();
                     if ($numRows < 1) {
                         $data = array();
                         $data['lang_id'] = $feed->lang_id;
@@ -207,7 +230,7 @@ class RssModel extends BaseModel
                         $data['video_embed_code'] = '';
                         $data['user_id'] = $feed->user_id;
                         $data['feed_id'] = $feed->id;
-                        $data['post_url'] = $item->get_link();
+                        $data['post_url'] = $postLink;
                         $data['show_post_url'] = $feed->read_more_button;
                         $data['image_description'] = '';
                         $data['created_at'] = date('Y-m-d H:i:s');

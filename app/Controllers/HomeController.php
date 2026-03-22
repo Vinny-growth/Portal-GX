@@ -26,29 +26,76 @@ class HomeController extends BaseController
 
     public function index()
     {
+        $simulators = $this->getSimulatorCatalog();
+        $latestPosts = array_slice($this->postModel->getLatestPosts($this->activeLang->id, 4, 0), 0, 4);
+
         $data = [
-            'title' => $this->settings->home_title,
+            'title' => 'Cambio estruturado, credito e consultoria para empresas',
             'description' => $this->settings->site_description,
             'keywords' => $this->settings->keywords,
-            'homeTitle' => $this->settings->home_title,
-            'latestPosts' => $this->postModel->getLatestPosts($this->activeLang->id, POST_NUM_LOAD_MORE, 0)
+            'bodyClass' => 'gx-marketing-home',
+            'pageHeadView' => 'marketing/_shared_styles',
+            'blogUrl' => langBaseUrl('blog'),
+            'simulatorsHubUrl' => langBaseUrl('simuladores'),
+            'wealthUrl' => base_url('wealth'),
+            'quickLinks' => [
+                ['label' => 'Solucoes', 'href' => '#verticais'],
+                ['label' => 'Simuladores', 'href' => '#simuladores'],
+                ['label' => 'Insights', 'href' => '#blog-tecnico'],
+                ['label' => 'Especialista', 'href' => '#fale-especialista'],
+            ],
+            'heroStats' => [
+                ['value' => count($simulators), 'label' => 'simuladores disponiveis'],
+                ['value' => 5, 'label' => 'frentes de atuacao'],
+                ['value' => count($latestPosts), 'label' => 'analises recentes'],
+            ],
+            'businessVerticals' => $this->getBusinessVerticals(),
+            'simulators' => $simulators,
+            'latestPosts' => $latestPosts,
+            'userSession' => getUserSession()
         ];
-        //slider posts
-        $data['sliderPosts'] = $data['latestPosts'];
-        if ($this->generalSettings->show_latest_posts_on_slider != 1) {
-            $data['sliderPosts'] = getSelectedPostsByType($this->postsSelected, 'slider');
-        }
-        //featured posts
-        $data['featuredPosts'] = $data['latestPosts'];
-        if ($this->generalSettings->show_latest_posts_on_featured != 1) {
-            $data['featuredPosts'] = getSelectedPostsByType($this->postsSelected, 'featured');
-        }
-        //breaking news
-        $data['breakingNews'] = getSelectedPostsByType($this->postsSelected, 'breaking');
-        $data['userSession'] = getUserSession();
+
+        echo loadView('partials/_header', $data);
+        echo view('marketing/home_institutional', $data);
+        echo loadView('partials/_footer', $data);
+    }
+
+    /**
+     * Institutional Blog Home
+     */
+    public function blog()
+    {
+        $this->cachePage(300);
+        $data = $this->buildEditorialHomeData([
+            'title' => 'Blog GX Capital',
+            'description' => 'Conteudo tecnico sobre cambio, credito estruturado, mercado de capitais, consorcios e investimentos.',
+            'keywords' => trim($this->settings->keywords . ', blog gx capital, conteudo tecnico, mercado financeiro', ' ,'),
+            'homeTitle' => 'Blog GX Capital'
+        ]);
 
         echo loadView('partials/_header', $data);
         echo loadView('index', $data);
+        echo loadView('partials/_footer', $data);
+    }
+
+    /**
+     * Simulators Hub
+     */
+    public function simulatorsHub()
+    {
+        $data = [
+            'title' => 'Hub de simuladores financeiros',
+            'description' => 'Catalogo central dos simuladores da GX Capital com preservacao das URLs individuais ja existentes.',
+            'keywords' => trim($this->settings->keywords . ', simuladores financeiros, simulador de risco cambial, simulador de custo de capital', ' ,'),
+            'pageHeadView' => 'marketing/_shared_styles',
+            'homeUrl' => langBaseUrl(),
+            'blogUrl' => langBaseUrl('blog'),
+            'simulators' => $this->getSimulatorCatalog(),
+            'userSession' => getUserSession()
+        ];
+
+        echo loadView('partials/_header', $data);
+        echo view('marketing/simulators_hub', $data);
         echo loadView('partials/_footer', $data);
     }
 
@@ -66,6 +113,167 @@ class HomeController extends BaseController
         echo loadView('partials/_header', $data);
         echo loadView('post/posts', $data);
         echo loadView('partials/_footer', $data);
+    }
+
+    /**
+     * Build editorial blog homepage data
+     */
+    private function buildEditorialHomeData(array $meta = [])
+    {
+        $data = [
+            'title' => $meta['title'] ?? $this->settings->home_title,
+            'description' => $meta['description'] ?? $this->settings->site_description,
+            'keywords' => $meta['keywords'] ?? $this->settings->keywords,
+            'homeTitle' => $meta['homeTitle'] ?? 'Blog GX Capital',
+            'latestPosts' => $this->postModel->getLatestPosts($this->activeLang->id, POST_NUM_LOAD_MORE, 0)
+        ];
+
+        $data['sliderPosts'] = $data['latestPosts'];
+        if ($this->generalSettings->show_latest_posts_on_slider != 1) {
+            $data['sliderPosts'] = getSelectedPostsByType($this->postsSelected, 'slider');
+        }
+
+        $data['featuredPosts'] = $data['latestPosts'];
+        if ($this->generalSettings->show_latest_posts_on_featured != 1) {
+            $data['featuredPosts'] = getSelectedPostsByType($this->postsSelected, 'featured');
+        }
+
+        $data['breakingNews'] = getSelectedPostsByType($this->postsSelected, 'breaking');
+        $data['userSession'] = getUserSession();
+
+        return $data;
+    }
+
+    /**
+     * Business vertical cards for the institutional homepage
+     */
+    private function getBusinessVerticals()
+    {
+        return [
+            [
+                'title' => 'Credito Estruturado',
+                'eyebrow' => 'Funding e capital de giro',
+                'description' => 'Estruture capital, alongue prazos e compare linhas com mais clareza antes de negociar.',
+                'link_label' => 'Ver frente de credito',
+                'link_url' => $this->resolveCategoryUrl('credito-empresarial', langBaseUrl('simuladores')),
+                'accent' => '#0f766e'
+            ],
+            [
+                'title' => 'Cambio e Trade Finance',
+                'eyebrow' => 'Protecao cambial e execucao',
+                'description' => 'Combine hedge, fluxo internacional e leitura de exposicao cambial em uma unica frente.',
+                'link_label' => 'Explorar cambio',
+                'link_url' => $this->resolveCategoryUrl('cambio-6', langBaseUrl('simuladores')),
+                'accent' => '#0b5cab'
+            ],
+            [
+                'title' => 'Consorcios Estruturados',
+                'eyebrow' => 'Planejamento e alavancagem',
+                'description' => 'Avalie fluxo de pagamento, contemplacao e custo total antes de escolher a estrutura ideal.',
+                'link_label' => 'Abrir simulador',
+                'link_url' => $this->resolvePageUrl('simulador-consorcio', langBaseUrl('simuladores')),
+                'accent' => '#8f5b2e'
+            ],
+            [
+                'title' => 'Seguros',
+                'eyebrow' => 'Protecao patrimonial e operacional',
+                'description' => 'Desenhe coberturas aderentes ao risco real da empresa e traga a conversa para a mesa financeira.',
+                'link_label' => 'Falar com especialista',
+                'link_url' => '#fale-especialista',
+                'accent' => '#b45309'
+            ],
+            [
+                'title' => 'Consultoria de Investimentos',
+                'eyebrow' => 'Patrimonio, liquidez e estrategia',
+                'description' => 'Conecte tesouraria, objetivos patrimoniais e alocacao com uma leitura mais executavel do patrimonio.',
+                'link_label' => 'Conhecer wealth',
+                'link_url' => base_url('wealth'),
+                'accent' => '#7c3aed'
+            ],
+        ];
+    }
+
+    /**
+     * Existing public simulator pages that must keep their legacy URLs
+     */
+    private function getSimulatorCatalog()
+    {
+        $pageModel = new PageModel();
+        $definitions = [
+            'simulador-de-risco-cambial' => [
+                'label' => 'FX',
+                'eyebrow' => 'Cambio e trade finance',
+                'title' => 'Simulador de Risco Cambial',
+                'description' => 'Projete exposicao cambial e antecipe cenarios para importacao, exportacao e protecao de margem.',
+                'cta' => 'Abrir simulador'
+            ],
+            'aurum-simulador-de-custo-de-capital' => [
+                'label' => 'CAP',
+                'eyebrow' => 'Credito estruturado',
+                'title' => 'Simulador de Custo de Capital',
+                'description' => 'Compare custos de funding e entenda qual estrutura de credito faz mais sentido para a operacao.',
+                'cta' => 'Calcular custo'
+            ],
+            'simulador-mercado-de-capitais' => [
+                'label' => 'MKT',
+                'eyebrow' => 'Mercado de capitais',
+                'title' => 'Simulador de Mercado de Capitais',
+                'description' => 'Teste cenarios para debentures, CRA, CRI e outras estruturas de captacao fora do credito bancario.',
+                'cta' => 'Explorar estrutura'
+            ],
+            'simulador-de-custo-de-antecipacao' => [
+                'label' => 'FIDC',
+                'eyebrow' => 'Recebiveis e antecipacao',
+                'title' => 'Simulador de Custo de Antecipacao',
+                'description' => 'Compare desconto bancario e FIDC para decidir a melhor rota de antecipacao de recebiveis.',
+                'cta' => 'Comparar custos'
+            ],
+            'simulador-consorcio' => [
+                'label' => 'CONS',
+                'eyebrow' => 'Consorcio estruturado',
+                'title' => 'Simulador de Consorcio',
+                'description' => 'Entenda custo total, fluxo de parcelas e diferencas entre consorcio e financiamento tradicional.',
+                'cta' => 'Simular consorcio'
+            ],
+        ];
+
+        $items = [];
+        foreach ($definitions as $slug => $item) {
+            $page = $pageModel->getPageByLang($slug, $this->activeLang->id);
+            if (!empty($page) && (int)$page->visibility === 1) {
+                if (!empty($page->title)) {
+                    $item['title'] = $page->title;
+                }
+                if (!empty($page->description)) {
+                    $item['description'] = $page->description;
+                }
+                $item['slug'] = $page->slug;
+                $item['url'] = langBaseUrl($page->slug);
+                $items[] = $item;
+            }
+        }
+
+        return $items;
+    }
+
+    private function resolveCategoryUrl($slug, $fallback)
+    {
+        $categoryModel = new CategoryModel();
+        $category = $categoryModel->getCategoryBySlug($slug);
+        if (!empty($category)) {
+            return generateCategoryURL($category);
+        }
+        return $fallback;
+    }
+
+    private function resolvePageUrl($slug, $fallback)
+    {
+        $pageModel = new PageModel();
+        $page = $pageModel->getPageByLang($slug, $this->activeLang->id);
+        if (!empty($page) && (int)$page->visibility === 1) {
+            return langBaseUrl($page->slug);
+        }
+        return $fallback;
     }
 
     /**
@@ -584,6 +792,6 @@ class HomeController extends BaseController
     {
         // A página agora é gerenciada pelo sistema de páginas do CMS
         // Redirecionar para a URL amigável da página
-        return redirect()->to(generateURL('aurum-simulador-de-custo-de-capital'));
+        return redirect()->to(generateURL('aurum-simulador-de-custo-de-capital'), 301);
     }
 }

@@ -52,11 +52,45 @@ class SitemapModel extends BaseModel
     //add static page urls
     private function addStaticURLs()
     {
-        //index page
-        if (countItems($this->activeLanguages) > 1) {
+        $now = date('Y-m-d\TH:i:sP');
+        if (!empty($this->activeLanguages)) {
             foreach ($this->activeLanguages as $lang) {
                 $baseUrl = $this->generateBaseURLByLang($lang->id, $lang->short_form);
-                $this->add($baseUrl, 'always', date('Y-m-d\TH:i:sP'), 1.0);
+                $this->add($baseUrl, 'always', $now, 1.0);
+                $this->add($baseUrl . 'blog', 'hourly', $now, 0.9);
+                $this->add($baseUrl . 'simuladores', 'weekly', $now, 0.9);
+            }
+        } else {
+            $baseUrl = base_url() . '/';
+            $this->add($baseUrl, 'always', $now, 1.0);
+            $this->add($baseUrl . 'blog', 'hourly', $now, 0.9);
+            $this->add($baseUrl . 'simuladores', 'weekly', $now, 0.9);
+        }
+    }
+
+    //add public CMS page urls
+    private function addPageURLs()
+    {
+        $pages = $this->db->table('pages')
+            ->select('pages.slug, pages.lang_id, pages.created_at, languages.short_form AS lang_short_form')
+            ->join('languages', 'languages.id = pages.lang_id')
+            ->where('languages.status', 1)
+            ->where('pages.visibility', 1)
+            ->where('pages.need_auth', 0)
+            ->where('pages.page_type', 'page')
+            ->where('pages.slug IS NOT NULL')
+            ->where('pages.slug !=', '')
+            ->orderBy('pages.id DESC')
+            ->get()
+            ->getResult();
+
+        if (!empty($pages)) {
+            foreach ($pages as $page) {
+                $baseURL = $this->generateBaseURLByLang($page->lang_id, $page->lang_short_form);
+                if (!empty($baseURL)) {
+                    $array = $this->getPostFreqLastMod($page->created_at);
+                    $this->add($baseURL . $page->slug, $array['freq'], $array['lastMod'], 0.7);
+                }
             }
         }
     }
@@ -107,6 +141,7 @@ class SitemapModel extends BaseModel
     {
         if ($index == 0) {
             $this->addStaticURLs();
+            $this->addPageURLs();
             $this->addCategoryURLs();
         }
         $this->addPostUrls($index);

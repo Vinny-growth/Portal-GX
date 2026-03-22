@@ -69,8 +69,8 @@ abstract class BaseAdminController extends Controller
         // Do Not Edit This Line
         parent::initController($request, $response, $logger);
 
-        // prevent iframe
-        $this->response->setHeader('Content-Security-Policy', "frame-ancestors 'none';");
+        // allow same-origin iframes (needed for embedding internal builders)
+        $this->response->setHeader('Content-Security-Policy', "frame-ancestors 'self';");
 
         // Preload any models, libraries, etc, here.
         $this->session = \Config\Services::session();

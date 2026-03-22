@@ -110,7 +110,17 @@
 <?php endif; ?>
 <script src="<?= base_url($assetsPath. '/js/jquery-1.12.4.min.js'); ?>"></script>
 <script src="<?= base_url($assetsPath. '/js/plugins-2.4.2.js'); ?>"></script>
-<script>$("form[method='post']").append("<input type='hidden' name='sys_lang_id' value='<?= $activeLang->id; ?>'>");</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll("form[method='post']").forEach(function (f) {
+        var i = document.createElement('input');
+        i.type = 'hidden';
+        i.name = 'sys_lang_id';
+        i.value = '<?= $activeLang->id; ?>';
+        f.appendChild(i);
+    });
+});
+</script>
 <script src="<?= base_url($assetsPath. '/js/script-2.4.min.js'); ?>"></script>
 <?= loadView('partials/_js_footer'); ?>
 <?php if ($generalSettings->pwa_status == 1): ?>

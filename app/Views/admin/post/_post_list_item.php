@@ -77,7 +77,7 @@ if (!empty($postListItem)): ?>
                                         </div>
                                     </div>
                                 <?php endif; ?>
-                                <textarea id="editor_<?= $postListItem->id; ?>" class="tinyMCEQuiz form-control" name="list_item_content_<?= $postListItem->id; ?>"><?= $postListItem->content; ?></textarea>
+                                <textarea id="editor_<?= $postListItem->id; ?>" class="tinyMCEQuiz form-control" name="list_item_content_<?= $postListItem->id; ?>" placeholder="<?= trans('content'); ?>"><?= $postListItem->content; ?></textarea>
                             </div>
                         </div>
                     </div>
@@ -150,7 +150,7 @@ if (!empty($postListItem)): ?>
                                         </div>
                                     </div>
                                 <?php endif; ?>
-                                <textarea id="editor_<?= $uniqueID; ?>" class="tinyMCEQuiz form-control" name="list_item_content[]"></textarea>
+                                <textarea id="editor_<?= $uniqueID; ?>" class="tinyMCEQuiz form-control" name="list_item_content[]" placeholder="<?= trans('content'); ?>"></textarea>
                             </div>
                         </div>
                     </div>

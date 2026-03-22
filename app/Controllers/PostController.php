@@ -856,6 +856,215 @@ class PostController extends BaseAdminController
         $this->postAdminModel->deletePostFile($id);
     }
 
+    /**
+     * Generate AI Cover Image for Post
+     */
+    public function generateCoverImageAI()
+    {
+        try { checkPermission('add_post'); } catch (\Throwable $e) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Permissão insuficiente']);
+        }
+
+        // Collect inputs
+        $postId = inputPost('post_id');
+        $title = trim((string) inputPost('title'));
+        $summary = trim((string) inputPost('summary'));
+        $content = trim((string) inputPost('content'));
+        $keywords = trim((string) inputPost('keywords'));
+        $langId = inputPost('lang_id');
+
+        // If editing, load post as fallback
+        if (empty($title) && !empty($postId)) {
+            $post = $this->postAdminModel->getPost($postId);
+            if (!empty($post)) {
+                $title = $post->title ?: '';
+                $summary = $post->summary ?: '';
+                $content = $post->content ?: '';
+                $keywords = $post->keywords ?: '';
+                $langId = $post->lang_id ?: $langId;
+            }
+        }
+
+        if (empty($title)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Título do artigo é obrigatório']);
+        }
+
+        // Check OpenAI config
+        $apiKey = getenv('OPENAI_API_KEY') ?: '';
+        if (empty($apiKey)) {
+            // fallback to AI Writer settings if present
+            try {
+                $ai = aiWriter();
+                if (!empty($ai) && !empty($ai->apiKey)) {
+                    $apiKey = $ai->apiKey;
+                }
+            } catch (\Throwable $e) {}
+        }
+        if (empty($apiKey)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'API do OpenAI não configurada']);
+        }
+
+        // Compose prompt in PT-BR with brand/theme guidance
+        $primary = !empty($this->activeTheme->theme_color) ? $this->activeTheme->theme_color : '#0d6aad';
+        $block = !empty($this->activeTheme->block_color) ? $this->activeTheme->block_color : '';
+        $mega = (!empty($this->activeTheme->mega_menu_color) && $this->activeTheme->theme != 'classic') ? $this->activeTheme->mega_menu_color : '';
+        $brandColors = trim(implode(' ', array_filter([$primary, $block, $mega])));
+
+        $contentBrief = '';
+        if (!empty($summary)) { $contentBrief .= 'Resumo: ' . strip_tags($summary) . '. '; }
+        if (!empty($keywords)) { $contentBrief .= 'Palavras-chave: ' . strip_tags($keywords) . '. '; }
+        if (!empty($content)) {
+            // limit content length to keep prompt concise
+            $plain = trim(strip_tags($content));
+            if (mb_strlen($plain) > 600) { $plain = mb_substr($plain, 0, 600) . '...'; }
+            $contentBrief .= 'Conteúdo: ' . $plain;
+        }
+
+        $brandStyle = getenv('OPENAI_BRAND_STYLE') ?: 'estilo editorial sofisticado e minimalista, premium, clean';
+        $prompt = 'Gerar uma imagem de capa editorial, realista e sem texto para um artigo. '
+            . 'Tema do artigo: "' . $title . '". '
+            . (!empty($contentBrief) ? $contentBrief . ' ' : '')
+            . 'Estilo: ' . $brandStyle . '; composição limpa, fotográfica, iluminação natural, aspecto moderno e profissional. '
+            . 'Cores: utilizar e harmonizar com as cores da marca (' . $brandColors . ') como predominantes/acentos quando apropriado. '
+            . 'Requisitos: formato paisagem, foco centralizado, deixar margens de segurança nas bordas, sem textos, sem logos, sem marcas d’água, alta qualidade.';
+
+        // Select model/size/quality according to Web Stories settings (env)
+        $model = getenv('OPENAI_DEFAULT_MODEL') ?: 'gpt-image-1';
+        $quality = getenv('OPENAI_DEFAULT_QUALITY') ?: (($model === 'gpt-image-1') ? 'high' : 'hd');
+        // Prefer 3:2 landscape; fall back to closest if model doesn't support 3:2
+        if ($model === 'gpt-image-1') {
+            $size = '1536x1024'; // 3:2
+        } elseif ($model === 'dall-e-3') {
+            $size = '1792x1024'; // will crop later to 3:2 via our processing
+        } else {
+            $size = '1024x1024'; // legacy model; will crop on save
+        }
+
+        // Generate image
+        $openAIHelper = new \App\Helpers\OpenAIImageHelper();
+        $result = $openAIHelper->generateImage($prompt, $model, $size, $quality, 1);
+        if (!$result || empty($result['data'][0])) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Falha ao gerar imagem com IA']);
+        }
+
+        $imageData = $result['data'][0];
+        $imageUrl = $imageData['url'] ?? null;
+        if (empty($imageUrl)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Resposta inválida da IA']);
+        }
+
+        // Download to tmp
+        $tmpDir = FCPATH . 'uploads/tmp/';
+        if (!is_dir($tmpDir)) { @mkdir($tmpDir, 0755, true); }
+        $tmpName = 'ai_cover_' . uniqid('', true) . '.png';
+        $tmpPath = $tmpDir . $tmpName;
+
+        $downloaded = $this->downloadImage($imageUrl, $tmpPath);
+        if (!$downloaded || !file_exists($tmpPath)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Não foi possível baixar a imagem gerada']);
+        }
+
+        // Produce post image variants and convert to WebP
+        $uploadModel = new UploadModel();
+        $webpConverter = new \App\Helpers\WebPConverter(85);
+
+        // Ensure 3:2 feel via variant sizes (UploadModel uses cropping for fixed sizes)
+        $paths = [];
+        $paths['image_big'] = $uploadModel->uploadPostImage($tmpPath, 'big');
+        $paths['image_default'] = $uploadModel->uploadPostImage($tmpPath, 'default');
+        $paths['image_slider'] = $uploadModel->uploadPostImage($tmpPath, 'slider');
+        $paths['image_mid'] = $uploadModel->uploadPostImage($tmpPath, 'mid');
+        $paths['image_small'] = $uploadModel->uploadPostImage($tmpPath, 'small');
+
+        // Convert all to WebP regardless of global setting
+        foreach ($paths as $k => $p) {
+            if (!empty($p) && file_exists(FCPATH . $p)) {
+                $converted = $webpConverter->convert(FCPATH . $p, null, true);
+                if ($converted) {
+                    // store relative path
+                    $rel = str_replace(FCPATH, '', $converted);
+                    $paths[$k] = $rel;
+                }
+            }
+        }
+
+        // Upload to AWS S3 if configured
+        if ($this->generalSettings->storage == 'aws_s3') {
+            try {
+                $awsModel = new \App\Models\AwsModel();
+                foreach ($paths as $p) {
+                    if (!empty($p) && file_exists(FCPATH . $p)) {
+                        $awsModel->uploadFile($p);
+                    }
+                }
+            } catch (\Throwable $e) {
+                log_message('error', 'AWS upload error (AI cover): ' . $e->getMessage());
+            }
+        }
+
+        // Build DB row for images table
+        $slugBase = !empty($title) ? strSlug($title) : ('ai-cover-' . uniqid());
+        $fileName = $uploadModel->createFileNameByExt($slugBase, 'webp');
+        $dataImage = [
+            'image_big' => $paths['image_big'] ?? '',
+            'image_default' => $paths['image_default'] ?? '',
+            'image_slider' => $paths['image_slider'] ?? '',
+            'image_mid' => $paths['image_mid'] ?? '',
+            'image_small' => $paths['image_small'] ?? '',
+            'image_mime' => 'webp',
+            'file_name' => $fileName,
+            'user_id' => user()->id,
+            'storage' => $this->generalSettings->storage
+        ];
+
+        $db = \Config\Database::connect(null, false);
+        $ok = $db->table('images')->insert($dataImage);
+        $imageId = $ok ? $db->insertID() : 0;
+        $db->close();
+
+        // Clean tmp
+        @unlink($tmpPath);
+
+        if (!$ok || empty($imageId)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Falha ao salvar imagem no servidor']);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'image_id' => (int) $imageId,
+            'image_preview' => !empty($paths['image_mid']) ? base_url($paths['image_mid']) : (!empty($paths['image_default']) ? base_url($paths['image_default']) : ''),
+            'message' => 'Imagem de capa gerada com sucesso',
+            'post_id' => !empty($postId) ? (int)$postId : null
+        ]);
+    }
+
+    /**
+     * Download image helper
+     */
+    private function downloadImage(string $url, string $destPath): bool
+    {
+        $ch = curl_init($url);
+        $fp = fopen($destPath, 'w');
+        if ($fp === false) { curl_close($ch); return false; }
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        $ok = curl_exec($ch);
+        $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err = curl_error($ch);
+        curl_close($ch);
+        fclose($fp);
+        if ($ok === false || $http < 200 || $http >= 300) {
+            if (file_exists($destPath)) { @unlink($destPath); }
+            log_message('error', 'AI cover download failed: HTTP ' . $http . ' - ' . $err);
+            return false;
+        }
+        return true;
+    }
+
     /*
     *-------------------------------------------------------------------------------------------------
     * IMPORT POSTS

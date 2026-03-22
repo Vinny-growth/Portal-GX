@@ -35,34 +35,91 @@ endif; ?>
 <div class="row">
 <div class="col-sm-12">
 <ul class="nav navbar-nav">
+<?php $menuLimit = $generalSettings->menu_limit; ?>
 <?php if ($generalSettings->show_home_link == 1): ?>
 <li class="nav-item"><a href="<?= langBaseUrl(); ?>" class="nav-link"><?= trans("home"); ?></a></li>
-<?php endif;
+<?php endif; ?>
+<?php
+// contar itens elegíveis (top ou main, visíveis e sem pai)
+$totalItem = 0;
+if (!empty($baseMenuLinks)) {
+    foreach ($baseMenuLinks as $item) {
+        if ($item->item_visibility == 1 && ($item->item_location == "top" || $item->item_location == "main") && $item->item_parent_id == "0") {
+            $totalItem++;
+        }
+    }
+}
+
+// renderizar primeiros itens até o limite
+$i = 1;
 if (!empty($baseMenuLinks)):
-foreach ($baseMenuLinks as $item):
-if ($item->item_visibility == 1 && ($item->item_location == "top" || $item->item_location == "main") && $item->item_parent_id == "0"):
-$subLinks = getSubMenuLinks($baseMenuLinks, $item->item_id, $item->item_type);
-if (!empty($subLinks)): ?>
-<li class="nav-item dropdown">
-<a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true"><?= esc($item->item_name) ?><i class="icon-arrow-down"></i></a>
-<ul class="dropdown-menu">
-<?php if ($item->item_type == "category"): ?>
-<li class="nav-item"><a href="<?= generateMenuItemURL($item, $baseCategories); ?>" class="nav-link"><?= trans("all"); ?></a></li>
-<?php endif;
-foreach ($subLinks as $sub):
-if ($sub->item_visibility == 1):?>
-<li class="nav-item"><a href="<?= generateMenuItemURL($sub, $baseCategories); ?>" class="nav-link"><?= esc($sub->item_name) ?></a></li>
-<?php endif;
-endforeach; ?>
-</ul>
-</li>
-<?php else: ?>
-<li class="nav-item"><a href="<?= generateMenuItemURL($item, $baseCategories); ?>" class="nav-link"><?= esc($item->item_name) ?></a></li>
-<?php endif;
+    foreach ($baseMenuLinks as $item):
+        if ($item->item_visibility == 1 && ($item->item_location == "top" || $item->item_location == "main") && $item->item_parent_id == "0"):
+            if ($i < $menuLimit):
+                $subLinks = getSubMenuLinks($baseMenuLinks, $item->item_id, $item->item_type);
+                if (!empty($subLinks)): ?>
+                    <li class="nav-item dropdown">
+                        <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
+                            <?= esc($item->item_name) ?><i class="icon-arrow-down"></i>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <?php if ($item->item_type == "category"): ?>
+                                <li class="nav-item"><a href="<?= generateMenuItemURL($item, $baseCategories); ?>" class="nav-link"><?= trans("all"); ?></a></li>
+                            <?php endif; ?>
+                            <?php foreach ($subLinks as $sub):
+                                if ($sub->item_visibility == 1): ?>
+                                    <li class="nav-item"><a href="<?= generateMenuItemURL($sub, $baseCategories); ?>" class="nav-link"><?= esc($sub->item_name) ?></a></li>
+                                <?php endif;
+                            endforeach; ?>
+                        </ul>
+                    </li>
+                <?php else: ?>
+                    <li class="nav-item"><a href="<?= generateMenuItemURL($item, $baseCategories); ?>" class="nav-link"><?= esc($item->item_name) ?></a></li>
+                <?php endif; $i++;
+            endif;
+        endif;
+    endforeach;
 endif;
-endforeach;
-endif;
-if ($generalSettings->multilingual_system == 1 && countItems($activeLanguages) > 1): ?>
+
+// agrupar excedentes em "Mais"
+if ($totalItem >= $menuLimit): ?>
+    <li class="nav-item dropdown">
+        <a href="#" class="dropdown-toggle nav-link d-flex justify-content-between" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span><?= trans("more"); ?></span>
+            <i class="icon-arrow-down"></i>
+        </a>
+        <ul class="dropdown-menu">
+            <?php $i = 1;
+            if (!empty($baseMenuLinks)):
+                foreach ($baseMenuLinks as $item):
+                    if ($item->item_visibility == 1 && ($item->item_location == "top" || $item->item_location == "main") && $item->item_parent_id == "0"):
+                        if ($i >= $menuLimit):
+                            $subLinks = getSubMenuLinks($baseMenuLinks, $item->item_id, $item->item_type);
+                            if (!empty($subLinks)): ?>
+                                <li class="nav-item dropdown">
+                                    <a href="<?= generateMenuItemURL($item, $baseCategories); ?>" class="nav-link d-flex justify-content-between">
+                                        <span><?= esc($item->item_name); ?></span>
+                                        <i class="icon-arrow-down"></i>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <?php foreach ($subLinks as $subItem): if ($subItem->item_visibility == 1): ?>
+                                            <li class="nav-item"><a href="<?= generateMenuItemURL($subItem, $baseCategories); ?>" class="nav-link"><?= esc($subItem->item_name); ?></a></li>
+                                        <?php endif; endforeach; ?>
+                                    </ul>
+                                </li>
+                            <?php else: ?>
+                                <li class="nav-item"><a href="<?= generateMenuItemURL($item, $baseCategories); ?>" class="nav-link"><?= esc($item->item_name); ?></a></li>
+                            <?php endif;
+                        endif;
+                        $i++;
+                    endif;
+                endforeach;
+            endif; ?>
+        </ul>
+    </li>
+<?php endif; ?>
+
+<?php if ($generalSettings->multilingual_system == 1 && countItems($activeLanguages) > 1): ?>
 <li class="nav-item border-0">
 <a href="#" class="nav-link"><?= trans("language"); ?></a>
 <ul class="mobile-language-options">

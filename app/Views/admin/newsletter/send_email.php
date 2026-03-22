@@ -35,7 +35,7 @@
                                 <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#file_manager_image" data-image-type="editor"><i class="fa fa-image"></i>&nbsp;&nbsp;&nbsp;<?= trans("add_image"); ?></button>
                             </div>
                         </div>
-                        <textarea class="tinyMCE form-control" name="body"></textarea>
+                        <textarea class="tinyMCE form-control" name="body" placeholder="<?= trans('content'); ?>"></textarea>
                     </div>
                 </div>
                 <div class="box-footer">

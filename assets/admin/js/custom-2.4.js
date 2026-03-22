@@ -295,6 +295,35 @@ function getSubCategories(val) {
     });
 }
 
+// Toast helper using SweetAlert2 (fallback to alert)
+function showToast(type, title, text) {
+    try {
+        if (typeof Swal !== 'undefined' && Swal.fire) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2500,
+                timerProgressBar: true,
+                icon: type || 'info',
+                title: title || '',
+                text: text || '',
+                didOpen: (toast) => {
+                    // brand color accent on left border if available
+                    try {
+                        var color = (VrConfig && VrConfig.themeColor) ? VrConfig.themeColor : '#0d6aad';
+                        toast.style.borderLeft = '6px solid ' + color;
+                    } catch (e) {}
+                }
+            });
+            return;
+        }
+    } catch (e) {}
+    // Fallback
+    var msg = (title ? (title + ' ') : '') + (text || '');
+    alert(msg);
+}
+
 //delete post main image
 $(document).on('click', '#btn_delete_post_main_image', function () {
     var content = '<a class="btn-select-image" data-toggle="modal" data-target="#file_manager_image" data-image-type="main">' +
@@ -349,6 +378,68 @@ $(document).on('click', '.btn-delete-additional-image-database', function () {
         url: VrConfig.baseURL + '/Post/deletePostAdditionalImage',
         data: setAjaxData(data),
         success: function (response) {
+        }
+    });
+});
+
+// Generate AI Cover Image
+$(document).on('click', '#btn-generate-ai-cover', function () {
+    var $btn = $(this);
+    var originalText = $btn.text();
+    $btn.prop('disabled', true).text('Gerando...');
+
+    // Try to extract content from TinyMCE if present
+    var contentText = '';
+    try {
+        if (typeof tinymce !== 'undefined' && tinymce.activeEditor) {
+            contentText = tinymce.activeEditor.getContent({format: 'text'}) || '';
+        } else {
+            contentText = ($('textarea[name="content"]').first().val() || '');
+        }
+    } catch (e) {}
+
+    var data = {
+        title: $('input[name="title"]').val() || '',
+        summary: $('textarea[name="summary"]').val() || '',
+        content: contentText,
+        keywords: $('input[name="keywords"]').val() || '',
+        lang_id: ($('select[name="lang_id"]').val() || '')
+    };
+    var postIdField = $('input[name="id"]');
+    if (postIdField.length) { data.post_id = postIdField.val(); }
+
+    $.ajax({
+        type: 'POST',
+        url: VrConfig.baseURL + '/Post/generateCoverImageAI',
+        data: setAjaxData(data),
+        success: function (resp) {
+            try { if (typeof resp === 'string') { resp = JSON.parse(resp); } } catch (e) {}
+            if (resp && resp.success) {
+                var image = '';
+                image += '<img src="' + resp.image_preview + '" id="selected_image_file" alt="">';
+                if (resp.post_id) {
+                    image += '<a id="btn_delete_post_main_image_database" class="btn btn-danger btn-sm btn-delete-selected-file-image" data-post-id="' + resp.post_id + '">\n' +
+                             '    <i class="fa fa-times"></i>\n' +
+                             '</a>';
+                } else {
+                    image += '<a id="btn_delete_post_main_image" class="btn btn-danger btn-sm btn-delete-selected-file-image">\n' +
+                             '    <i class="fa fa-times"></i>\n' +
+                             '</a>';
+                }
+                if (document.getElementById('post_select_image_container')) {
+                    document.getElementById('post_select_image_container').innerHTML = image;
+                }
+                $('input[name="post_image_id"]').val(resp.image_id);
+                showToast('success', 'Imagem gerada', 'Imagem de capa criada e selecionada.');
+            } else {
+                showToast('error', 'Falha', (resp && resp.message) ? resp.message : 'Falha ao gerar imagem');
+            }
+        },
+        error: function () {
+            showToast('error', 'Erro', 'Erro ao gerar imagem');
+        },
+        complete: function () {
+            $btn.prop('disabled', false).text(originalText);
         }
     });
 });
@@ -746,4 +837,3 @@ $(document).ready(function () {
         }
     });
 });
-

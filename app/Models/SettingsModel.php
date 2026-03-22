@@ -1,6 +1,7 @@
 <?php namespace App\Models;
 
 use CodeIgniter\Model;
+use Config\Globals;
 
 class SettingsModel extends BaseModel
 {
@@ -33,6 +34,26 @@ class SettingsModel extends BaseModel
             'cookies_warning' => inputPost('cookies_warning'),
             'cookies_warning_text' => inputPost('cookies_warning_text')
         ];
+    }
+
+    //get bio settings
+    public function getBioSettings()
+    {
+        $activeLang = Globals::$activeLang;
+        $settings = $this->builder->where('lang_id', $activeLang->id)->get()->getRow();
+        
+        if (!$settings) {
+            return (object) ['bio_description' => 'Assessoria em investimentos, gestão de patrimônio e consultoria financeira personalizada para o seu sucesso.'];
+        }
+        
+        return $settings;
+    }
+
+    //update bio settings
+    public function updateBioSettings($langId, $bioDescription)
+    {
+        $data = ['bio_description' => $bioDescription];
+        return $this->builder->where('lang_id', $langId)->update($data);
     }
 
     //update settings
@@ -203,11 +224,70 @@ class SettingsModel extends BaseModel
                 'auto_post_deletion_days' => inputPost('auto_post_deletion_days'),
                 'auto_post_deletion_delete_all' => inputPost('auto_post_deletion_delete_all')
             ];
+        } elseif ($form == 'openai_env') {
+            $envKey = trim(inputPost('openai_api_key') ?? '');
+            $model = trim(inputPost('openai_model') ?? '');
+            $size = trim(inputPost('openai_size') ?? '');
+            $quality = trim(inputPost('openai_quality') ?? '');
+            $textModel = trim(inputPost('openai_text_model') ?? '');
+            $textFallback = trim(inputPost('openai_text_fallback_model') ?? '');
+            $textTimeout = trim(inputPost('openai_text_timeout') ?? '');
+            $brandStyle = trim(inputPost('openai_brand_style') ?? '');
+
+            $ok = true;
+            $ok = $ok && $this->setEnvVar('OPENAI_API_KEY', $envKey);
+            if (!empty($model)) { $ok = $ok && $this->setEnvVar('OPENAI_DEFAULT_MODEL', $model); }
+            if (!empty($size)) { $ok = $ok && $this->setEnvVar('OPENAI_DEFAULT_SIZE', $size); }
+            if (!empty($quality)) { $ok = $ok && $this->setEnvVar('OPENAI_DEFAULT_QUALITY', $quality); }
+            if (!empty($textModel)) { $ok = $ok && $this->setEnvVar('OPENAI_TEXT_MODEL', $textModel); }
+            if (!empty($textFallback)) { $ok = $ok && $this->setEnvVar('OPENAI_TEXT_FALLBACK_MODEL', $textFallback); }
+            if (!empty($textTimeout)) { $ok = $ok && $this->setEnvVar('OPENAI_TEXT_TIMEOUT', $textTimeout); }
+            // brand style can be empty to clear; still persist
+            $ok = $ok && $this->setEnvVar('OPENAI_BRAND_STYLE', $brandStyle);
+            return $ok;
         }
         if (!empty($data)) {
             return $this->builderGeneral->where('id', 1)->update($data);
         }
         return false;
+    }
+
+    /**
+     * Safely set/update an environment var in .env and process env.
+     */
+    protected function setEnvVar(string $name, string $value): bool
+    {
+        $envPath = FCPATH . '.env';
+
+        // Build line in KEY="value" format with escaping
+        $escaped = str_replace(["\\", '"'], ["\\\\", '\\"'], $value);
+        $newLine = $name . '="' . $escaped . '"';
+
+        $contents = '';
+        if (file_exists($envPath)) {
+            $contents = file_get_contents($envPath);
+            if ($contents === false) {
+                return false;
+            }
+            $pattern = '/^(?!\s*#)\s*' . preg_quote($name, '/') . '\s*=\s*.*$/m';
+            if (preg_match($pattern, $contents)) {
+                $contents = preg_replace($pattern, $newLine, $contents);
+            } else {
+                $contents = rtrim($contents, "\r\n") . "\n" . $newLine . "\n";
+            }
+        } else {
+            $contents = $newLine . "\n";
+        }
+
+        // Attempt to write back
+        $result = @file_put_contents($envPath, $contents) !== false;
+        if ($result) {
+            // Update current process environment
+            @putenv($name . '=' . $value);
+            $_ENV[$name] = $value;
+            $_SERVER[$name] = $value;
+        }
+        return $result;
     }
 
     //get socail social media links
@@ -298,6 +378,13 @@ class SettingsModel extends BaseModel
         ];
         return $this->builderGeneral->where('id', 1)->update($data);
     }
+    
+    //get seo settings base data
+    private function getSeoSettingsBase($langId)
+    {
+        $langId = clrNum($langId);
+        return $this->builder->where('lang_id', $langId)->get()->getRow();
+    }
 
     //update route settings
     public function updateRouteSettings()
@@ -311,6 +398,16 @@ class SettingsModel extends BaseModel
             'routes' => serialize($routesArray)
         ];
         return $this->builderGeneral->where('id', 1)->update($data);
+    }
+    
+    //get routes
+    public function getRoutes()
+    {
+        $settings = $this->getGeneralSettings();
+        if (!empty($settings) && !empty($settings->routes)) {
+            return unserialize($settings->routes);
+        }
+        return null;
     }
 
     //update email settings
@@ -344,11 +441,73 @@ class SettingsModel extends BaseModel
     }
 
     //update email verification settings
-    public function emailVerificationSettings()
+    public function updateEmailVerificationSettings()
     {
         $data = [
             'email_verification' => inputPost('email_verification')
         ];
+        return $this->builderGeneral->where('id', 1)->update($data);
+    }
+    
+    //update general settings
+    public function updateGeneralSettings()
+    {
+        $data = [
+            'application_name' => inputPost('application_name'),
+            'timezone' => inputPost('timezone'),
+            'copyright' => inputPost('copyright')
+        ];
+        
+        $uploadModel = new \App\Models\UploadModel();
+        $logoPath = $uploadModel->uploadLogo('logo');
+        if (!empty($logoPath) && !empty($logoPath['path'])) {
+            $data['logo'] = $logoPath['path'];
+        }
+        
+        $faviconPath = $uploadModel->uploadFavicon('favicon');
+        if (!empty($faviconPath) && !empty($faviconPath['path'])) {
+            $data['favicon'] = $faviconPath['path'];
+        }
+        
+        return $this->builderGeneral->where('id', 1)->update($data);
+    }
+    
+    //update cookies warning settings
+    public function updateCookiesSettings()
+    {
+        $cookiesData = [
+            'cookies_warning' => inputPost('cookies_warning'),
+            'cookies_warning_text' => inputPost('cookies_warning_text')
+        ];
+        
+        $data = [
+            'cookies_settings' => json_encode($cookiesData)
+        ];
+        
+        return $this->builderGeneral->where('id', 1)->update($data);
+    }
+
+    //update meta conversions api settings
+    public function updateMetaConversionsApiSettings()
+    {
+        $trackEvents = inputPost('track_events');
+        if (empty($trackEvents) || !is_array($trackEvents)) {
+            $trackEvents = [];
+        }
+        
+        $metaApiData = [
+            'pixel_id' => inputPost('pixel_id'),
+            'access_token' => inputPost('access_token'),
+            'test_event_code' => inputPost('test_event_code'),
+            'api_enabled' => inputPost('meta_api_enabled'),
+            'test_mode' => inputPost('meta_test_mode'),
+            'track_events' => $trackEvents
+        ];
+        
+        $data = [
+            'meta_conversions_api' => json_encode($metaApiData)
+        ];
+        
         return $this->builderGeneral->where('id', 1)->update($data);
     }
 
@@ -391,12 +550,44 @@ class SettingsModel extends BaseModel
     }
 
     //update google news settings
-    public function updateGoogleNews()
+    public function updateGoogleNewsSettings()
     {
         $data = [
             'google_news' => inputPost('google_news')
         ];
         return $this->builderGeneral->where('id', 1)->update($data);
+    }
+
+    //update social login settings
+    public function updateSocialLoginSettings()
+    {
+        $loginType = inputPost('login_type');
+        
+        if ($loginType == 'facebook') {
+            $data = [
+                'facebook_app_id' => inputPost('facebook_app_id'),
+                'facebook_app_secret' => inputPost('facebook_app_secret'),
+                'facebook_login' => inputPost('facebook_login_status')
+            ];
+        } elseif ($loginType == 'google') {
+            $data = [
+                'google_client_id' => inputPost('google_client_id'),
+                'google_client_secret' => inputPost('google_client_secret'),
+                'google_login' => inputPost('google_login_status')
+            ];
+        } elseif ($loginType == 'vk') {
+            $data = [
+                'vk_app_id' => inputPost('vk_app_id'),
+                'vk_secure_key' => inputPost('vk_secure_key'),
+                'vk_redirect_url' => inputPost('vk_redirect_url'),
+                'vk_login' => inputPost('vk_login_status')
+            ];
+        }
+        
+        if (!empty($data)) {
+            return $this->builderGeneral->where('id', 1)->update($data);
+        }
+        return false;
     }
 
     //update social settings
@@ -435,6 +626,20 @@ class SettingsModel extends BaseModel
     public function getGeneralSettings()
     {
         return $this->builderGeneral->where('id', 1)->get()->getRow();
+    }
+
+    //get seo settings
+    public function getSeoSettings($langId)
+    {
+        $settings = $this->getSeoSettingsBase($langId);
+        if (!$settings) {
+            $settings = new \stdClass();
+            $settings->site_title = '';
+            $settings->home_title = '';
+            $settings->site_description = '';
+            $settings->keywords = '';
+        }
+        return $settings;
     }
 
     //set theme mode
@@ -743,6 +948,18 @@ class SettingsModel extends BaseModel
             return $this->builderFonts->where('id', clrNum($id))->update($data);
         }
         return false;
+    }
+
+    //set site font
+    public function setSiteFont()
+    {
+        $langId = inputPost('lang_id');
+        $data = [
+            'primary_font' => inputPost('primary_font'),
+            'secondary_font' => inputPost('secondary_font'),
+            'tertiary_font' => inputPost('tertiary_font'),
+        ];
+        return $this->db->table('settings')->where('lang_id', clrNum($langId))->update($data);
     }
 
     //update font settings

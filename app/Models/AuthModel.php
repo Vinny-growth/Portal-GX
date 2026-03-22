@@ -501,6 +501,24 @@ class AuthModel extends BaseModel
         $this->filterUsers();
         return $this->builder->orderBy('id DESC')->limit($perPage, $offset)->get()->getResult();
     }
+    
+    //get users for admin panel
+    public function getUsers()
+    {
+        return $this->getUsersPaginated(20, 0);
+    }
+    
+    //get user roles except admin
+    public function getUserRolesExceptAdmin()
+    {
+        return $this->builderRoles->where('is_super_admin !=', 1)->get()->getResult();
+    }
+    
+    //get user roles
+    public function getUserRoles()
+    {
+        return $this->builderRoles->get()->getResult();
+    }
 
     //users filter
     public function filterUsers()

@@ -79,7 +79,7 @@
                                     <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#file_manager_image" data-image-type="editor"><i class="fa fa-image"></i>&nbsp;&nbsp;&nbsp;<?= trans("add_image"); ?></button>
                                 </div>
                             </div>
-                            <textarea class="tinyMCE form-control" name="content"><?= old('content'); ?></textarea>
+                            <textarea class="tinyMCE form-control" name="content" placeholder="<?= trans('content'); ?>"><?= old('content'); ?></textarea>
                         </div>
                     </div>
                 </div>

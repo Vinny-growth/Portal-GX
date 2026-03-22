@@ -1620,6 +1620,7 @@ if (!function_exists('resetCacheDataOnChange')) {
                 }
             }
         }
+        @unlink($cachePath . 'cstable_scheduled_posts');
 
         if (Globals::$generalSettings->refresh_cache_database_changes == 1) {
             resetCacheData();

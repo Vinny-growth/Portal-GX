@@ -27,9 +27,9 @@ class Database extends Config
     public array $default = [
         'DSN'          => '',
         'hostname' => 'localhost',
-        'username' => 'Vinny',
-        'password' => 'Mariah@2021filha',
-        'database' => 'portal',
+        'username' => '',
+        'password' => '',
+        'database' => '',
         'DBDriver'     => 'MySQLi',
         'DBPrefix'     => '',
         'pConnect'     => false,
@@ -53,6 +53,19 @@ class Database extends Config
     public function __construct()
     {
         parent::__construct();
+
+        $this->default['hostname'] = env('database.default.hostname', $this->default['hostname']);
+        $this->default['username'] = env('database.default.username', $this->default['username']);
+        $this->default['password'] = env('database.default.password', $this->default['password']);
+        $this->default['database'] = env('database.default.database', $this->default['database']);
+        $this->default['DBDriver'] = env('database.default.DBDriver', $this->default['DBDriver']);
+        $this->default['port'] = (int) env('database.default.port', $this->default['port']);
+        $debug = env('database.default.DBDebug');
+        if ($debug !== null) {
+            $this->default['DBDebug'] = filter_var($debug, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? $this->default['DBDebug'];
+        } else {
+            $this->default['DBDebug'] = ENVIRONMENT !== 'production';
+        }
 
         if (empty($this->default['database']) || empty($this->default['username'])) {
             $root = (isset($_SERVER['HTTPS']) ? "https://" : "http://") . $_SERVER['HTTP_HOST'];

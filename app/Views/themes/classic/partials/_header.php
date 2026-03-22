@@ -63,9 +63,12 @@ if ($generalSettings->pwa_status == 1): ?>
 <?= view('common/_fonts'); ?>
 <link href="<?= base_url($assetsPath . '/css/style-2.4.1.min.css'); ?>" rel="stylesheet"/>
 <?= loadView('partials/_css_js_header'); ?>
+<?php if (!empty($pageHeadView)): ?>
+<?= view($pageHeadView); ?>
+<?php endif; ?>
 <?= $generalSettings->custom_header_codes; ?>
 </head>
-<body class="<?= $darkMode == true ? 'dark-mode' : ''; ?> <?= $activeLang->text_direction == 'rtl' ? 'rtl-mode' : ''; ?>">
+<body class="<?= !empty($bodyClass) ? esc($bodyClass) : ''; ?> <?= $darkMode == true ? 'dark-mode' : ''; ?> <?= $activeLang->text_direction == 'rtl' ? 'rtl-mode' : ''; ?>">
 <header id="header">
 <?= loadView('nav/_nav_top'); ?>
 <div class="logo-banner">

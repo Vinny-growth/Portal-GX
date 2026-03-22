@@ -62,7 +62,7 @@
                     <input type="number" class="form-control" name="limit" placeholder="<?= trans('limit'); ?>" value="1000">
                 </div>
                 <div class="form-group">
-                    <textarea id="urlTextarea" class="form-control" style="display: none"></textarea>
+                    <textarea id="urlTextarea" class="form-control" style="display: none" placeholder="<?= trans('url'); ?>"></textarea>
                 </div>
                 <div class="box-footer" style="padding-left: 0; padding-right: 0;">
                     <button type="submit" name="action" value="save" id="btnGenerateFeedUrl" class="btn btn-primary pull-right"><?= trans('generate_feed_url'); ?></button>

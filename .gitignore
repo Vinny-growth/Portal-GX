@@ -5,3 +5,9 @@ vendor/
 *.tmp
 .DS_Store
 Thumb.db
+.claude/
+.well-known/acme-challenge/
+github_deploy_key
+do_push.sh
+github_push.sh
+uploads/tmp/

@@ -46,6 +46,14 @@
                         <input type="text" class="form-control" name="image_url" id="video_thumbnail_url" placeholder="<?= trans('add_image_url'); ?>" value="<?= $post->image_url; ?>">
                     </div>
                 </div>
+                <div class="row m-b-15">
+                    <div class="col-sm-12">
+                        <button type="button" id="btn-generate-ai-cover" class="btn btn-primary">
+                            <i class="fa fa-magic"></i>&nbsp; Gerar imagem de capa com IA
+                        </button>
+                        <small class="text-muted" style="margin-left:8px;">Usa título/resumo e cores do tema (3:2, sem texto).</small>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-sm-12">
                         <label class="control-label"><?= trans('image_description'); ?></label>
@@ -72,6 +80,14 @@
                     </div>
                     <div class="col-sm-12 m-b-5">
                         <input type="text" class="form-control" name="image_url" id="video_thumbnail_url" placeholder="<?= trans('add_image_url'); ?>">
+                    </div>
+                </div>
+                <div class="row m-b-15">
+                    <div class="col-sm-12">
+                        <button type="button" id="btn-generate-ai-cover" class="btn btn-primary">
+                            <i class="fa fa-magic"></i>&nbsp; Gerar imagem de capa com IA
+                        </button>
+                        <small class="text-muted" style="margin-left:8px;">Usa título/resumo e cores do tema (3:2, sem texto).</small>
                     </div>
                 </div>
                 <div class="row row-image-description">

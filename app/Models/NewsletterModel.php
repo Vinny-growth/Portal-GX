@@ -39,6 +39,12 @@ class NewsletterModel extends BaseModel
     {
         return $this->builder->countAllResults();
     }
+    
+    //get subscribers
+    public function getSubscribers()
+    {
+        return $this->builder->orderBy('id DESC')->get()->getResult();
+    }
 
     //load more subscribers
     public function loadMoreSubscribers($q, $perPage, $offset)

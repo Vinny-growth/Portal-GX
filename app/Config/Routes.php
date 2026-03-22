@@ -12,6 +12,8 @@ $generalSettings = Globals::$generalSettings;
 $customRoutes = Globals::$customRoutes;
 
 $routes->get('/', 'HomeController::index');
+$routes->get('blog', 'HomeController::blog');
+$routes->get('simuladores', 'HomeController::simulatorsHub');
 $routes->get('cron/update-feeds', 'CronController::checkFeedPosts');
 $routes->get('cron/update-sitemap', 'CronController::updateSitemap');
 $routes->get('unsubscribe', 'AuthController::unsubscribe');
@@ -22,6 +24,39 @@ $routes->get('connect-with-vk', 'AuthController::connectWithVK');
 $routes->get('gnews/feed', 'HomeController::googleNewsFeeds');
 $routes->get('simulador-aurum', 'HomeController::simuladorAurum');
 $routes->post('api/save-simulator-lead', 'ApiController::saveSimulatorLead');
+
+// Bio Links Routes
+$routes->get('bio', 'BioLinksController::index');
+$routes->get('bio/click/(:num)', 'BioLinksController::click/$1');
+
+// Web Stories Routes
+$routes->get('web-stories', 'WebStoriesController::index');
+$routes->get('web-stories/view/(:num)', 'WebStoriesController::view/$1');
+$routes->get('web-stories/story/(:num)', 'WebStoriesController::story/$1');
+$routes->get('web-stories/click/(:num)', 'WebStoriesController::click/$1');
+$routes->get('api/web-stories', 'WebStoriesController::apiGetStories');
+
+// Wealth Manager (public)
+$routes->get('wealth', 'WealthManagerController::index');
+$routes->get('wealth/conversa', 'WealthManagerController::conversa', ['filter' => 'auth']);
+$routes->post('WealthManager/sendMessage', 'WealthManagerController::sendMessage', ['filter' => 'auth']);
+$routes->post('WealthManager/acceptConsent', 'WealthManagerController::acceptConsent', ['filter' => 'auth']);
+$routes->post('WealthManager/saveProfileBasic', 'WealthManagerController::saveProfileBasic', ['filter' => 'auth']);
+$routes->post('WealthManager/saveIncomeForm', 'WealthManagerController::saveIncomeForm', ['filter' => 'auth']);
+$routes->post('WealthManager/saveExpenseForm', 'WealthManagerController::saveExpenseForm', ['filter' => 'auth']);
+$routes->post('WealthManager/saveDependentsForm', 'WealthManagerController::saveDependentsForm', ['filter' => 'auth']);
+$routes->post('WealthManager/saveAllocationForm', 'WealthManagerController::saveAllocationForm', ['filter' => 'auth']);
+$routes->post('WealthManager/saveRealEstateForm', 'WealthManagerController::saveRealEstateForm', ['filter' => 'auth']);
+$routes->post('WealthManager/saveLiabilitiesForm', 'WealthManagerController::saveLiabilitiesForm', ['filter' => 'auth']);
+$routes->post('WealthManager/saveGoalsForm', 'WealthManagerController::saveGoalsForm', ['filter' => 'auth']);
+$routes->get('wealth/resultado', 'WealthManagerController::resultado', ['filter' => 'auth']);
+$routes->get('wealth/resultado/pdf', 'WealthManagerController::resumoPdf', ['filter' => 'auth']);
+$routes->get('wealth/agendar', 'WealthManagerController::agendar', ['filter' => 'auth']);
+$routes->post('wealth/agendar', 'WealthManagerController::agendarPost', ['filter' => 'auth']);
+$routes->post('WealthManager/trackEvent', 'WealthManagerController::trackEvent');
+
+// CMS Pages (public)
+$routes->get('p/(:any)', 'CmsController::view/$1');
 
 /*
  * --------------------------------------------------------------------
@@ -74,6 +109,16 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->get('drafts', 'PostController::drafts');
     $routes->get('bulk-post-upload', 'PostController::bulkPostUpload');
     $routes->get('edit-post/(:num)', 'PostController::editPost/$1');
+    //content AI center
+    $routes->get('content-ai', 'ContentAIController::index');
+    $routes->post('content-ai/settings', 'ContentAIController::saveSettingsPost');
+    $routes->post('content-ai/calendar/add', 'ContentAIController::addCalendarItemPost');
+    $routes->post('content-ai/calendar/delete', 'ContentAIController::deleteCalendarItemPost');
+    $routes->post('content-ai/calendar/approve', 'ContentAIController::approveCalendarItemPost');
+    $routes->post('content-ai/run-now', 'ContentAIController::runNowPost');
+    $routes->post('content-ai/trends/fetch', 'ContentAIController::fetchTrendsPost');
+    $routes->post('content-ai/trends/update', 'ContentAIController::updateTrendFlagsPost');
+    $routes->post('content-ai/trends/add', 'ContentAIController::addSelectedTrendsToCalendarPost');
     //rss feeds
     $routes->get('feeds', 'RssController::feeds');
     $routes->get('import-feed', 'RssController::importFeed');
@@ -85,6 +130,9 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     //widgets
     $routes->get('widgets', 'AdminController::widgets');
     $routes->get('add-widget', 'AdminController::addWidget');
+    // CMS helper
+    $routes->get('cms-pages/seed-wealth', 'PagesAdminController::seedWealthLp');
+    $routes->get('cms-pages/restore/(:num)', 'PagesAdminController::restore/$1');
     $routes->get('edit-widget/(:num)', 'AdminController::editWidget/$1');
     //polls
     $routes->get('polls', 'AdminController::polls');
@@ -142,12 +190,72 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->get('edit-font/(:num)', 'AdminController::editFont/$1');
     $routes->get('social-login-settings', 'AdminController::socialLoginSettings');
     $routes->get('general-settings', 'AdminController::generalSettings');
+    //dashboard
+    $routes->get('dashboard', 'DashboardController::index');
+    $routes->get('dashboard/widgets', 'DashboardController::widgets');
+    $routes->post('dashboard/save-widget-config', 'DashboardController::saveWidgetConfig');
+    $routes->get('dashboard/live-data', 'DashboardController::liveData');
+    $routes->post('dashboard/get-analytics-data', 'DashboardController::getAnalyticsData');
+    $routes->get('dashboard/export-data', 'DashboardController::exportData');
     //language
     $routes->get('language-settings', 'LanguageController::languages');
     $routes->get('edit-language/(:num)', 'LanguageController::editLanguage/$1');
     $routes->get('edit-translations/(:num)', 'LanguageController::editTranslations/$1');
     //tags
     $routes->get('tags', 'CategoryController::tags');
+    //bio links
+    $routes->get('bio-links', 'BioLinksController::admin');
+    $routes->get('bio-links/add', 'BioLinksController::adminAdd');
+    $routes->post('bio-links/add', 'BioLinksController::adminAdd');
+    $routes->get('bio-links/edit/(:num)', 'BioLinksController::adminEdit/$1');
+    $routes->post('bio-links/edit/(:num)', 'BioLinksController::adminEdit/$1');
+    $routes->get('bio-links/delete/(:num)', 'BioLinksController::adminDelete/$1');
+    $routes->post('bio-links/delete/(:num)', 'BioLinksController::adminDelete/$1');
+    $routes->get('bio-links/toggle/(:num)', 'BioLinksController::adminToggle/$1');
+    $routes->post('bio-links/update-order', 'BioLinksController::adminUpdateOrder');
+    $routes->post('bio-links/update-settings', 'BioLinksController::updateBioSettings');
+    //web stories
+    $routes->get('web-stories', 'WebStoriesController::admin');
+    $routes->get('web-stories/add', 'WebStoriesController::adminAdd');
+    $routes->post('web-stories/add', 'WebStoriesController::adminAddPost');
+    $routes->get('web-stories/edit/(:num)', 'WebStoriesController::adminEdit/$1');
+    $routes->post('web-stories/edit/(:num)', 'WebStoriesController::adminEditPost/$1');
+    $routes->get('web-stories/delete/(:num)', 'WebStoriesController::adminDelete/$1');
+    $routes->post('web-stories/delete/(:num)', 'WebStoriesController::adminDelete/$1');
+    $routes->get('web-stories/toggle/(:num)', 'WebStoriesController::adminToggle/$1');
+    // wealth manager (admin)
+    $routes->get('wealth', 'WealthAdminController::index');
+    $routes->get('wealth/settings', 'WealthAdminController::settings');
+    $routes->post('WealthManager/adminSettingsPost', 'WealthAdminController::settingsPost');
+    $routes->get('wealth/tokens', 'WealthAdminController::tokens');
+    $routes->post('WealthManager/adminTokensPost', 'WealthAdminController::tokensPost');
+    $routes->get('wealth/appointments', 'WealthAdminController::appointments');
+    $routes->post('WealthManager/adminAppointmentStatusPost', 'WealthAdminController::appointmentStatusPost');
+    $routes->get('wealth/cms', 'WealthAdminController::cms');
+    $routes->post('WealthManager/adminCMSPost', 'WealthAdminController::cmsPost');
+    $routes->get('wealth/export', 'WealthAdminController::export');
+    $routes->post('WealthManager/adminExportCsv', 'WealthAdminController::exportCsv');
+    $routes->get('wealth/view-result/(:num)', 'WealthAdminController::viewResult/$1');
+    $routes->get('wealth/logs', 'WealthAdminController::logs');
+    $routes->get('wealth/run-setup', 'WealthAdminController::runSetup');
+    $routes->get('wealth/diagnostics', 'WealthAdminController::diagnostics');
+    $routes->get('wealth/sessions', 'WealthAdminController::sessions');
+    $routes->get('wealth/session/(:num)', 'WealthAdminController::session/$1');
+
+    // CMS Pages (admin) - visual builder (avoid conflict with AdminController::pages)
+    $routes->get('cms-pages', 'PagesAdminController::index');
+    $routes->post('cms-pages/add', 'PagesAdminController::add');
+    $routes->get('cms-pages/edit/(:num)', 'PagesAdminController::edit/$1');
+    $routes->post('cms-pages/edit/(:num)', 'PagesAdminController::editPost/$1');
+    $routes->get('cms-pages/builder/(:num)', 'PagesAdminController::builder/$1');
+    $routes->post('cms-pages/save-builder/(:num)', 'PagesAdminController::saveBuilder/$1');
+    $routes->get('cms-pages/publish/(:num)', 'PagesAdminController::publish/$1');
+    $routes->get('cms-pages/delete/(:num)', 'PagesAdminController::delete/$1');
+    $routes->post('cms-pages/save-template', 'PagesAdminController::saveTemplate');
+    $routes->get('cms-pages/delete-template/(:num)', 'PagesAdminController::deleteTemplate/$1');
+    $routes->get('cms-pages/run-setup', 'PagesAdminController::runSetup');
+    // link legacy page to visual builder
+    $routes->get('pages/visual/(:num)', 'PagesAdminController::linkLegacy/$1');
 });
 
 
@@ -202,10 +310,17 @@ $postRoutesArray = [
     'Admin/contactEmailSettingsPost',
     'Admin/sendTestEmailPost',
     'Admin/generalSettingsPost',
+    'Admin/contactSettingsPost',
+    'Admin/socialMediaSettingsPost', 
+    'Admin/customHeaderCodesPost',
+    'Admin/cookiesWarningPost',
+    'Admin/metaConversionsApiPost',
     'Admin/recaptchaSettingsPost',
     'Admin/maintenanceModePost',
     'Admin/preferencesPost',
     'Admin/aiWriterPost',
+    'Admin/validateOpenAIKeyPost',
+    'Admin/validateAIWriterKeyPost',
     'Admin/fileUploadSettingsPost',
     'Admin/routeSettingsPost',
     'Admin/addUserPost',
@@ -226,6 +341,7 @@ $postRoutesArray = [
     'Admin/deleteSelectedContactMessages',
     'Admin/deleteSimulatorLeadPost',
     'Admin/deleteSelectedSimulatorLeads',
+    'Admin/updateSimulatorLeadStatus',
     //Ajax
     'Ajax/setThemeModePost',
     'Ajax/incrementPostViews',
@@ -253,6 +369,16 @@ $postRoutesArray = [
     'Ajax/addSimulatorLeadPost',
     //Auth
     'Auth/loginPost',
+    //WebStories
+    'WebStories/adminUpdateOrder',
+    'WebStories/generateImage',
+    'WebStories/uploadImage',
+    'WebStories/generateFromArticle',
+    'WebStories/generateImagesStep',
+    'WebStories/bulkVisibility',
+    'WebStories/bulkDelete',
+    'WebStories/testConnection',
+    'WebStories/checkImageStatus',
     //Category
     'Category/deleteCategoryPost',
     'Category/addCategoryPost',
@@ -336,6 +462,7 @@ $postRoutesArray = [
     'Post/deletePostVideo',
     'Post/deletePostAudio',
     'Post/deletePostFile',
+    'Post/generateCoverImageAI',
     'Post/getListItemHTML',
     'Post/addListItem',
     'Post/deletePostListItemPost',
@@ -380,6 +507,8 @@ if (!empty($languages)) {
         if ($generalSettings->site_lang != $language->id) {
             $key = $language->short_form . '/';
             $routes->get($language->short_form, 'HomeController::index');
+            $routes->get($key . 'blog', 'HomeController::blog');
+            $routes->get($key . 'simuladores', 'HomeController::simulatorsHub');
         }
         $routes->get($key . $customRoutes->register, 'AuthController::register');
         $routes->get($key . $customRoutes->forgot_password, 'AuthController::forgotPassword');
@@ -413,3 +542,6 @@ if (!empty($languages)) {
 $routes->get('(:any)/(:any)/(:any)', 'HomeController::error404');
 $routes->get('(:any)/(:any)', 'HomeController::subCategory/$1/$2');
 $routes->get('(:any)', 'HomeController::any/$1');
+
+// CLI utility for Wealth Manager setup (unified under WealthAdminController)
+$routes->cli($customRoutes->admin . '/wealth/run-setup', 'WealthAdminController::runSetup');

@@ -54,7 +54,7 @@ if ($question->answer_format == 'large_image') {
                         <div class="right">
                             <div id="editor_<?= $question->id; ?>">
                                 <label class="control-label"><?= trans("description"); ?></label>
-                                <textarea class="tinyMCEQuiz form-control" name="question_description_<?= $question->id; ?>"><?= $question->description; ?></textarea>
+                                <textarea class="tinyMCEQuiz form-control" name="question_description_<?= $question->id; ?>" placeholder="<?= trans('description'); ?>"><?= $question->description; ?></textarea>
                             </div>
                         </div>
                     </div>

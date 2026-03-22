@@ -7,6 +7,7 @@ class CommonModel extends BaseModel
     protected $builderContact;
     protected $builderComments;
     protected $builderAds;
+    protected $builderWidgets;
 
     public function __construct()
     {
@@ -14,6 +15,7 @@ class CommonModel extends BaseModel
         $this->builderContact = $this->db->table('contacts');
         $this->builderComments = $this->db->table('comments');
         $this->builderAds = $this->db->table('ad_spaces');
+        $this->builderWidgets = $this->db->table('widgets');
     }
 
     /*
@@ -28,31 +30,25 @@ class CommonModel extends BaseModel
         $data = [
             'name' => inputPost('name'),
             'email' => inputPost('email'),
-            'message' => inputPost('message')
+            'message' => inputPost('message'),
+            'created_at' => date('Y-m-d H:i:s')
         ];
-        $data['created_at'] = date('Y-m-d H:i:s');
-        $result = $this->builderContact->insert($data);
-        if ($this->generalSettings->mail_contact_status == 1) {
-            $emailModel = new EmailModel();
-            $emailModel->sendEmailContactMessage($data['name'], $data['email'], $data['message']);
-        }
-        return $result;
+        return $this->builderContact->insert($data);
     }
 
     //get contact messages
     public function getContactMessages($limit = null)
     {
-        if ($limit != null) {
-            $this->builderContact->limit(clrNum($limit));
+        if ($limit) {
+            return $this->builderContact->orderBy('id DESC')->limit($limit)->get()->getResult();
         }
         return $this->builderContact->orderBy('id DESC')->get()->getResult();
     }
 
-    //get latest comments
-    public function getLatestComments($status, $limit)
+    //get contact messages
+    public function getContactMessagesAll()
     {
-        return $this->builderComments->join('posts', 'posts.id = comments.post_id')->select('comments.*, posts.slug AS post_slug')
-            ->where('comments.status', clrNum($status))->orderBy('comments.id DESC')->get(clrNum($limit))->getResult();
+        return $this->builderContact->orderBy('id DESC')->get()->getResult();
     }
 
     //get contact message
@@ -64,19 +60,14 @@ class CommonModel extends BaseModel
     //delete contact message
     public function deleteContactMessage($id)
     {
-        $contact = $this->getContactMessage($id);
-        if (!empty($contact)) {
-            return $this->builderContact->where('id', clrNum($id))->delete();
-        }
-        return false;
+        return $this->builderContact->where('id', clrNum($id))->delete();
     }
 
-    //delete multi contact messages
-    public function deleteMultiMessages()
+    //delete multi messages
+    public function deleteMultiMessages($messages)
     {
-        $messagesIds = inputPost('messages_ids');
-        if (!empty($messagesIds)) {
-            foreach ($messagesIds as $id) {
+        if (!empty($messages)) {
+            foreach ($messages as $id) {
                 $this->deleteContactMessage($id);
             }
         }
@@ -88,87 +79,36 @@ class CommonModel extends BaseModel
     * --------------------------------------------------------------------
     */
 
+    //add comment
     public function addComment()
     {
-        $commentStatus = 1;
-        if ($this->generalSettings->comment_approval_system == 1 && !hasPermission('comments_contact')) {
-            $commentStatus = 0;
-        }
         $data = [
             'parent_id' => inputPost('parent_id'),
             'post_id' => inputPost('post_id'),
-            'name' => inputPost('name'),
-            'email' => inputPost('email'),
+            'user_id' => user()->id,
             'comment' => inputPost('comment'),
-            'status' => $commentStatus,
-            'ip_address' => 0,
+            'created_at' => date('Y-m-d H:i:s')
         ];
-        if (empty($data['parent_id'])) {
-            $data['parent_id'] = 0;
+        if ($this->generalSettings->comment_approval_system == 1) {
+            $data['status'] = 0;
+        } else {
+            $data['status'] = 1;
         }
-        if (!empty($data['post_id']) && !empty($data['comment'])) {
-            $data['user_id'] = 0;
-            if (authCheck()) {
-                $data['user_id'] = user()->id;
-                $data['name'] = user()->username;
-                $data['email'] = user()->email;
-            }
-            $ip = getIPAddress();
-            if (!empty($ip)) {
-                $data['ip_address'] = $ip;
-            }
-            $data['created_at'] = date('Y-m-d H:i:s');
-            if ($this->builderComments->insert($data)) {
-                $lastId = $this->db->insertID();
-                helperSetCookie('added_comment_id_' . $lastId, 1);
-                if ($commentStatus == 1) {
-                    $this->updatePostTotalComments($data['post_id']);
-                }
-            }
-        }
+        $this->builderComments->insert($data);
+        $this->updatePostTotalComments($data['post_id']);
     }
 
-    //like comment
-    public function likeComment($commentId)
-    {
-        $comment = $this->getComment($commentId);
-        if (!empty($comment)) {
-            $likeCount = $comment->like_count;
-            //check comment owner
-            if (checkCommentOwner($comment)) {
-                return $likeCount;
-            }
-            $cookie = helperGetCookie('comment_voted_' . $comment->id);
-            $newCookie = '';
-            if (!empty($cookie)) {
-                $likeCount = $likeCount - 1;
-                $newCookie = '';
-            } else {
-                $likeCount = $likeCount + 1;
-                $newCookie = 1;
-            }
-            if ($likeCount < 0) {
-                $likeCount = 0;
-            }
-            if ($this->builderComments->where('id', $comment->id)->update(['like_count' => $likeCount])) {
-                helperSetCookie('comment_voted_' . $comment->id, $newCookie);
-                return $likeCount;
-            }
-        }
-        return 0;
-    }
-
-    //get comment
-    public function getComment($id)
-    {
-        return $this->builderComments->where('comments.id', clrNum($id))->get()->getRow();
-    }
-
-    //comments
+    //get comments
     public function getComments($postId, $limit)
     {
         return $this->builderComments->join('users', 'users.id = comments.user_id', 'left')->select('comments.*, users.username AS user_username, users.slug AS user_slug, users.avatar AS user_avatar')
             ->where('comments.post_id', clrNum($postId))->where('comments.parent_id = 0')->where('comments.status = 1')->orderBy('comments.id DESC')->get(clrNum($limit))->getResult();
+    }
+    
+    //get latest comments
+    public function getLatestComments($status, $limit)
+    {
+        return $this->builderComments->where('comments.status', clrNum($status))->orderBy('comments.id DESC')->limit($limit)->get()->getResult();
     }
 
     //get approved comments count
@@ -219,6 +159,19 @@ class CommonModel extends BaseModel
         }
     }
 
+    //update total comments
+    public function updatePostTotalComments($postId)
+    {
+        //get post
+        $post = $this->db->table('posts')->where('id', $postId)->get()->getRow();
+        if (!empty($post)) {
+            //get comment count
+            $commentCount = $this->getCommentCountByPostId($post->id);
+            //update post
+            $this->db->table('posts')->where('id', $post->id)->update(['comment_count' => $commentCount]);
+        }
+    }
+
     //delete comment
     public function deleteComment($id)
     {
@@ -243,14 +196,34 @@ class CommonModel extends BaseModel
         }
     }
 
-    //update post total comments
-    public function updatePostTotalComments($postId)
+    //get comment
+    public function getComment($id)
     {
-        $post = getPostById($postId);
-        if (!empty($post)) {
-            $count = $this->builderComments->where('post_id', $post->id)->where('comments.parent_id', 0)->where('status', 1)->countAllResults();
-            $this->db->table('posts')->where('id', $post->id)->update(['comment_count' => $count]);
-        }
+        return $this->builderComments->where('id', clrNum($id))->get()->getRow();
+    }
+
+    /*
+    * --------------------------------------------------------------------
+    * WIDGETS
+    * --------------------------------------------------------------------
+    */
+
+    //get widgets
+    public function getWidgets()
+    {
+        return $this->builderWidgets->orderBy('id')->get()->getResult();
+    }
+
+    //get widget
+    public function getWidget($id)
+    {
+        return $this->builderWidgets->where('id', clrNum($id))->get()->getRow();
+    }
+
+    //delete widget
+    public function deleteWidget($id)
+    {
+        return $this->builderWidgets->where('id', clrNum($id))->delete();
     }
 
     /*
@@ -258,40 +231,6 @@ class CommonModel extends BaseModel
     * AD SPACES
     * --------------------------------------------------------------------
     */
-
-    public function updateAdSpaces($id)
-    {
-        $adSpace = $this->getAdSpaceById($id);
-        if (!empty($adSpace)) {
-            $uploadModel = new UploadModel();
-            $data = [
-                'ad_code_desktop' => inputPost('ad_code_desktop'),
-                'ad_code_mobile' => inputPost('ad_code_mobile'),
-                'desktop_width' => inputPost('desktop_width'),
-                'desktop_height' => inputPost('desktop_height'),
-                'mobile_width' => inputPost('mobile_width'),
-                'mobile_height' => inputPost('mobile_height')
-            ];
-            $adURL = inputPost('url_ad_code_desktop');
-            $file = $uploadModel->uploadAd('file_ad_code_desktop');
-            if (!empty($file) && !empty($file['path'])) {
-                $data['ad_code_desktop'] = $this->createAdCode($adURL, $file['path'], $data['desktop_width'], $data['desktop_height']);
-            }
-            $adURL = inputPost('url_ad_code_mobile');
-            $file = $uploadModel->uploadAd('file_ad_code_mobile');
-            if (!empty($file) && !empty($file['path'])) {
-                $data['ad_code_mobile'] = $this->createAdCode($adURL, $file['path'], $data['mobile_width'], $data['mobile_height']);
-            }
-            if (getActiveTheme()->theme != 'classic' && ($adSpace->ad_space == 'sidebar_1' || $adSpace->ad_space == 'sidebar_2')) {
-                $data['display_category_id'] = inputPost('display_category_id');
-            }
-            if ($adSpace->ad_space == 'in_article_1' || $adSpace->ad_space == 'in_article_2') {
-                $data['paragraph_number'] = inputPost('paragraph_number');
-            }
-            return $this->builderAds->where('id', $adSpace->id)->update($data);
-        }
-        return false;
-    }
 
     //get ad spaces
     public function getAdSpaces()

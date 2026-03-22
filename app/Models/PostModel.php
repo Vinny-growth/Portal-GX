@@ -403,16 +403,20 @@ class PostModel extends BaseModel
     //check scheduled posts
     public function checkScheduledPosts()
     {
+        $date = date('Y-m-d H:i:s');
         $posts = cache('cstable_scheduled_posts');
+        if (empty($posts)) {
+            $posts = $this->builder->select('id, created_at')->where('status', 1)->where('is_scheduled', 1)->get()->getResult();
+            if (!empty($posts)) {
+                cache()->save('cstable_scheduled_posts', $posts, 21600); //6 hours
+            }
+        }
         $isUpdated = false;
         if (!empty($posts)) {
-            $date = date('Y-m-d H:i:s');
-            if (!empty($posts)) {
-                foreach ($posts as $post) {
-                    if (strtotime($post->created_at) <= strtotime($date)) {
-                        $this->builder->where('id', $post->id)->update(['is_scheduled' => 0, 'created_at' => $date]);
-                        $isUpdated = true;
-                    }
+            foreach ($posts as $post) {
+                if (strtotime($post->created_at) <= strtotime($date)) {
+                    $this->builder->where('id', $post->id)->update(['is_scheduled' => 0, 'created_at' => $date]);
+                    $isUpdated = true;
                 }
             }
         }

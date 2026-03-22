@@ -17,9 +17,9 @@
                 </div>
             </div>
             <?php if (!empty($post)): ?>
-                <textarea id="editor-<?= $editorId; ?>" class="tinyMCE form-control" name="content"><?= $post->content; ?></textarea>
+                <textarea id="editor-<?= $editorId; ?>" class="tinyMCE form-control" name="content" placeholder="<?= trans('content'); ?>"><?= $post->content; ?></textarea>
             <?php else: ?>
-                <textarea id="editor-<?= $editorId; ?>" class="tinyMCE form-control" name="content"><?= old('content'); ?></textarea>
+                <textarea id="editor-<?= $editorId; ?>" class="tinyMCE form-control" name="content" placeholder="<?= trans('content'); ?>"><?= old('content'); ?></textarea>
             <?php endif; ?>
         </div>
     </div>

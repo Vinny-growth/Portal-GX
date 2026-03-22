@@ -396,5 +396,8 @@ if ($tab != "general" && $tab != "homepage" && $tab != "posts" && $tab != "post_
         const tagify = new Tagify(inputElement, {
             enforceWhitelist: false,
         });
+        if (inputElement) {
+            inputElement.setAttribute('placeholder', '<?= trans('type_extension'); ?>');
+        }
     });
 </script>

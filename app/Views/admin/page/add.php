@@ -6,6 +6,7 @@
                     <h3 class="box-title"><?= trans("add_page"); ?></h3>
                 </div>
                 <div class="right">
+                    <a href="<?= adminUrl('cms-pages'); ?>" class="btn btn-default" style="margin-right:8px;"><i class="fa fa-magic"></i> CMS Visual</a>
                     <a href="<?= adminUrl('pages'); ?>" class="btn btn-success btn-add-new"><i class="fa fa-bars"></i><?= trans("pages"); ?></a>
                 </div>
             </div>
@@ -125,7 +126,7 @@
                                     <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#file_manager_image" data-image-type="editor"><i class="fa fa-image"></i>&nbsp;&nbsp;&nbsp;<?= trans("add_image"); ?></button>
                                 </div>
                             </div>
-                            <textarea class="tinyMCE form-control" name="page_content"><?= old('page_content'); ?></textarea>
+                            <textarea class="tinyMCE form-control" name="page_content" placeholder="<?= trans('content'); ?>"><?= old('page_content'); ?></textarea>
                         </div>
                     </div>
                 </div>

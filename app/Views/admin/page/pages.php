@@ -4,6 +4,9 @@
             <h3 class="box-title"><?= trans("pages"); ?></h3>
         </div>
         <div class="right">
+            <a href="<?= adminUrl('cms-pages'); ?>" class="btn btn-default" style="margin-right:8px;">
+                <i class="fa fa-magic"></i> CMS Visual
+            </a>
             <a href="<?= adminUrl('add-page'); ?>" class="btn btn-success btn-add-new"><i class="fa fa-plus"></i><?= trans("add_page"); ?></a>
         </div>
     </div>
@@ -76,6 +79,11 @@
                                                     <li>
                                                         <a href="<?= adminUrl('edit-page/' . esc($item->id)); ?>"><i class="fa fa-edit option-icon"></i><?= trans('edit'); ?></a>
                                                     </li>
+                                                    <?php if ($item->is_custom == 1): ?>
+                                                    <li>
+                                                        <a href="<?= adminUrl('pages/visual/' . esc($item->id)); ?>"><i class="fa fa-magic option-icon"></i> Visual (CMS)</a>
+                                                    </li>
+                                                    <?php endif; ?>
                                                     <li>
                                                         <a href="javascript:void(0)" onclick='deleteItem("Admin/deletePagePost","<?= $item->id; ?>","<?= trans("confirm_page"); ?>");'><i class="fa fa-trash option-icon"></i><?= trans('delete'); ?></a>
                                                     </li>

@@ -19,24 +19,7 @@ class AjaxController extends BaseController
     {
         parent::initController($request, $response, $logger);
         
-        // Para solicitações do simulador, desabilitamos a verificação
-        $uri = $this->request->getPath();
-        $simulatorEndpoints = [
-            'Ajax/addSimulatorLeadPost',
-            'Ajax/runOnPageLoad',
-            'Ajax/loadMorePosts',
-            'Ajax/incrementPostViews'
-        ];
-        
-        if (in_array($uri, $simulatorEndpoints)) {
-            $this->request->getPost(); // Força a inicialização da coleção POST
-            $this->request->isValidCSRF = true; // Define que a validação CSRF foi aprovada
-            
-            // Log da solicitação bypass para debug
-            log_message('info', 'CSRF bypass aplicado para: ' . $uri);
-        }
-        // Para outras rotas, verificamos se é AJAX
-        else if (!$this->request->isAJAX()) {
+        if (!$this->request->isAJAX()) {
             exit();
         }
         
@@ -574,16 +557,8 @@ class AjaxController extends BaseController
     /**
      * Add Simulator Lead
      */
-    /**
-     * Esse método foi completamente personalizado para ignorar validação CSRF
-     * já que está sendo chamado diretamente de um script na página
-     */
     public function addSimulatorLeadPost()
     {
-        // IMPORTANTE: Desativa a proteção CSRF para esta requisição específica
-        $this->request->getPost(); // Força a inicialização da coleção POST
-        $this->request->isValidCSRF = true; // Define que a validação CSRF foi aprovada
-        
         $jsonData = ["result" => 0, "message" => ""];
         
         try {
@@ -594,6 +569,12 @@ class AjaxController extends BaseController
             $email = cleanStr($this->request->getPost('email'));
             $phone = cleanStr($this->request->getPost('phone'));
             $simData = $this->request->getPost('sim_data');
+            $observations = $this->request->getPost('observations');
+            $company = cleanStr($this->request->getPost('company'));
+            $origin = cleanStr($this->request->getPost('origem') ?: $this->request->getPost('origin'));
+            $utmSource = $this->request->getPost('utm_source') ?: $this->request->getGet('utm_source');
+            $utmMedium = $this->request->getPost('utm_medium') ?: $this->request->getGet('utm_medium');
+            $utmCampaign = $this->request->getPost('utm_campaign') ?: $this->request->getGet('utm_campaign');
             
             // Log dos dados recebidos
             log_message('info', 'Dados do lead: ' . json_encode([
@@ -625,7 +606,13 @@ class AjaxController extends BaseController
                 'name' => $name,
                 'email' => $email,
                 'phone' => $phone,
-                'sim_data' => $simData
+                'sim_data' => $simData,
+                'observations' => $observations,
+                'company' => $company,
+                'origem' => $origin,
+                'utm_source' => $utmSource,
+                'utm_medium' => $utmMedium,
+                'utm_campaign' => $utmCampaign
             ];
             
             $simLeadModel = new SimLeadModel();
@@ -641,11 +628,6 @@ class AjaxController extends BaseController
             $jsonData['message'] = "Erro no servidor: " . $e->getMessage();
             log_message('error', 'Exceção ao processar lead: ' . $e->getMessage());
         }
-        
-        // Certifique-se de enviar os cabeçalhos CORS corretos
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: POST');
-        header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
         
         echo json_encode($jsonData);
         exit();

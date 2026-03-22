@@ -47,7 +47,7 @@
                         <div class="right">
                             <div id="editor_result_<?= $result->id; ?>">
                                 <label class="control-label"><?= trans("description"); ?></label>
-                                <textarea class="tinyMCEQuiz form-control" name="result_description_<?= $result->id; ?>"><?= $result->description; ?></textarea>
+                                <textarea class="tinyMCEQuiz form-control" name="result_description_<?= $result->id; ?>" placeholder="<?= trans('description'); ?>"><?= $result->description; ?></textarea>
                             </div>
                         </div>
                     </div>

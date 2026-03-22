@@ -59,7 +59,7 @@
                                     <tr class="tr-phrase">
                                         <td style="width: 50px;"><?= $count; ?></td>
                                         <td style="width: 40%;"><input type="text" class="form-control" value="<?= $item->label; ?>" <?= $language->text_direction == "rtl" ? 'dir="rtl"' : ''; ?> readonly></td>
-                                        <td style="width: 60%;"><input type="text" name="<?= $item->id; ?>" class="form-control input_translation" value="<?= $item->translation; ?>" <?= $language->text_direction == "rtl" ? 'dir="rtl"' : ''; ?>></td>
+                                        <td style="width: 60%;"><input type="text" name="<?= $item->id; ?>" class="form-control input_translation" value="<?= $item->translation; ?>" placeholder="<?= esc($item->label); ?>" <?= $language->text_direction == "rtl" ? 'dir="rtl"' : ''; ?>></td>
                                     </tr>
                                     <?php $count++;
                                 endforeach;

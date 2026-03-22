@@ -10,7 +10,31 @@ if (!empty($activeFonts)) {
         }
     }
 }
-if(!empty($localFonts)):
+// Preload local woff2 fonts for faster first render
+if (!empty($localFonts)):
+    foreach ($localFonts as $font):
+        if ($font->font_source == 'local'):
+            if ($font->font_key == 'open-sans'): ?>
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/open-sans/open-sans-400.woff2'); ?>">
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/open-sans/open-sans-600.woff2'); ?>">
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/open-sans/open-sans-700.woff2'); ?>">
+            <?php elseif ($font->font_key == 'inter'): ?>
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/inter/inter-400.woff2'); ?>">
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/inter/inter-600.woff2'); ?>">
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/inter/inter-700.woff2'); ?>">
+            <?php elseif ($font->font_key == 'roboto'): ?>
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/roboto/roboto-400.woff2'); ?>">
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/roboto/roboto-500.woff2'); ?>">
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/roboto/roboto-700.woff2'); ?>">
+            <?php elseif ($font->font_key == 'pt-serif'): ?>
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/pt-serif/pt-serif-400.woff2'); ?>">
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/pt-serif/pt-serif-700.woff2'); ?>">
+            <?php elseif ($font->font_key == 'source-sans-3'): ?>
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/source-sans/source-sans-3-400.woff2'); ?>">
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/source-sans/source-sans-3-600.woff2'); ?>">
+                <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/source-sans/source-sans-3-700.woff2'); ?>">
+            <?php endif; endif; endforeach; endif; ?>
+<?php if(!empty($localFonts)):
 foreach ($localFonts as $font):
 if($font->font_source == 'local' && $font->font_key=='open-sans'):?>
 <style>@font-face {font-family: 'Open Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url('<?= base_url('assets/fonts/open-sans/open-sans-400.woff2'); ?>') format('woff2'), url('<?= base_url('assets/fonts/open-sans/open-sans-400.woff'); ?>') format('woff')}  @font-face {font-family: 'Open Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url('<?= base_url('assets/fonts/open-sans/open-sans-600.woff2'); ?>') format('woff2'), url('<?= base_url('assets/fonts/open-sans/open-sans-600.woff'); ?>') format('woff')}  @font-face {font-family: 'Open Sans'; font-style: normal; font-weight: 700; font-display: swap; src: url('<?= base_url('assets/fonts/open-sans/open-sans-700.woff2'); ?>') format('woff2'), url('<?= base_url('assets/fonts/open-sans/open-sans-700.woff'); ?>') format('woff')}</style>
