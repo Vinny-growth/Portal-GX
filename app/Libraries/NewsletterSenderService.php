@@ -187,12 +187,20 @@ class NewsletterSenderService
             }
         }
 
-        $finalStatus = ($failed > 0 && $sent === 0) ? 'failed' : 'sent';
+        // Authoritative cumulative counts from the recipient ledger, so resuming a
+        // crashed/partial dispatch does not overwrite delivered_count with only this
+        // run's freshly-sent total (previously-sent recipients are skipped above).
+        $recipientsTotal = $this->db->table('newsletter_send_recipients')
+            ->where('send_id', $sendId)->countAllResults();
+        $deliveredTotal = $this->db->table('newsletter_send_recipients')
+            ->where(['send_id' => $sendId, 'status' => 'sent'])->countAllResults();
+
+        $finalStatus = ($deliveredTotal === 0 && $recipientsTotal > 0) ? 'failed' : 'sent';
         $this->sendModel->updateSend($sendId, [
             'status'           => $finalStatus,
             'sent_at'          => date('Y-m-d H:i:s'),
-            'recipients_count' => count($subscribers),
-            'delivered_count'  => $sent,
+            'recipients_count' => $recipientsTotal,
+            'delivered_count'  => $deliveredTotal,
             'error'            => $failed > 0 ? ('failed=' . $failed . '; ' . substr(implode(' | ', $errors), 0, 400)) : null,
         ]);
         $this->lineModel->touchLastSent($lineId);

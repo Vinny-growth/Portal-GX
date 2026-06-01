@@ -49,10 +49,16 @@ class NewsletterSubscriptionService
 
         $existing = $this->nlModel->getSubscriber($email);
         if ($existing) {
+            $status = $existing->status ?? '';
             // If pending and asking again, re-send confirmation
-            if (($existing->status ?? '') === 'pending') {
+            if ($status === 'pending') {
                 $this->sendConfirmation($existing);
                 return ['ok' => true, 'status' => 'pending_resent', 'subscriber_id' => (int) $existing->id];
+            }
+            // Previously opted-out (or bounced) and now actively asking to join again:
+            // honour the request and re-open the subscription instead of silently ignoring it.
+            if ($status === 'unsubscribed' || $status === 'bounced') {
+                return $this->reactivate($existing, $source, $explicitLineIds);
             }
             // If active, just acknowledge (idempotent)
             return ['ok' => true, 'status' => 'existing', 'subscriber_id' => (int) $existing->id];
@@ -100,6 +106,44 @@ class NewsletterSubscriptionService
             'subscriber_id' => $subId,
             'double_opt_in' => $doubleOptIn,
         ];
+    }
+
+    /**
+     * Re-open a previously unsubscribed/bounced contact who is subscribing again.
+     * Mirrors the new-subscriber flow (double opt-in vs immediate welcome) and clears
+     * the opt-out timestamp. Returns the same shape as subscribe()'s create branch.
+     */
+    protected function reactivate($existing, array $source, array $explicitLineIds): array
+    {
+        $doubleOptIn = $this->settingsModel->isDoubleOptInEnabled();
+
+        // Recompute editorial lines from this fresh opt-in (explicit form selection wins).
+        $lineIds = array_values(array_filter(array_map('intval', $explicitLineIds), fn($v) => $v > 0));
+        if (empty($lineIds) && !empty($source['source_category_id'])) {
+            $lineIds = $this->lineModel->getMatchingLineIdsForCategory((int) $source['source_category_id']);
+        }
+
+        $update = [
+            'status'          => $doubleOptIn ? 'pending' : 'active',
+            'confirm_token'   => $doubleOptIn ? bin2hex(random_bytes(24)) : null,
+            'confirmed_at'    => $doubleOptIn ? null : date('Y-m-d H:i:s'),
+            'unsubscribed_at' => null,
+        ];
+        if (!empty($lineIds)) {
+            $update['editorial_line_ids'] = json_encode(array_values(array_unique($lineIds)));
+        }
+        if (empty($existing->token)) {
+            $update['token'] = generateToken();
+        }
+        $this->db->table('subscribers')->where('id', $existing->id)->update($update);
+        $sub = $this->db->table('subscribers')->where('id', $existing->id)->get()->getRow();
+
+        if ($doubleOptIn) {
+            $this->sendConfirmation($sub);
+            return ['ok' => true, 'status' => 'pending', 'subscriber_id' => (int) $sub->id, 'double_opt_in' => true];
+        }
+        $this->sendWelcomeWithMagnets($sub);
+        return ['ok' => true, 'status' => 'active', 'subscriber_id' => (int) $sub->id, 'double_opt_in' => false];
     }
 
     public function confirm(string $token): array
