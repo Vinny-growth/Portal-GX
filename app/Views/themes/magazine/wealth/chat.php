@@ -1,2 +1,1 @@
-<?= view('wealth/chat'); ?>
-
+<?= view('wealth/chat', get_defined_vars()); ?>

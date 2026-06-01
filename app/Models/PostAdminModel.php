@@ -27,7 +27,7 @@ class PostAdminModel extends BaseModel
 
     public function buildQuery()
     {
-        $this->builder->select("posts.*, (SELECT CONCAT('img_bg::', i.image_big, '||','img_df::', i.image_default, '||','img_sl::', i.image_slider, '||','img_md::', i.image_mid, '||','img_sm::', i.image_small, '||','img_mi::', i.image_mime, '||',
+        $this->builder->select("posts.*, (SELECT CONCAT('img_dsc::', IFNULL(i.image_discover,''), '||','img_bg::', i.image_big, '||','img_df::', i.image_default, '||','img_sl::', i.image_slider, '||','img_md::', i.image_mid, '||','img_sm::', i.image_small, '||','img_mi::', i.image_mime, '||',
         'img_st::', i.storage) FROM images i WHERE i.id = posts.image_id LIMIT 1) AS image_data");
     }
 
@@ -514,6 +514,8 @@ class PostAdminModel extends BaseModel
             $this->db->table('comments')->where('post_id', $post->id)->delete();
             //remove google index
             $this->requestRemoveGoogleIndexing($post);
+            //notify IndexNow about removed URL
+            $this->requestIndexNowRemoval($post);
             //delete post
             return $this->builder->where('id', $post->id)->delete();
         }
@@ -780,6 +782,42 @@ class PostAdminModel extends BaseModel
         return null;
     }
 
+    //submit post URL to IndexNow (Bing and other search engines)
+    public function requestIndexNowSubmission($post)
+    {
+        if (!empty($post) && !empty($this->generalSettings->indexnow_enabled) && $this->generalSettings->indexnow_enabled == 1 && isPostPublished($post)) {
+            $baseUrl = generateBaseURLByLangId($post->lang_id);
+            $postUrl = generatePostURL($post, $baseUrl);
+            if (!empty($postUrl)) {
+                $client = new \App\Libraries\IndexNowClient();
+                $client->submitUrl($postUrl);
+            }
+        }
+    }
+
+    //submit URL removal to IndexNow (notify URL changed/removed)
+    public function requestIndexNowRemoval($post)
+    {
+        if (!empty($post) && !empty($this->generalSettings->indexnow_enabled) && $this->generalSettings->indexnow_enabled == 1) {
+            $baseUrl = generateBaseURLByLangId($post->lang_id);
+            $postUrl = generatePostURL($post, $baseUrl);
+            if (!empty($postUrl)) {
+                $client = new \App\Libraries\IndexNowClient();
+                $client->submitUrl($postUrl);
+            }
+        }
+    }
+
+    //test IndexNow API
+    public function requestTestIndexNow()
+    {
+        if (!empty($this->generalSettings->indexnow_enabled) && $this->generalSettings->indexnow_enabled == 1) {
+            $client = new \App\Libraries\IndexNowClient();
+            return $client->submitUrl(base_url());
+        }
+        return null;
+    }
+
     //generate CSV object
     public function generateCSVObject($filePath)
     {
@@ -823,7 +861,7 @@ class PostAdminModel extends BaseModel
         $filePath = FCPATH . 'uploads/tmp/' . $txtFileName;
         $file = fopen($filePath, 'r');
         $content = fread($file, filesize($filePath));
-        $array = @unserialize($content);
+        $array = is_string($content) ? @unserialize($content) : false;
         if (!empty($array)) {
             $uploadModel = new UploadModel();
             $i = 1;
@@ -886,6 +924,7 @@ class PostAdminModel extends BaseModel
                                 $tempPath = $uploadModel->downloadTempImage($imgURL, 'jpg');
                                 if (!empty($tempPath) && file_exists($tempPath)) {
                                     $dataImage = [
+                                        'image_discover' => $uploadModel->uploadPostImage($tempPath, 'discover'),
                                         'image_big' => $uploadModel->uploadPostImage($tempPath, 'big'),
                                         'image_default' => $uploadModel->uploadPostImage($tempPath, 'default'),
                                         'image_slider' => $uploadModel->uploadPostImage($tempPath, 'slider'),

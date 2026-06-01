@@ -15,7 +15,9 @@ class RssParser
      **/
     public function getFeeds($url)
     {
-        header('Content-type:text/html; charset=utf-8');
+        if (!headers_sent()) {
+            header('Content-type:text/html; charset=utf-8');
+        }
         $feed = new \SimplePie\SimplePie();
         $feed->set_feed_url($url);
         $feed->enable_cache(false);
@@ -45,6 +47,7 @@ class RssParser
                 $tempPath = $uploadModel->downloadTempImage($imgURL, 'jpg');
                 if (!empty($tempPath) && file_exists($tempPath)) {
                     $data = [
+                        'image_discover' => $uploadModel->uploadPostImage($tempPath, 'discover'),
                         'image_big' => $uploadModel->uploadPostImage($tempPath, 'big'),
                         'image_default' => $uploadModel->uploadPostImage($tempPath, 'default'),
                         'image_slider' => $uploadModel->uploadPostImage($tempPath, 'slider'),

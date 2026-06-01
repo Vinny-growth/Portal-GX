@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\WealthModel;
 use App\Libraries\WealthAgent;
-use App\Models\CmsPageModel;
+use App\Models\SimLeadModel;
 
 class WealthManagerController extends BaseController
 {
@@ -19,17 +19,11 @@ class WealthManagerController extends BaseController
     // Public: Landing /wealth
     public function index()
     {
-        $data = setPageMeta('Wealth Manager');
-        $data['userSession'] = getUserSession();
-
-        // If guest and CMS page 'wealth' is published, route to CMS LP
-        if (!authCheck()) {
-            $cms = new CmsPageModel();
-            $p = $cms->getBySlug('wealth');
-            if ($p && !empty($p->published_json)) {
-                return redirect()->to(base_url('p/wealth'));
-            }
-        }
+        $data = $this->getWealthMarketingShell([
+            'title' => 'Wealth advisory para estruturar patrimônio, renda e legado',
+            'description' => 'Diagnóstico patrimonial, alocação, liquidez, proteção e plano consultivo para famílias, executivos e empresários.',
+            'keywords' => trim($this->settings->keywords . ', wealth advisory, planejamento patrimonial, consultoria financeira, gestão de patrimônio', ' ,'),
+        ]);
 
         // CMS content from settings
         $landingJson = $this->wm->getSetting('wm_landing_content', null);
@@ -39,10 +33,84 @@ class WealthManagerController extends BaseController
         $copyJson = $this->wm->getSetting('wm_copy_json', '{}');
         $copyArr = @json_decode($copyJson, true);
         $data['copy'] = is_array($copyArr) ? $copyArr : [];
+        $data['memberProgress'] = null;
+
+        if ($data['isAuthenticated']) {
+            $progress = $this->computeProgress(user()->id);
+            if (!empty($progress['total']) && !empty($progress['score'])) {
+                $progress['pct'] = (int)round(($progress['score'] / $progress['total']) * 100);
+                $data['memberProgress'] = $progress;
+            }
+        }
+
+        // Build FAQPage + Service schema for wealth landing
+        $landingArr = is_array($data['landing'] ?? null) ? $data['landing'] : [];
+        $faqItems = !empty($landingArr['faq']) && is_array($landingArr['faq']) ? $landingArr['faq'] : [
+            ['q' => 'Para quem a consultoria é indicada?', 'a' => 'Para famílias, executivos e empresários que querem organizar patrimônio, renda, liquidez e decisões financeiras com visão integrada.'],
+            ['q' => 'Preciso transferir a carteira para ter um diagnóstico?', 'a' => 'Não. O diagnóstico inicial parte do seu contexto atual e identifica onde estão travas, desalinhamentos e prioridades.'],
+            ['q' => 'O que recebo após o primeiro contato?', 'a' => 'Uma leitura consultiva do caso, hipóteses de ganho de eficiência e indicação objetiva dos próximos movimentos possíveis.'],
+            ['q' => 'A análise inclui fluxo de caixa, patrimônio e metas?', 'a' => 'Sim. O foco é conectar patrimônio, liquidez, objetivos e ritmo de construção para evitar decisões isoladas.'],
+        ];
+
+        $faqEntities = [];
+        foreach ($faqItems as $i => $faq) {
+            $q = trim((string)($faq['q'] ?? ''));
+            $a = trim((string)($faq['a'] ?? ''));
+            if ($q !== '' && $a !== '') {
+                $faqEntities[] = [
+                    '@type' => 'Question',
+                    'name' => $q,
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => $a,
+                    ],
+                    'position' => $i + 1,
+                ];
+            }
+        }
+
+        $wealthCanonical = base_url('wealth');
+        $data['marketingSchema'] = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                [
+                    '@type' => 'WebPage',
+                    '@id' => $wealthCanonical . '#webpage',
+                    'url' => $wealthCanonical,
+                    'name' => $data['title'],
+                    'description' => $data['description'],
+                    'inLanguage' => $this->activeLang->language_code ?? 'pt',
+                    'isPartOf' => ['@id' => base_url() . '/#website'],
+                    'about' => ['@id' => $wealthCanonical . '#service'],
+                ],
+                [
+                    '@type' => 'FinancialService',
+                    '@id' => $wealthCanonical . '#service',
+                    'name' => 'Wealth Advisory GX Capital',
+                    'description' => 'Diagnóstico patrimonial, alocação, liquidez, proteção e plano consultivo para famílias, executivos e empresários.',
+                    'provider' => ['@id' => base_url() . '/#organization'],
+                    'areaServed' => 'BR',
+                    'serviceType' => [
+                        'Diagnóstico patrimonial',
+                        'Consultoria de alocação',
+                        'Planejamento de liquidez e renda',
+                        'Proteção patrimonial e legado',
+                    ],
+                ],
+                [
+                    '@type' => 'FAQPage',
+                    '@id' => $wealthCanonical . '#faq',
+                    'mainEntity' => $faqEntities,
+                ],
+            ],
+        ];
 
         $this->wm->incrementCounter('wm_analytics_view_landing', 1);
-        if (($this->generalSettings->meta_api_enabled ?? 0) == 1) {
-            @trackMetaPageView(current_url());
+        if (function_exists('metaConversions') && metaConversions()->isEventEnabled('PageView')) {
+            $pageUrl = current_url();
+            deferAfterResponse(function () use ($pageUrl) {
+                @trackMetaPageView($pageUrl);
+            });
         }
 
         echo loadView('partials/_header', $data);
@@ -52,12 +120,51 @@ class WealthManagerController extends BaseController
 
     public function trackEvent()
     {
-        $name = inputPost('name');
-        if ($name === 'start_signup') {
-            $this->wm->incrementCounter('wm_analytics_start_signup', 1);
+        $name = trim((string)inputPost('name'));
+        $map = [
+            'start_signup' => 'wm_analytics_start_signup',
+            'wealth_diagnostic_interaction' => 'wm_analytics_diagnostic_interaction',
+            'wealth_lead_submit' => 'wm_analytics_lead_submit',
+            'wealth_continue_area' => 'wm_analytics_continue_area',
+        ];
+
+        if (isset($map[$name])) {
+            $this->wm->incrementCounter($map[$name], 1);
             return $this->response->setJSON(['ok'=>true]);
         }
         return $this->response->setJSON(['ok'=>false]);
+    }
+
+    public function leadCapture()
+    {
+        $lead = $this->collectLeadRequest();
+        if (!empty($lead['errors'])) {
+            return $this->response
+                ->setStatusCode(422)
+                ->setJSON([
+                    'success' => false,
+                    'message' => implode(' ', $lead['errors']),
+                ]);
+        }
+
+        try {
+            $this->persistLeadSubmission($lead);
+            $this->wm->incrementCounter('wm_analytics_lead_submit', 1);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'message' => 'Recebemos seu diagnóstico inicial. Nosso time vai analisar e retornar com os próximos passos.',
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Wealth lead capture failed: {message}', ['message' => $e->getMessage()]);
+
+            return $this->response
+                ->setStatusCode(500)
+                ->setJSON([
+                    'success' => false,
+                    'message' => 'Não foi possível enviar seus dados agora. Tente novamente em alguns instantes.',
+                ]);
+        }
     }
 
     // Public: Conversa /wealth/conversa
@@ -618,12 +725,11 @@ class WealthManagerController extends BaseController
     // Public: Agendar /wealth/agendar
     public function agendar()
     {
-        if (!authCheck()) {
-            setErrorMessage('message_post_auth');
-            return redirect()->to(generateURL('register'));
-        }
-        $data = setPageMeta('Agendar Consultoria');
-        $data['userSession'] = getUserSession();
+        $data = $this->getWealthMarketingShell([
+            'title' => 'Agende um diagnóstico patrimonial consultivo',
+            'description' => 'Envie seu contexto, objetivos e melhor horário. A equipe da GX Capital retorna com um plano inicial de próximos passos.',
+            'keywords' => trim($this->settings->keywords . ', wealth advisory, diagnóstico patrimonial, agendar consultoria financeira', ' ,'),
+        ]);
 
         echo loadView('partials/_header', $data);
         echo loadView('wealth/schedule', $data);
@@ -632,22 +738,26 @@ class WealthManagerController extends BaseController
 
     public function agendarPost()
     {
-        if (!authCheck()) {
-            return redirect()->to(generateURL('register'));
+        $lead = $this->collectLeadRequest();
+        if (!empty($lead['errors'])) {
+            setErrorMessage(implode(' ', $lead['errors']), false);
+            return redirect()->back()->withInput();
         }
-        $userId = user()->id;
-        $data = [
-            'user_id' => $userId,
-            'nome' => inputPost('nome'),
-            'email' => inputPost('email'),
-            'telefone' => inputPost('telefone'),
-            'preferencia_horario' => inputPost('preferencia_horario'),
-            'status' => 'novo',
-        ];
-        $this->wm->addAppointment($data);
-        $this->wm->incrementCounter('wm_analytics_appointment_created', 1);
-        setSuccessMessage('Pedido de agendamento enviado com sucesso!');
-        return redirect()->to(base_url('wealth/agendar'));
+
+        try {
+            $this->persistLeadSubmission($lead);
+            setSuccessMessage('Recebemos sua solicitação. Nosso time vai retornar com os próximos passos.', false);
+        } catch (\Throwable $e) {
+            log_message('error', 'Wealth appointment post failed: {message}', ['message' => $e->getMessage()]);
+            setErrorMessage('Não foi possível enviar sua solicitação agora. Tente novamente em alguns instantes.', false);
+            return redirect()->back()->withInput();
+        }
+
+        $target = ($lead['source_page'] ?? '') === 'landing'
+            ? base_url('wealth') . '#fale-com-especialista'
+            : base_url('wealth/agendar') . '#gx-wealth-schedule-form';
+
+        return redirect()->to($target);
     }
 
     // Public: PDF básico do resumo
@@ -694,6 +804,211 @@ class WealthManagerController extends BaseController
             ->setHeader('Content-Type', 'application/octet-stream')
             ->setHeader('Content-Disposition', 'attachment; filename="resumo_wealth_manager.html"')
             ->setBody($html);
+    }
+
+    private function getWealthMarketingShell(array $overrides = [])
+    {
+        $title = $overrides['title'] ?? 'Wealth advisory GX Capital';
+        $data = setPageMeta($title);
+        $defaults = [
+            'title' => $title,
+            'description' => 'Consultoria patrimonial para organizar patrimônio, renda, liquidez e decisões financeiras com visão integrada.',
+            'keywords' => trim($this->settings->keywords . ', wealth advisory, consultoria financeira, planejamento patrimonial', ' ,'),
+            'bodyClass' => 'gx-marketing-home gx-wealth-page',
+            'pageHeadView' => 'wealth/_shared_styles',
+            'userSession' => getUserSession(),
+            'isAuthenticated' => authCheck(),
+            'blogUrl' => langBaseUrl('blog'),
+            'simulatorsHubUrl' => langBaseUrl('simuladores'),
+            'wealthConversationUrl' => base_url('wealth/conversa'),
+            'wealthResultsUrl' => base_url('wealth/resultado'),
+            'wealthScheduleUrl' => base_url('wealth/agendar'),
+            'wealthLeadUrl' => base_url('wealth/lead'),
+        ];
+
+        return array_merge($data, $defaults, $overrides);
+    }
+
+    private function collectLeadRequest()
+    {
+        $honeypot = trim((string)inputPost('company_website'));
+        $name = trim((string)inputPost('name'));
+        $email = trim((string)inputPost('email'));
+        $phone = trim((string)inputPost('phone'));
+        $goal = trim((string)(inputPost('goal') ?: inputPost('diagnosis_objective')));
+        $patrimonyRange = trim((string)inputPost('patrimony_range'));
+        $preferredSlot = trim((string)inputPost('preferred_slot'));
+        $message = trim((string)inputPost('message'));
+        $sourcePage = trim((string)inputPost('source_page'));
+        $phoneDigits = preg_replace('/\D+/', '', $phone);
+        $diagnostic = [
+            'invested' => $this->normalizeLeadNumber(inputPost('diagnosis_invested')),
+            'monthly_invest' => $this->normalizeLeadNumber(inputPost('diagnosis_monthly_invest')),
+            'monthly_cost' => $this->normalizeLeadNumber(inputPost('diagnosis_monthly_cost')),
+            'target_capital' => $this->normalizeLeadNumber(inputPost('diagnosis_target_capital')),
+            'projection_10y' => $this->normalizeLeadNumber(inputPost('diagnosis_projection_10y')),
+            'gap' => $this->normalizeLeadNumber(inputPost('diagnosis_gap')),
+            'coverage_pct' => $this->normalizeLeadNumber(inputPost('diagnosis_coverage_pct')),
+            'objective' => trim((string)inputPost('diagnosis_objective')),
+        ];
+
+        $errors = [];
+
+        if ($honeypot !== '') {
+            $errors[] = 'Solicitação inválida.';
+        }
+        if ($name === '') {
+            $errors[] = 'Informe seu nome.';
+        }
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'Informe um e-mail válido.';
+        }
+        if ($phone === '' || strlen($phoneDigits) < 10) {
+            $errors[] = 'Informe um telefone com DDD.';
+        }
+        if ($goal === '') {
+            $errors[] = 'Selecione seu principal objetivo.';
+        }
+        if ($patrimonyRange === '') {
+            $errors[] = 'Selecione a faixa patrimonial.';
+        }
+
+        return [
+            'errors' => $errors,
+            'user_id' => authCheck() ? user()->id : null,
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'goal' => $goal,
+            'patrimony_range' => $patrimonyRange,
+            'preferred_slot' => $preferredSlot,
+            'message' => $message,
+            'source_page' => $sourcePage,
+            'landing_page' => trim((string)(inputPost('landing_page') ?: current_url())),
+            'utm_source' => trim((string)inputPost('utm_source')),
+            'utm_medium' => trim((string)inputPost('utm_medium')),
+            'utm_campaign' => trim((string)inputPost('utm_campaign')),
+            'utm_term' => trim((string)inputPost('utm_term')),
+            'utm_content' => trim((string)inputPost('utm_content')),
+            'diagnostic' => $diagnostic,
+        ];
+    }
+
+    private function persistLeadSubmission(array $lead)
+    {
+        $saved = $this->wm->addAppointment([
+            'user_id' => $lead['user_id'],
+            'nome' => $lead['name'],
+            'email' => $lead['email'],
+            'telefone' => $lead['phone'],
+            'preferencia_horario' => $lead['preferred_slot'] ?: $lead['goal'],
+            'status' => 'novo',
+        ]);
+
+        if (!$saved) {
+            throw new \RuntimeException('Unable to persist wealth appointment lead.');
+        }
+
+        $this->wm->incrementCounter('wm_analytics_appointment_created', 1);
+
+        try {
+            $simLead = new SimLeadModel();
+            $simLead->addSimLead([
+                'name' => $lead['name'],
+                'email' => $lead['email'],
+                'phone' => $lead['phone'],
+                'sim_data' => json_encode([
+                    'source' => 'wealth_landing',
+                    'goal' => $lead['goal'],
+                    'patrimony_range' => $lead['patrimony_range'],
+                    'preferred_slot' => $lead['preferred_slot'],
+                    'diagnostic' => $lead['diagnostic'],
+                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                'observations' => $this->buildLeadObservationText($lead),
+                'origem' => 'Wealth Advisory GX Capital',
+                'utm_source' => $lead['utm_source'],
+                'utm_medium' => $lead['utm_medium'],
+                'utm_campaign' => $lead['utm_campaign'],
+                'utm_term' => $lead['utm_term'],
+                'utm_content' => $lead['utm_content'],
+                'landing_page' => $lead['landing_page'],
+                'source_system' => 'site-gx-php-wealth',
+                'meta_content_name' => 'Wealth Advisory GX Capital',
+                'meta_content_category' => 'Consultoria Financeira',
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'Wealth lead mirror failed: {message}', ['message' => $e->getMessage()]);
+        }
+    }
+
+    private function buildLeadObservationText(array $lead)
+    {
+        $lines = [
+            'Objetivo principal: ' . $lead['goal'],
+            'Faixa patrimonial: ' . $lead['patrimony_range'],
+        ];
+
+        if (!empty($lead['preferred_slot'])) {
+            $lines[] = 'Melhor horário para contato: ' . $lead['preferred_slot'];
+        }
+
+        if (!empty($lead['message'])) {
+            $lines[] = 'Contexto informado: ' . $lead['message'];
+        }
+
+        $diagnostic = $lead['diagnostic'] ?? [];
+        $diagParts = [];
+        if ($diagnostic['invested'] !== null) {
+            $diagParts[] = 'patrimônio informado ' . $this->formatCurrencyForLead($diagnostic['invested']);
+        }
+        if ($diagnostic['monthly_invest'] !== null) {
+            $diagParts[] = 'aporte mensal ' . $this->formatCurrencyForLead($diagnostic['monthly_invest']);
+        }
+        if ($diagnostic['monthly_cost'] !== null) {
+            $diagParts[] = 'custo de vida ' . $this->formatCurrencyForLead($diagnostic['monthly_cost']);
+        }
+        if ($diagnostic['target_capital'] !== null) {
+            $diagParts[] = 'capital alvo ' . $this->formatCurrencyForLead($diagnostic['target_capital']);
+        }
+        if ($diagnostic['projection_10y'] !== null) {
+            $diagParts[] = 'projeção 10 anos ' . $this->formatCurrencyForLead($diagnostic['projection_10y']);
+        }
+        if ($diagnostic['gap'] !== null) {
+            $diagParts[] = 'gap estimado ' . $this->formatCurrencyForLead($diagnostic['gap']);
+        }
+        if ($diagnostic['coverage_pct'] !== null) {
+            $diagParts[] = 'cobertura estimada ' . number_format($diagnostic['coverage_pct'], 1, ',', '.') . '%';
+        }
+
+        if (!empty($diagParts)) {
+            $lines[] = 'Diagnóstico rápido: ' . implode(' | ', $diagParts);
+        }
+
+        return implode("\n", $lines);
+    }
+
+    private function normalizeLeadNumber($value)
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string)$value);
+        if ($value === '') {
+            return null;
+        }
+
+        $normalized = str_replace(',', '.', $value);
+        if (!is_numeric($normalized)) {
+            return null;
+        }
+
+        return round((float)$normalized, 2);
+    }
+
+    private function formatCurrencyForLead($value)
+    {
+        return 'R$ ' . number_format((float)$value, 2, ',', '.');
     }
 
 }

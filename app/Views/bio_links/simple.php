@@ -149,45 +149,9 @@
             font-weight: 900;
         }
         
-        /* Força a cor do ícone quando personalizada */
+        /* Garante que ícones com cor inline não sejam sobrescritos pelo tema */
         .bio-link i[style*="color"] {
-            color: inherit !important;
-        }
-        
-        .bio-link i.fa-youtube-play:before {
-            content: "\f04b";
-        }
-        
-        .bio-link i.fa-youtube:before {
-            content: "\f167";
-        }
-        
-        .bio-link i.fa-instagram:before {
-            content: "\f16d";
-        }
-        
-        .bio-link i.fa-facebook:before {
-            content: "\f09a";
-        }
-        
-        .bio-link i.fa-twitter:before {
-            content: "\f099";
-        }
-        
-        .bio-link i.fa-linkedin:before {
-            content: "\f0e1";
-        }
-        
-        .bio-link i.fa-globe:before {
-            content: "\f0ac";
-        }
-        
-        .bio-link i.fa-whatsapp:before {
-            content: "\f232";
-        }
-        
-        .bio-link i.fa-telegram:before {
-            content: "\f2c6";
+            color: inherit;
         }
 
         .bio-link-title {
@@ -304,24 +268,45 @@
                        style="<?= !empty($link['button_color']) ? 'background-color: ' . esc($link['button_color']) . ';' : ''; ?><?= !empty($link['text_color']) ? 'color: ' . esc($link['text_color']) . ';' : ''; ?>">
                         
                         <?php if (!empty($link['icon'])): ?>
-                            <?php 
-                            // Converter ícones FA4 para FA6 se necessário
-                            $iconClass = esc($link['icon']);
-                            $iconClass = str_replace('fa-youtube-play', 'fa-youtube', $iconClass);
-                            
-                            // Se não tem prefixo fa, fas, far, fab, adicionar fab para redes sociais
-                            if (!preg_match('/^(fa|fas|far|fab|fal|fad|fat)\s/', $iconClass)) {
-                                if (strpos($iconClass, 'youtube') !== false || 
-                                    strpos($iconClass, 'instagram') !== false || 
-                                    strpos($iconClass, 'facebook') !== false || 
-                                    strpos($iconClass, 'twitter') !== false || 
-                                    strpos($iconClass, 'linkedin') !== false ||
-                                    strpos($iconClass, 'whatsapp') !== false ||
-                                    strpos($iconClass, 'telegram') !== false) {
-                                    $iconClass = 'fab ' . str_replace('fa ', '', $iconClass);
-                                } elseif (!preg_match('/^fa\s/', $iconClass)) {
-                                    $iconClass = 'fas ' . $iconClass;
+                            <?php
+                            $iconClass = trim(esc($link['icon']));
+
+                            // Remover prefixo "fa " (FA4 legacy) — não é válido no FA6
+                            $iconClass = preg_replace('/^fa\s+/', '', $iconClass);
+
+                            // Converter nomes de ícones FA4 para FA6
+                            $fa4ToFa6 = [
+                                'fa-youtube-play' => 'fa-youtube',
+                                'fa-newspaper-o'  => 'fa-newspaper',
+                                'fa-envelope-o'   => 'fa-envelope',
+                                'fa-file-text-o'  => 'fa-file-lines',
+                                'fa-money'        => 'fa-money-bill',
+                                'fa-bar-chart'    => 'fa-chart-bar',
+                                'fa-pie-chart'    => 'fa-chart-pie',
+                                'fa-area-chart'   => 'fa-chart-area',
+                                'fa-pencil'       => 'fa-pencil-alt',
+                            ];
+                            foreach ($fa4ToFa6 as $old => $new) {
+                                $iconClass = str_replace($old, $new, $iconClass);
+                            }
+                            // Remover sufixo -o genérico de ícones outline FA4
+                            $iconClass = preg_replace('/^(fa-\w+)-o$/', '$1', $iconClass);
+
+                            // Se já tem prefixo FA6 válido (fas, far, fab, fal, fad), manter
+                            if (!preg_match('/^(fas|far|fab|fal|fad|fat)\s/', $iconClass)) {
+                                // Ícones de marcas → fab
+                                $brandIcons = ['youtube','instagram','facebook','twitter','linkedin',
+                                               'whatsapp','telegram','tiktok','spotify','pinterest',
+                                               'snapchat','github','reddit','x-twitter','threads',
+                                               'discord','twitch','medium','dribbble','behance'];
+                                $isBrand = false;
+                                foreach ($brandIcons as $brand) {
+                                    if (strpos($iconClass, $brand) !== false) {
+                                        $isBrand = true;
+                                        break;
+                                    }
                                 }
+                                $iconClass = ($isBrand ? 'fab ' : 'fas ') . $iconClass;
                             }
                             ?>
                             <i class="<?= $iconClass; ?>" style="<?= !empty($link['text_color']) ? 'color: ' . esc($link['text_color']) . ';' : ''; ?>"></i>

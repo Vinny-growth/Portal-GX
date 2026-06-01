@@ -1,13 +1,36 @@
-writable/
-vendor/
-.env
-*.log
-*.tmp
+# OS
 .DS_Store
-Thumb.db
-.claude/
-.well-known/acme-challenge/
-github_deploy_key
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Node (caso adicione build tools depois)
+node_modules/
+dist/
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Reviews / scratch
+.review/
+scraps/
+
+# Secrets / deploy scripts (contain credentials — never commit)
 do_push.sh
 github_push.sh
-uploads/tmp/
+github_deploy_key
+*.pem
+*.key
+id_rsa
+
+# CodeIgniter runtime (cache, logs, sessions)
+writable/
+
+# User-generated uploads (served from disk, not versioned)
+uploads/

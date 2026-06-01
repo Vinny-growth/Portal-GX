@@ -1,0 +1,32 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css">
+<style>
+body { background:#fff; padding: 20px; }
+.tabs { display:flex; gap: 32px; border-bottom: 1px solid var(--gx-border); margin-bottom: 20px; }
+.tab { padding: 8px 0; font-size: 12px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; color: rgba(135,112,74,.5); border-bottom: 2px solid transparent; cursor: pointer; transition: var(--transition-smooth); display:inline-flex; align-items:center; gap:8px;}
+.tab:hover { color: var(--gx-secondary-dark); }
+.tab.active { color: var(--gx-secondary-dark); border-bottom-color: var(--gx-secondary-dark); }
+.tab.ai.active { color: var(--gx-primary); border-bottom-color: var(--gx-primary); }
+.row { display:flex; gap: 8px; align-items:center; }
+.tag { padding: 4px 10px; background: var(--gx-primary); color: var(--gx-secondary-light); font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;}
+.tag.gold { background: var(--gx-secondary-dark); color: #fff; }
+.tag.outline { background: transparent; color: var(--gx-primary); border: 1px solid var(--gx-primary); }
+</style></head>
+<body>
+<div class="eyebrow" style="margin-bottom:8px">Tabs · brutalist underline</div>
+<div class="tabs">
+  <span class="tab active">Visão Geral</span>
+  <span class="tab">Analytics</span>
+  <span class="tab">KPIs Executivos</span>
+  <span class="tab ai">Nexus IA</span>
+</div>
+
+<div class="eyebrow" style="margin-bottom:8px">Status / chip tags</div>
+<div class="row">
+  <span class="tag">CRM</span>
+  <span class="tag gold">Premium</span>
+  <span class="tag outline">META 87%</span>
+  <span class="tag" style="background:#16a34a; color:#fff;">Aprovado</span>
+  <span class="tag" style="background:#dc2626; color:#fff;">Atraso</span>
+</div>
+</body></html>

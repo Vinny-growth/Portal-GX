@@ -1,0 +1,21 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css">
+<style>
+.spaces { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; align-items:end; }
+.spaces .col { gap: 4px; align-items:center; }
+.bar { background: var(--gx-primary); width: 100%; }
+.spaces .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--fg2); }
+</style></head>
+<body>
+<div class="eyebrow" style="margin-bottom:12px">Spacing scale · 4px base</div>
+<div class="spaces">
+  <div class="col"><div class="bar" style="height:4px"></div><div class="lbl">4</div></div>
+  <div class="col"><div class="bar" style="height:8px"></div><div class="lbl">8</div></div>
+  <div class="col"><div class="bar" style="height:12px"></div><div class="lbl">12</div></div>
+  <div class="col"><div class="bar" style="height:16px"></div><div class="lbl">16</div></div>
+  <div class="col"><div class="bar" style="height:24px"></div><div class="lbl">24</div></div>
+  <div class="col"><div class="bar" style="height:32px"></div><div class="lbl">32</div></div>
+  <div class="col"><div class="bar" style="height:48px"></div><div class="lbl">48</div></div>
+  <div class="col"><div class="bar" style="height:64px"></div><div class="lbl">64</div></div>
+</div>
+</body></html>

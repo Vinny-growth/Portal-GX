@@ -1,0 +1,34 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css">
+<style>
+body { background: var(--bg2); }
+.row-b { display:flex; flex-wrap: wrap; gap: 8px; align-items:center; }
+.badge { display:inline-flex; align-items:center; gap:6px; font-family: var(--font-sans); font-size:11px; font-weight:600; padding: 3px 10px; border: 1px solid transparent; border-radius: 9999px; letter-spacing: 0.02em;}
+.badge.primary { background: var(--gx-primary); color: var(--gx-secondary-light); }
+.badge.secondary { background: var(--gx-secondary-light); color: var(--gx-primary); }
+.badge.success { background: #16a34a; color: #fff; }
+.badge.warning { background: #d97706; color: #fff; }
+.badge.danger { background: #dc2626; color: #fff; }
+.badge.outline { background: #fff; color: var(--gx-primary); border-color: var(--gx-border); }
+.tag-square { font-family: var(--font-sans); font-size:10px; font-weight:700; letter-spacing: .12em; text-transform: uppercase; padding: 4px 8px; border-radius: 0;}
+.dot { width: 6px; height: 6px; border-radius: 50%; }
+.row-section + .row-section { margin-top: 10px; }
+</style></head>
+<body>
+  <div class="eyebrow" style="margin-bottom:8px">Badges (pill — legacy)</div>
+  <div class="row-section row-b">
+    <span class="badge primary">Default</span>
+    <span class="badge secondary">Secondary</span>
+    <span class="badge success"><span class="dot" style="background:#fff"></span>Active</span>
+    <span class="badge warning">Warning</span>
+    <span class="badge danger">Destructive</span>
+    <span class="badge outline">Outline</span>
+  </div>
+  <div class="eyebrow" style="margin-top:14px; margin-bottom:8px">Tags (sharp — preferred for brutalist UI)</div>
+  <div class="row-section row-b">
+    <span class="tag-square" style="background:var(--gx-primary); color:var(--gx-secondary-light);">NEXUS&nbsp;IA</span>
+    <span class="tag-square" style="background:var(--gx-secondary-dark); color:#fff;">PREMIUM</span>
+    <span class="tag-square" style="background:var(--gx-secondary-light); color:var(--gx-primary);">CRM</span>
+    <span class="tag-square" style="background:#fff; color:var(--gx-primary); border:1px solid var(--gx-border);">META · 87%</span>
+  </div>
+</body></html>

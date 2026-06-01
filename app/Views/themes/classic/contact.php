@@ -33,16 +33,27 @@
                                     <?= loadView('partials/_messages'); ?>
                                     <form action="<?= base_url('contact-post'); ?>" method="post" id="form_validate" class="validate_terms">
                                         <?= csrf_field(); ?>
+                                        <input type="hidden" name="landing_page" value="<?= esc(current_url()); ?>">
+                                        <input type="hidden" name="lead_origin" value="<?= esc('Página de contato - ' . $page->title); ?>">
                                         <div class="form-group">
                                             <input type="text" class="form-control form-input" name="name" placeholder="<?= trans("name"); ?>" maxlength="199" minlength="1" pattern=".*\S+.*" value="<?= old('name'); ?>" required>
                                         </div>
                                         <div class="form-group">
                                             <input type="email" class="form-control form-input" name="email" maxlength="199" placeholder="<?= trans("email"); ?>" value="<?= old('email'); ?>" required>
                                         </div>
+                                        <?= view('partials/_lead_phone_field', [
+                                            'fieldIdPrefix' => 'classic-contact-phone',
+                                            'wrapperClass' => 'form-group',
+                                            'label' => false,
+                                            'countryClass' => 'form-control form-input',
+                                            'inputClass' => 'form-control form-input',
+                                            'countryValue' => old('phone_country'),
+                                            'phoneValue' => old('phone'),
+                                        ]); ?>
                                         <div class="form-group">
                                             <textarea class="form-control form-input form-textarea" name="message" placeholder="<?= trans("message"); ?>" maxlength="4970" minlength="5" required><?= old('message'); ?></textarea>
                                         </div>
-                                        <input type="text" name="message_content">
+                                        <input type="text" name="message_content" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off">
                                         <div class="form-group">
                                             <label class="custom-checkbox">
                                                 <input type="checkbox" class="checkbox_terms_conditions" required>

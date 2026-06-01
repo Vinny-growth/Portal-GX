@@ -13,14 +13,74 @@ class NewsletterModel extends BaseModel
     }
 
     //add to subscriber
-    public function addSubscriber($email)
+    public function addSubscriber($email, array $source = [])
     {
         $data = [
             'email' => $email,
             'token' => generateToken(),
-            'created_at' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s'),
+            'status' => 'active',
         ];
+
+        $categoryId = isset($source['source_category_id']) ? (int) $source['source_category_id'] : 0;
+        $postId = isset($source['source_post_id']) ? (int) $source['source_post_id'] : 0;
+        $url = '';
+        if (isset($source['source_url'])) {
+            $raw = trim((string) $source['source_url']);
+            if (filter_var($raw, FILTER_VALIDATE_URL)) {
+                $url = $raw;
+            }
+        }
+
+        if ($categoryId > 0) $data['source_category_id'] = $categoryId;
+        if ($postId > 0) $data['source_post_id'] = $postId;
+        if (!empty($url)) $data['source_url'] = mb_substr($url, 0, 500);
+
+        // map category -> editorial line ids
+        $lineIds = [];
+        if ($categoryId > 0) {
+            $lineModel = new NewsletterEditorialLineModel();
+            $lineIds = $lineModel->getMatchingLineIdsForCategory($categoryId);
+        }
+        if (!empty($lineIds)) {
+            $data['editorial_line_ids'] = json_encode(array_values(array_unique($lineIds)));
+        }
+
         return $this->builder->insert($data);
+    }
+
+    public function getActiveSubscribersForLine($editorialLineId)
+    {
+        $editorialLineId = (int) $editorialLineId;
+        // any row where editorial_line_ids JSON contains the id; treat NULL/empty as "geral" (all lines)
+        $rows = $this->db->table('subscribers')
+            ->where('(status IS NULL OR status = "active")', null, false)
+            ->get()->getResult();
+        $matched = [];
+        foreach ($rows as $row) {
+            $ids = [];
+            if (!empty($row->editorial_line_ids)) {
+                $decoded = json_decode($row->editorial_line_ids, true);
+                if (is_array($decoded)) {
+                    $ids = array_map('intval', $decoded);
+                }
+            }
+            // empty editorial_line_ids = "geral" (recebe todas as linhas)
+            if (empty($ids) || in_array($editorialLineId, $ids, true)) {
+                $matched[] = $row;
+            }
+        }
+        return $matched;
+    }
+
+    public function updateEngagement($subscriberId, $delta = 1.0)
+    {
+        $subscriberId = (int) $subscriberId;
+        $this->db->table('subscribers')
+            ->where('id', $subscriberId)
+            ->set('engagement_score', "engagement_score + " . (float) $delta, false)
+            ->set('last_engagement_at', date('Y-m-d H:i:s'))
+            ->update();
     }
 
     //update subscriber token
@@ -87,10 +147,13 @@ class NewsletterModel extends BaseModel
         return $this->builder->where('token', cleanStr($token))->get()->getRow();
     }
 
-    //unsubscribe email
+    //unsubscribe email — soft delete so future imports do not silently reactivate the contact (LGPD)
     public function unsubscribeEmail($email)
     {
-        return $this->builder->where('email', cleanStr($email))->delete();
+        return $this->builder->where('email', cleanStr($email))->update([
+            'status'          => 'unsubscribed',
+            'unsubscribed_at' => date('Y-m-d H:i:s'),
+        ]);
     }
 
     //update settings

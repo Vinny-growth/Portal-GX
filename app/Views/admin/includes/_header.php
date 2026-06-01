@@ -135,11 +135,29 @@
                         <li class="nav-pages">
                             <a href="<?= adminUrl('pages'); ?>"><i class="fa fa-file-text"></i><span><?= trans("pages"); ?></span></a>
                         </li>
+                        <li class="nav-marketing-home<?php isAdminNavActive(['marketing']); ?>">
+                            <a href="<?= adminUrl('marketing/home-cms'); ?>"><i class="fa fa-desktop"></i><span>Home Institucional</span></a>
+                        </li>
+                        <li class="nav-marketing-simulators<?php isAdminNavActive(['marketing']); ?>">
+                            <a href="<?= adminUrl('marketing/simulators-cms'); ?>"><i class="fa fa-line-chart"></i><span>Simuladores de Câmbio</span></a>
+                        </li>
+                        <li class="nav-marketing-consorcio<?php isAdminNavActive(['marketing']); ?>">
+                            <a href="<?= adminUrl('marketing/consorcio-cms'); ?>"><i class="fa fa-handshake-o"></i><span>Simulador de Consórcio</span></a>
+                        </li>
                         <li class="nav-cms-pages">
                             <a href="<?= adminUrl('cms-pages'); ?>"><i class="fa fa-magic"></i><span>Páginas (CMS Visual)</span></a>
                         </li>
                     <?php endif;
                     if (!hasPermission('pages') && hasPermission('admin_panel')): ?>
+                        <li class="nav-marketing-home<?php isAdminNavActive(['marketing']); ?>">
+                            <a href="<?= adminUrl('marketing/home-cms'); ?>"><i class="fa fa-desktop"></i><span>Home Institucional</span></a>
+                        </li>
+                        <li class="nav-marketing-simulators<?php isAdminNavActive(['marketing']); ?>">
+                            <a href="<?= adminUrl('marketing/simulators-cms'); ?>"><i class="fa fa-line-chart"></i><span>Simuladores de Câmbio</span></a>
+                        </li>
+                        <li class="nav-marketing-consorcio<?php isAdminNavActive(['marketing']); ?>">
+                            <a href="<?= adminUrl('marketing/consorcio-cms'); ?>"><i class="fa fa-handshake-o"></i><span>Simulador de Consórcio</span></a>
+                        </li>
                         <li class="nav-cms-pages">
                             <a href="<?= adminUrl('cms-pages'); ?>"><i class="fa fa-magic"></i><span>Páginas (CMS Visual)</span></a>
                         </li>
@@ -231,8 +249,17 @@
                         </li>
                     <?php endif;
                     if (hasPermission('newsletter')): ?>
-                        <li class="nav-newsletter">
-                            <a href="<?= adminUrl('newsletter'); ?>"><i class="fa fa-envelope" aria-hidden="true"></i><span><?= trans("newsletter"); ?></span></a>
+                        <li class="treeview<?php isAdminNavActive(['newsletter','newsletter/editorial-lines','newsletter/queue','newsletter/analytics']); ?>">
+                            <a href="#"><i class="fa fa-envelope" aria-hidden="true"></i><span><?= trans("newsletter"); ?></span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li class="nav-newsletter"><a href="<?= adminUrl('newsletter'); ?>"><i class="fa fa-users"></i> <?= trans("subscribers"); ?></a></li>
+                                <li class="nav-newsletter-editorial-lines"><a href="<?= adminUrl('newsletter/editorial-lines'); ?>"><i class="fa fa-bookmark"></i> Linhas Editoriais</a></li>
+                                <li class="nav-newsletter-queue"><a href="<?= adminUrl('newsletter/queue'); ?>"><i class="fa fa-paper-plane"></i> Fila de Envios</a></li>
+                                <li class="nav-newsletter-analytics"><a href="<?= adminUrl('newsletter/analytics'); ?>"><i class="fa fa-line-chart"></i> Analytics</a></li>
+                                <li class="nav-newsletter-magnets"><a href="<?= adminUrl('newsletter/magnets'); ?>"><i class="fa fa-gift"></i> Lead Magnets</a></li>
+                                <li class="nav-newsletter-crm-sync"><a href="<?= adminUrl('newsletter/crm-sync'); ?>"><i class="fa fa-exchange"></i> Sync CRM</a></li>
+                                <li class="nav-newsletter-settings"><a href="<?= adminUrl('newsletter/settings'); ?>"><i class="fa fa-cogs"></i> Configurações</a></li>
+                            </ul>
                         </li>
                     <?php endif;
                     if (hasPermission('reward_system')): ?>

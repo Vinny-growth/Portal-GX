@@ -107,7 +107,7 @@
         <div class="sim-modal-content">
             <h2 class="sim-text-center aurum-blue-text sim-mb-6" style="font-size: 1.5rem; font-weight: 600;">Acesse o Simulador de Custo de Capital</h2>
             <p class="sim-text-center sim-mb-6" style="color: #666; font-size: 0.875rem;">Preencha seus dados para receber o relatório comparativo da simulação por e-mail e acessar o simulador.</p>
-            <form id="leadForm" class="sim-space-y-4" method="post" action="/Ajax/addSimulatorLeadPost">
+            <form id="leadForm" class="sim-space-y-4" method="post" action="/api/save-simulator-lead">
                 <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" class="csrf_token">
                 <div>
                     <label for="leadName" class="sim-form-label">Nome Completo:</label>
@@ -138,7 +138,7 @@
 
         <div class="sim-card">
             <h2 class="aurum-blue-text sim-mb-6" style="font-size: 1.5rem; font-weight: 600;">Dados da Empresa e Necessidade de Crédito</h2>
-            <form id="capitalCostForm" class="sim-grid-2" method="post" action="/Ajax/addSimulatorLeadPost">
+            <form id="capitalCostForm" class="sim-grid-2" method="post" action="/api/save-simulator-lead">
                 <input type="hidden" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" class="csrf_token">
                 <input type="hidden" id="simName" name="name" value="">
                 <input type="hidden" id="simEmail" name="email" value="">
@@ -618,7 +618,7 @@
                     const formData = new FormData(capitalCostForm);
                     formData.append('sim_data', JSON.stringify(simData));
                     
-                    fetch('/Ajax/addSimulatorLeadPost', {
+                    fetch('/api/save-simulator-lead', {
                         method: 'POST',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'

@@ -90,6 +90,7 @@
                         <div class="post-text">
                             <?= loadView('post/_post_content'); ?>
                         </div>
+                        <?= view('common/_newsletter_cta_inline', ['post' => $post]); ?>
                     <?php endif;
                     if (!empty($post->optional_url)) : ?>
                         <div class="optional-url-cnt">

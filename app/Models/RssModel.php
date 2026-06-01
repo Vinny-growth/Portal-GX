@@ -291,25 +291,31 @@ class RssModel extends BaseModel
     //create google news feed
     public function createGoogleNewsFeed($posts)
     {
-        $url = "";
+        $siteName = \Config\Globals::$generalSettings->application_name ?? 'GX Capital';
+        $siteLang = \Config\Globals::$activeLang->short_form ?? 'pt';
+
         $xml = '<?xml version="1.0" encoding="UTF-8" ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">';
         if (!empty($posts)):
-            foreach ($posts as $post)
+            foreach ($posts as $post) {
+                $url = generatePostURL($post);
+                $pubDate = date('Y-m-d', strtotime($post->created_at));
+                $title = htmlspecialchars($post->title, ENT_XML1, 'UTF-8');
                 $xml .= '<url>
             <loc>' . $url . '</loc>
             <news:news>
                 <news:publication>
-                    <news:name>The Example Times</news:name>
-                    <news:language>en</news:language>
+                    <news:name>' . htmlspecialchars($siteName, ENT_XML1, 'UTF-8') . '</news:name>
+                    <news:language>' . $siteLang . '</news:language>
                 </news:publication>
-                <news:publication_date>2008-12-23</news:publication_date>
-                <news:title>Companies A, B in Merger Talks</news:title>
+                <news:publication_date>' . $pubDate . '</news:publication_date>
+                <news:title>' . $title . '</news:title>
             </news:news>
         </url>';
+            }
         endif;
-        '</urlset>';
+        $xml .= '</urlset>';
 
         return $xml;
     }

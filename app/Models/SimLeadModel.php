@@ -1,6 +1,6 @@
 <?php namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Libraries\CrmLeadClient;
 
 class SimLeadModel extends BaseModel
 {
@@ -81,37 +81,42 @@ class SimLeadModel extends BaseModel
         ];
         
         $result = $this->builderSimLeads->insert($insertData);
-        
-        // Enviar evento de Lead para Meta Conversions API
-        if ($result) {
-            $customData = [
-                'content_name' => 'Simulador de Risco Cambial',
-                'content_category' => 'Lead Generation',
-                'value' => 1,
-                'currency' => 'BRL'
-            ];
-            
-            // Separar nome completo em primeiro e último nome se necessário
-            $firstName = null;
-            $lastName = null;
-            if (!empty($data['name'])) {
-                $nameParts = explode(' ', trim($data['name']), 2);
-                $firstName = $nameParts[0];
-                $lastName = isset($nameParts[1]) ? $nameParts[1] : null;
-            }
-            
-            // Enviar evento para Meta API
-            trackMetaLead(
-                $data['email'] ?? null,
-                $data['phone'] ?? null,
-                $firstName,
-                $lastName,
-                $customData
-            );
 
-            $this->sendLeadToCrm(array_merge($data, ['external_id' => $this->db->insertID()]));
+        // Agendar envio para Meta API e CRM APÓS a resposta HTTP (non-blocking)
+        if ($result) {
+            $insertId = $this->db->insertID();
+            $deferData = $data; // snapshot dos dados para o closure
+
+            deferAfterResponse(function () use ($deferData, $insertId) {
+                $customData = [
+                    'content_name' => $deferData['meta_content_name'] ?? $deferData['content_name'] ?? 'Simulador de Risco Cambial',
+                    'content_category' => $deferData['meta_content_category'] ?? $deferData['content_category'] ?? 'Lead Generation',
+                    'value' => isset($deferData['meta_value']) ? (float)$deferData['meta_value'] : (isset($deferData['value']) ? (float)$deferData['value'] : 1),
+                    'currency' => $deferData['meta_currency'] ?? $deferData['currency'] ?? 'BRL'
+                ];
+
+                $firstName = null;
+                $lastName = null;
+                if (!empty($deferData['name'])) {
+                    $nameParts = explode(' ', trim($deferData['name']), 2);
+                    $firstName = $nameParts[0];
+                    $lastName = $nameParts[1] ?? null;
+                }
+
+                $clientEventId = $deferData['event_id'] ?? null;
+                trackMetaLead(
+                    $deferData['email'] ?? null,
+                    $deferData['phone'] ?? null,
+                    $firstName,
+                    $lastName,
+                    $customData,
+                    $clientEventId
+                );
+
+                (new CrmLeadClient())->send(array_merge($deferData, ['external_id' => $insertId]));
+            });
         }
-        
+
         return $result;
     }
 
@@ -158,96 +163,6 @@ class SimLeadModel extends BaseModel
 
     private function sendLeadToCrm(array $data): bool
     {
-        $endpoint = getenv('CRM_LEAD_ENDPOINT') ?: '';
-        $apiKey = getenv('CRM_LEAD_API_KEY') ?: '';
-        if ($endpoint === '' || $apiKey === '') {
-            return false;
-        }
-
-        $utmTerm = $data['utm_term'] ?? null;
-        $utmContent = $data['utm_content'] ?? null;
-        $referrer = $data['referrer'] ?? null;
-        $landingPage = $data['landing_page'] ?? null;
-        $sourceSystem = $data['source_system'] ?? (getenv('CRM_LEAD_SOURCE_SYSTEM') ?: 'site-gx-php');
-        $status = getenv('CRM_LEAD_STATUS') ?: '';
-        $assignedTo = getenv('CRM_LEAD_ASSIGNED_TO') ?: '';
-        $origin = $data['origem'] ?? $data['origin'] ?? (getenv('CRM_LEAD_ORIGIN') ?: '');
-        if ($origin === '' && !empty($this->request)) {
-            $origin = 'Site GX Capital - ' . ($this->request->getUri()->getPath() ?: '/');
-        }
-        if ($utmTerm === null && !empty($this->request)) {
-            $utmTerm = $this->request->getGet('utm_term');
-        }
-        if ($utmContent === null && !empty($this->request)) {
-            $utmContent = $this->request->getGet('utm_content');
-        }
-        if ($referrer === null && !empty($this->request)) {
-            $referrer = $this->request->getServer('HTTP_REFERER');
-        }
-        if ($landingPage === null && !empty($this->request)) {
-            $landingPage = (string) $this->request->getUri();
-        }
-
-        $payload = [
-            'nome' => $data['nome'] ?? $data['name'] ?? null,
-            'email' => $data['email'] ?? null,
-            'telefone' => $data['telefone'] ?? $data['phone'] ?? null,
-            'empresa' => $data['empresa'] ?? $data['company'] ?? null,
-            'cargo' => $data['cargo'] ?? $data['position'] ?? null,
-            'mensagem' => $data['mensagem'] ?? $data['message'] ?? null,
-            'observacoes' => $data['observacoes'] ?? $data['observations'] ?? $data['notes'] ?? null,
-            'origem' => $origin,
-            'utm_source' => $data['utm_source'] ?? null,
-            'utm_medium' => $data['utm_medium'] ?? null,
-            'utm_campaign' => $data['utm_campaign'] ?? null,
-            'utm_term' => $utmTerm,
-            'utm_content' => $utmContent,
-            'referrer' => $referrer,
-            'landing_page' => $landingPage,
-            'source_system' => $sourceSystem,
-            'external_id' => $data['external_id'] ?? null,
-        ];
-        if ($status !== '') {
-            $payload['status'] = $status;
-        }
-        if ($assignedTo !== '') {
-            $payload['assigned_to'] = $assignedTo;
-        }
-
-        $timeout = (int) (getenv('CRM_LEAD_TIMEOUT') ?: 10);
-        if ($timeout < 3) {
-            $timeout = 3;
-        }
-
-        $ch = curl_init($endpoint);
-        curl_setopt_array($ch, [
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode($payload),
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'x-api-key: ' . $apiKey
-            ],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => $timeout,
-            CURLOPT_CONNECTTIMEOUT => 5
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlErr = curl_error($ch);
-        curl_close($ch);
-
-        if ($response === false) {
-            log_message('error', 'CRM lead capture error: ' . $curlErr);
-            return false;
-        }
-
-        $decoded = json_decode($response, true);
-        if ($httpCode >= 200 && $httpCode < 300 && is_array($decoded) && !empty($decoded['success'])) {
-            return true;
-        }
-
-        log_message('error', 'CRM lead capture failed: HTTP ' . $httpCode . ' Response: ' . $response);
-        return false;
+        return (new CrmLeadClient($this->request))->send($data);
     }
 }

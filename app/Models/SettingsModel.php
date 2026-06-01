@@ -98,7 +98,7 @@ class SettingsModel extends BaseModel
         if (!empty($logoHeight)) {
             $logoHeight = intval($logoHeight);
             if (intval($logoHeight) < 10 || intval($logoHeight) > 300) {
-                $logoWidth = 60;
+                $logoHeight = 60;
             }
             $general['logo_size'] .= 'x' . $logoHeight;
         }
@@ -378,6 +378,34 @@ class SettingsModel extends BaseModel
         ];
         return $this->builderGeneral->where('id', 1)->update($data);
     }
+
+    //update IndexNow settings
+    public function updateIndexNowSettings()
+    {
+        $enabled = !empty(inputPost('indexnow_enabled')) ? 1 : 0;
+        $newKey = trim(inputPost('indexnow_api_key') ?? '');
+
+        // Get current key to handle file cleanup
+        $current = $this->builderGeneral->where('id', 1)->get()->getRow();
+        $oldKey = $current->indexnow_api_key ?? '';
+
+        // If key changed, remove old key file and create new one
+        if (!empty($newKey) && $newKey !== $oldKey) {
+            \App\Libraries\IndexNowClient::removeKeyFile($oldKey);
+            \App\Libraries\IndexNowClient::ensureKeyFile($newKey);
+        }
+
+        // If enabling, ensure key file exists
+        if ($enabled && !empty($newKey)) {
+            \App\Libraries\IndexNowClient::ensureKeyFile($newKey);
+        }
+
+        $data = [
+            'indexnow_enabled' => $enabled,
+            'indexnow_api_key' => $newKey,
+        ];
+        return $this->builderGeneral->where('id', 1)->update($data);
+    }
     
     //get seo settings base data
     private function getSeoSettingsBase($langId)
@@ -404,8 +432,8 @@ class SettingsModel extends BaseModel
     public function getRoutes()
     {
         $settings = $this->getGeneralSettings();
-        if (!empty($settings) && !empty($settings->routes)) {
-            return unserialize($settings->routes);
+        if (!empty($settings) && !empty($settings->routes) && is_string($settings->routes)) {
+            return unserializeData($settings->routes);
         }
         return null;
     }

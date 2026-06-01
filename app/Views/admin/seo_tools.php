@@ -83,6 +83,49 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
+                <h3 class="box-title">IndexNow (Bing, Yandex, Naver)</h3>
+            </div>
+            <form id="formIndexNow" action="<?= base_url('Admin/indexNowSettingsPost'); ?>" method="post">
+                <?= csrf_field(); ?>
+                <div class="box-body">
+                    <div class="form-group">
+                        <label><?= trans("status"); ?></label>
+                        <?= formRadio('indexnow_enabled', 1, 0, trans("enable"), trans("disable"), $generalSettings->indexnow_enabled ?? 0); ?>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">API Key</label>
+                        <input type="text" class="form-control" name="indexnow_api_key" placeholder="API Key" value="<?= esc($generalSettings->indexnow_api_key ?? ''); ?>" maxlength="128">
+                        <small class="text-muted">
+                            <?php if (!empty($generalSettings->indexnow_api_key)): ?>
+                                Key file: <a href="<?= base_url($generalSettings->indexnow_api_key . '.txt'); ?>" target="_blank"><?= esc($generalSettings->indexnow_api_key); ?>.txt</a>
+                            <?php else: ?>
+                                A key file will be automatically created at the domain root.
+                            <?php endif; ?>
+                        </small>
+                    </div>
+                    <div class="box-footer text-right" style="padding-left: 0; padding-right: 0;">
+                        <button type="button" onclick="testIndexNowApi()" class="btn btn-warning"><?= trans("test_api"); ?></button>
+                        <button type="submit" class="btn btn-primary"><?= trans('save_changes'); ?></button>
+                    </div>
+                    <?php
+                    $indexNowResult = '';
+                    if ($session->getFlashdata('msgTestIndexNow')) {
+                        $indexNowResult = $session->getFlashdata('msgTestIndexNow');
+                    }
+                    if (!empty($indexNowResult)):?>
+                        <div class="alert <?= $indexNowResult['status'] == 1 ? 'alert-success' : 'alert-danger'; ?> alert-large m-t-10">
+                            <strong><?= $indexNowResult['message']; ?></strong>
+                        </div>
+                    <?php endif; ?>
+                    <div class="alert alert-info alert-large m-t-10">
+                        <strong>Info:</strong> IndexNow notifies Bing, Yandex and other search engines instantly when content is published, updated or deleted. Works independently from Google Indexing API.
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
                 <h3 class="box-title"><?= trans('google_analytics'); ?></h3>
             </div>
             <form action="<?= base_url('Admin/seoToolsPost'); ?>" method="post">
@@ -187,7 +230,12 @@
     function testGoogleIndexingApi() {
         var form = document.getElementById('formGoogleIndexingApi');
         form.action = VrConfig.baseURL + '/Post/testGoogleIndexingApiPost';
-        console.log(form);
+        form.requestSubmit();
+    }
+
+    function testIndexNowApi() {
+        var form = document.getElementById('formIndexNow');
+        form.action = VrConfig.baseURL + '/Post/testIndexNowApiPost';
         form.requestSubmit();
     }
 </script>

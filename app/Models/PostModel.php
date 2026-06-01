@@ -6,6 +6,7 @@ use App\Libraries\QueryBuilder;
 class PostModel extends BaseModel
 {
     protected $builder;
+    protected $hasDetailedPageviewColumns = null;
 
     public function __construct()
     {
@@ -24,7 +25,7 @@ class PostModel extends BaseModel
         } else {
             $this->builder->select('posts.id, posts.lang_id, posts.title, posts.slug, posts.summary, posts.category_id, posts.image_id, posts.slider_order, posts.featured_order, posts.post_type, posts.image_url, posts.user_id, posts.pageviews, posts.post_url, posts.comment_count, posts.updated_at, posts.created_at');
         }
-        $this->builder->select("(SELECT CONCAT('img_bg::', i.image_big, '||','img_df::', i.image_default, '||','img_sl::', i.image_slider, '||','img_md::', i.image_mid, '||','img_sm::', i.image_small, '||','img_mi::', i.image_mime, '||',
+        $this->builder->select("(SELECT CONCAT('img_dsc::', IFNULL(i.image_discover,''), '||','img_bg::', i.image_big, '||','img_df::', i.image_default, '||','img_sl::', i.image_slider, '||','img_md::', i.image_mid, '||','img_sm::', i.image_small, '||','img_mi::', i.image_mime, '||',
         'img_st::', i.storage) FROM images i WHERE i.id = posts.image_id LIMIT 1) AS image_data");
 
         $this->builder->select('categories.name AS category_name, categories.slug AS category_slug , categories.color AS category_color, users.username AS author_username, users.slug AS author_slug ');
@@ -312,6 +313,9 @@ class PostModel extends BaseModel
     public function getGoogleNewsFeeds($categories)
     {
         $langId = clrNum(inputGet('lang'));
+        if (empty($langId)) {
+            $langId = $this->activeLang->id;
+        }
         $categoryId = clrNum(inputGet('category'));
         $userId = clrNum(inputGet('author'));
         $limit = clrNum(inputGet('limit'));
@@ -323,7 +327,7 @@ class PostModel extends BaseModel
         if (!empty($posts)) {
             return $posts;
         }
-        $langShortForm = 'en';
+        $langShortForm = 'pt';
         $lang = getLanguage($langId);
         if (!empty($lang)) {
             $langShortForm = esc($lang->short_form);
@@ -345,7 +349,7 @@ class PostModel extends BaseModel
     }
 
     //increase post pageviews
-    public function incrementPostViews($postId)
+    public function incrementPostViews($postId, array $clientContext = [])
     {
         //check session
         $sesPostRead = getSession('vpr_' . $postId);
@@ -357,10 +361,10 @@ class PostModel extends BaseModel
         if ($agent->isRobot()) {
             return false;
         }
-        //check visit hash
+        //check visit hash (includes date so revisits after 24h are counted)
         $userAgent = $agent->getAgentString();
         $ipAddress = getIPAddress();
-        $visitHash = md5($postId . $ipAddress . $userAgent);
+        $visitHash = md5($postId . $ipAddress . $userAgent . date('Y-m-d'));
         $row = $this->db->table('post_pageviews_month')->where('visit_hash', $visitHash)->get()->getRow();
         if (!empty($row)) {
             return false;
@@ -388,6 +392,7 @@ class PostModel extends BaseModel
                 'visit_hash' => $visitHash,
                 'created_at' => date('Y-m-d H:i:s')
             ];
+            $data = array_merge($data, $this->getPageviewTrackingData($agent, $clientContext));
             if ($this->db->table('post_pageviews_month')->insert($data)) {
                 if ($rewardAmount > 0) {
                     $newBalance = $author->balance + $rewardAmount;
@@ -439,8 +444,290 @@ class PostModel extends BaseModel
     //delete old page views
     public function deleteOldPageviews()
     {
-        $now = date('Y-m-d H:i:s');
-        $month = strtotime("-30 days", strtotime($now));
-        $this->db->query("DELETE FROM post_pageviews_month WHERE created_at < '" . date('Y-m-d H:i:s', $month) . "'");
+        $retentionDays = (int) (getenv('PAGEVIEW_RETENTION_DAYS') ?: 395);
+        if ($retentionDays < 30) {
+            $retentionDays = 395;
+        }
+        $cutoff = date('Y-m-d H:i:s', strtotime('-' . $retentionDays . ' days'));
+        $this->db->query("DELETE FROM post_pageviews_month WHERE created_at < ?", [$cutoff]);
+    }
+
+    protected function getPageviewTrackingData($agent, array $clientContext = [])
+    {
+        if (!$this->hasDetailedPageviewColumns()) {
+            return [];
+        }
+
+        $clientReferrer = isset($clientContext['page_referrer']) ? trim((string) $clientContext['page_referrer']) : '';
+        $clientPageUrl = isset($clientContext['page_url']) ? trim((string) $clientContext['page_url']) : '';
+        $referrerHost = $this->resolveReferrerHost($clientReferrer);
+        $sourceGroup = $this->detectTrafficSourceGroup($clientReferrer, $clientPageUrl);
+
+        return [
+            'referrer_host' => $this->normalizeTrackingValue($referrerHost, 190),
+            'source_group' => $this->normalizeTrackingValue($sourceGroup, 50, 'Direto'),
+            'browser_name' => $this->normalizeTrackingValue($this->detectBrowserName($agent), 80, 'Não identificado'),
+            'platform_name' => $this->normalizeTrackingValue($agent->getPlatform(), 80, 'Não identificado'),
+            'device_type' => $this->normalizeTrackingValue($this->detectDeviceType($agent), 30, 'Desktop'),
+        ];
+    }
+
+    protected function hasDetailedPageviewColumns()
+    {
+        if ($this->hasDetailedPageviewColumns !== null) {
+            return $this->hasDetailedPageviewColumns;
+        }
+
+        $requiredColumns = ['referrer_host', 'source_group', 'browser_name', 'platform_name', 'device_type'];
+        foreach ($requiredColumns as $column) {
+            if (!$this->db->fieldExists($column, 'post_pageviews_month')) {
+                $this->hasDetailedPageviewColumns = false;
+                return false;
+            }
+        }
+
+        $this->hasDetailedPageviewColumns = true;
+        return true;
+    }
+
+    protected function detectTrafficSourceGroup($clientReferrer = '', $clientPageUrl = '')
+    {
+        [$utmMedium, $utmSource] = $this->extractUtmParams($clientPageUrl);
+
+        if ($utmMedium !== '') {
+            if (in_array($utmMedium, ['cpc', 'ppc', 'paid', 'paid_social', 'display', 'remarketing', 'affiliate'], true)) {
+                return 'Mídia paga';
+            }
+            if (in_array($utmMedium, ['social', 'social_paid', 'social-organic'], true)) {
+                return 'Social';
+            }
+            if (in_array($utmMedium, ['email', 'newsletter'], true)) {
+                return 'Email';
+            }
+            if (in_array($utmMedium, ['referral', 'partner'], true)) {
+                return 'Referência';
+            }
+        }
+
+        if ($utmSource !== '') {
+            if ($this->matchesHostPatterns($utmSource, ['facebook', 'instagram', 'linkedin', 'twitter', 'x.com', 'youtube', 'tiktok', 'pinterest', 'whatsapp', 'reddit'])) {
+                return 'Social';
+            }
+            if ($this->matchesHostPatterns($utmSource, ['google', 'bing', 'yahoo', 'duckduckgo', 'baidu'])) {
+                return 'Busca';
+            }
+            if ($this->matchesHostPatterns($utmSource, ['mail', 'newsletter'])) {
+                return 'Email';
+            }
+        }
+
+        $referrerHost = $this->resolveReferrerHost($clientReferrer);
+        if (empty($referrerHost)) {
+            return 'Direto';
+        }
+
+        if ($this->isInternalReferrer($referrerHost)) {
+            return 'Interno';
+        }
+
+        if ($this->matchesHostPatterns($referrerHost, [
+            'google.', 'bing.com', 'search.yahoo.', 'duckduckgo.com', 'yandex.', 'baidu.com', 'ecosia.org', 'search.brave.com'
+        ])) {
+            return 'Busca';
+        }
+
+        if ($this->matchesHostPatterns($referrerHost, [
+            'facebook.com', 'fb.com', 'instagram.com', 'linkedin.com', 'lnkd.in', 'twitter.com', 'x.com', 't.co',
+            'youtube.com', 'youtu.be', 'whatsapp.com', 'web.whatsapp.com', 'reddit.com', 'pinterest.com', 'tiktok.com'
+        ])) {
+            return 'Social';
+        }
+
+        if ($this->matchesHostPatterns($referrerHost, [
+            'mail.google.com', 'outlook.live.com', 'outlook.office.com', 'mail.yahoo.com', 'icloud.com', 'mail.', 'email.'
+        ])) {
+            return 'Email';
+        }
+
+        return 'Referência';
+    }
+
+    protected function detectBrowserName($agent)
+    {
+        if ($agent->isBrowser()) {
+            return $agent->getBrowser();
+        }
+
+        $userAgent = strtolower((string) $agent->getAgentString());
+        if (strpos($userAgent, 'edg/') !== false) {
+            return 'Edge';
+        }
+        if (strpos($userAgent, 'opr/') !== false || strpos($userAgent, 'opera') !== false) {
+            return 'Opera';
+        }
+        if (strpos($userAgent, 'chrome/') !== false && strpos($userAgent, 'edg/') === false) {
+            return 'Chrome';
+        }
+        if (strpos($userAgent, 'firefox/') !== false) {
+            return 'Firefox';
+        }
+        if (strpos($userAgent, 'safari/') !== false && strpos($userAgent, 'chrome/') === false) {
+            return 'Safari';
+        }
+
+        return 'Não identificado';
+    }
+
+    protected function detectDeviceType($agent)
+    {
+        $userAgent = strtolower((string) $agent->getAgentString());
+
+        if (strpos($userAgent, 'tablet') !== false || strpos($userAgent, 'ipad') !== false) {
+            return 'Tablet';
+        }
+
+        if (strpos($userAgent, 'smart-tv') !== false || strpos($userAgent, 'smarttv') !== false || strpos($userAgent, 'hbbtv') !== false) {
+            return 'TV';
+        }
+
+        if (strpos($userAgent, 'playstation') !== false || strpos($userAgent, 'xbox') !== false || strpos($userAgent, 'nintendo') !== false) {
+            return 'Console';
+        }
+
+        if ($agent->isMobile()) {
+            return 'Mobile';
+        }
+
+        return 'Desktop';
+    }
+
+    protected function getReferrerHost()
+    {
+        // Kept for any legacy caller. Prefer resolveReferrerHost() with the
+        // referrer captured client-side: HTTP_REFERER on AJAX requests reflects
+        // the post page itself, which would always be classified as "Interno".
+        $referrer = (string) $this->request->getServer('HTTP_REFERER');
+        if ($referrer === '') {
+            return null;
+        }
+
+        $host = parse_url($referrer, PHP_URL_HOST);
+        return $this->normalizeHost($host);
+    }
+
+    protected function resolveReferrerHost($clientReferrer)
+    {
+        $clientReferrer = trim((string) $clientReferrer);
+        if ($clientReferrer === '') {
+            return null;
+        }
+
+        $host = parse_url($clientReferrer, PHP_URL_HOST);
+        return $this->normalizeHost($host);
+    }
+
+    protected function extractUtmParams($clientPageUrl)
+    {
+        $clientPageUrl = trim((string) $clientPageUrl);
+        if ($clientPageUrl === '') {
+            return ['', ''];
+        }
+
+        $query = parse_url($clientPageUrl, PHP_URL_QUERY);
+        if (empty($query)) {
+            return ['', ''];
+        }
+
+        parse_str($query, $params);
+        return [
+            strtolower(trim((string) ($params['utm_medium'] ?? ''))),
+            strtolower(trim((string) ($params['utm_source'] ?? ''))),
+        ];
+    }
+
+    protected function getCurrentHost()
+    {
+        $baseHost = parse_url(base_url(), PHP_URL_HOST);
+        if (!empty($baseHost)) {
+            return $this->normalizeHost($baseHost);
+        }
+
+        return $this->normalizeHost($this->request->getServer('HTTP_HOST'));
+    }
+
+    protected function isInternalReferrer($referrerHost)
+    {
+        $referrerBase = $this->getBaseDomain($referrerHost);
+        $currentBase = $this->getBaseDomain($this->getCurrentHost());
+
+        if (empty($referrerBase) || empty($currentBase)) {
+            return false;
+        }
+
+        return $referrerBase === $currentBase;
+    }
+
+    protected function getBaseDomain($host)
+    {
+        $host = $this->normalizeHost($host);
+        if (empty($host)) {
+            return null;
+        }
+
+        $parts = explode('.', $host);
+        if (count($parts) < 2) {
+            return $host;
+        }
+
+        return implode('.', array_slice($parts, -2));
+    }
+
+    protected function matchesHostPatterns($value, array $patterns)
+    {
+        $value = strtolower((string) $value);
+        foreach ($patterns as $pattern) {
+            if ($pattern === '') {
+                continue;
+            }
+
+            $pattern = strtolower($pattern);
+            if ($pattern === 'mail.' || $pattern === 'email.') {
+                if (strpos($value, $pattern) === 0) {
+                    return true;
+                }
+                continue;
+            }
+
+            if (strpos($value, $pattern) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function normalizeHost($host)
+    {
+        $host = strtolower(trim((string) $host));
+        if ($host === '') {
+            return null;
+        }
+
+        $host = preg_replace('/:\d+$/', '', $host);
+        return preg_replace('/^www\./', '', $host);
+    }
+
+    protected function normalizeTrackingValue($value, $limit, $fallback = null)
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return $fallback;
+        }
+
+        if (function_exists('mb_substr')) {
+            return mb_substr($value, 0, $limit);
+        }
+
+        return substr($value, 0, $limit);
     }
 }

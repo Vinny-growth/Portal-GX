@@ -1,0 +1,389 @@
+
+Preciso que recrie a home page se baseando, quase que copiando esses arquivos de designer que eu fiz para o nosso projeto, cuidando para preservar as rotas
+Arquivo - home_institutional.php
+
+<?php
+$phoneHref = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/', '', (string)$baseSettings->contact_phone) : '';
+$navLinks = $quickLinks ?? [];
+$navLinks[] = ['label' => 'Wealth', 'href' => $wealthUrl];
+
+$verticalIcons = [
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><line x1="12" y1="14" x2="18" y2="14"/></svg>',
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>',
+    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></svg>',
+];
+
+$processIcons = [
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/></svg>',
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+];
+
+$trustIcons = [
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+];
+
+$trustLabels = ['Credito Estruturado', 'Cambio & Trade Finance', 'Consorcios', 'Seguros Corporativos', 'Wealth Management'];
+
+$processSteps = [
+    ['title' => 'Diagnostico', 'desc' => 'Mapeamos caixa, exposicao cambial, custo de capital e objetivo patrimonial antes de qualquer recomendacao.'],
+    ['title' => 'Estruturacao', 'desc' => 'Comparamos alternativas, modelamos cenarios e montamos a estrutura mais aderente ao momento da empresa.'],
+    ['title' => 'Execucao', 'desc' => 'Acompanhamos a implementacao para transformar a analise em decisao executada com criterio e rastreabilidade.'],
+];
+?>
+<main class="gx-marketing gx-home">
+    <nav class="gx-nav" id="gx-nav">
+        <div class="gx-nav-inner">
+            <a href="<?= langBaseUrl(); ?>" class="gx-nav-brand" aria-label="GX Capital">
+                <img src="<?= getLogo(); ?>" alt="GX Capital" width="<?= getLogoSize('width'); ?>" height="<?= getLogoSize('height'); ?>">
+            </a>
+
+            <div class="gx-nav-links" id="gx-nav-links">
+                <?php foreach ($navLinks as $item): ?>
+                    <a href="<?= esc($item['href']); ?>" class="gx-nav-link"><?= esc($item['label']); ?></a>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="gx-nav-right">
+                <?php if (!authCheck() && $generalSettings->registration_system == 1): ?>
+                    <a href="#" class="gx-nav-link" data-bs-toggle="modal" data-bs-target="#modalLogin">Entrar</a>
+                <?php else: ?>
+                    <a href="<?= esc($blogUrl); ?>" class="gx-nav-link">Blog</a>
+                <?php endif; ?>
+                <a href="#fale-especialista" class="gx-btn gx-btn-primary">Comecar agora</a>
+                <button type="button" class="gx-nav-toggle" id="gx-nav-toggle" aria-expanded="false" aria-controls="gx-nav-links" aria-label="Menu">
+                    <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="gx-hero">
+        <div class="gx-hero-inner">
+            <div class="gx-hero-content" data-gx-reveal>
+                <div class="gx-hero-badge">
+                    <span class="gx-hero-badge-dot"></span>
+                    Estruturacao financeira com profundidade tecnica
+                </div>
+
+                <h1 class="gx-hero-title">
+                    Solucoes sofisticadas para capital, protecao e patrimonio.
+                </h1>
+
+                <p class="gx-hero-sub">
+                    A GX Capital estrutura credito, cambio, consorcios, seguros e investimentos para empresas, empresarios
+                    e familias empresarias que precisam decidir com clareza, previsibilidade e visao de longo prazo.
+                </p>
+
+                <div class="gx-hero-cta">
+                    <a href="#fale-especialista" class="gx-btn gx-btn-primary gx-btn-lg">Falar com especialista</a>
+                    <a href="<?= esc($simulatorsHubUrl); ?>" class="gx-btn gx-btn-ghost gx-btn-lg">Explorar simuladores</a>
+                </div>
+            </div>
+
+            <div class="gx-hero-aside" data-gx-reveal data-gx-delay="150">
+                <div class="gx-hero-visual-card">
+                    <div class="gx-visual-header">
+                        <span class="gx-visual-logo">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C7A053" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                        </span>
+                        <span class="gx-visual-title">Visao integrada</span>
+                        <span class="gx-visual-badge">GX Capital</span>
+                    </div>
+                    <div class="gx-visual-chart" aria-hidden="true">
+                        <div class="gx-chart-bars">
+                            <div class="gx-chart-bar" style="--h:45%"><span>CR</span></div>
+                            <div class="gx-chart-bar gx-chart-bar-accent" style="--h:72%"><span>FX</span></div>
+                            <div class="gx-chart-bar" style="--h:58%"><span>CO</span></div>
+                            <div class="gx-chart-bar gx-chart-bar-accent" style="--h:85%"><span>SG</span></div>
+                            <div class="gx-chart-bar" style="--h:65%"><span>WM</span></div>
+                        </div>
+                        <div class="gx-chart-line"></div>
+                    </div>
+                    <div class="gx-visual-row">
+                        <div class="gx-visual-stat">
+                            <strong>5</strong>
+                            <span>verticais</span>
+                        </div>
+                        <div class="gx-visual-stat">
+                            <strong><?= esc((string)count($simulators ?? [])); ?></strong>
+                            <span>simuladores</span>
+                        </div>
+                        <div class="gx-visual-stat">
+                            <strong>360&deg;</strong>
+                            <span>cobertura</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gx-hero-stat-row">
+                    <?php foreach ($heroStats as $stat): ?>
+                        <div class="gx-hero-metric">
+                            <strong><?= esc((string)$stat['value']); ?></strong>
+                            <span><?= esc($stat['label']); ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="gx-strip">
+        <div class="gx-strip-inner" data-gx-reveal>
+            <?php foreach ($trustLabels as $i => $label): ?>
+                <span class="gx-strip-item">
+                    <?= $trustIcons[$i] ?? ''; ?>
+                    <?= esc($label); ?>
+                </span>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
+    <section class="gx-section" id="verticais">
+        <div class="gx-wrap">
+            <div class="gx-section-header is-centered" data-gx-reveal>
+                <p class="gx-label">Verticais de negocio</p>
+                <h2 class="gx-section-title">Cinco frentes especializadas. Um criterio integrado.</h2>
+                <p class="gx-section-desc" style="margin-left:auto;margin-right:auto;">
+                    Da liquidez de curto prazo ao patrimonio de longo prazo, cada frente opera com profundidade tecnica e visao de conjunto.
+                </p>
+            </div>
+
+            <div class="gx-grid-5" data-gx-reveal data-gx-delay="100">
+                <?php foreach ($businessVerticals as $index => $vertical): ?>
+                    <article class="gx-card">
+                        <span class="gx-card-icon"><?= $verticalIcons[$index] ?? esc($index + 1); ?></span>
+                        <p class="gx-card-label"><?= esc($vertical['eyebrow']); ?></p>
+                        <h3 class="gx-card-title"><?= esc($vertical['title']); ?></h3>
+                        <p class="gx-card-desc"><?= esc($vertical['description']); ?></p>
+                        <a href="<?= esc($vertical['link_url']); ?>" class="gx-card-link"><?= esc($vertical['link_label']); ?></a>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <div class="gx-divider"></div>
+
+    <section class="gx-section gx-section-alt">
+        <div class="gx-wrap">
+            <div class="gx-section-header is-centered" data-gx-reveal>
+                <p class="gx-label">Como atuamos</p>
+                <h2 class="gx-section-title">Da leitura do problema a estrutura executada.</h2>
+                <p class="gx-section-desc" style="margin-left:auto;margin-right:auto;">
+                    Combinamos analise financeira, modelagem comparativa e acompanhamento executivo para
+                    reduzir ruido e ganhar velocidade na decisao.
+                </p>
+            </div>
+
+            <div class="gx-process-grid">
+                <?php foreach ($processSteps as $index => $step): ?>
+                    <article class="gx-process-card" data-gx-reveal data-gx-delay="<?= esc((string)($index * 100)); ?>">
+                        <span class="gx-process-icon"><?= $processIcons[$index] ?? ''; ?></span>
+                        <h3 class="gx-process-title"><?= esc($step['title']); ?></h3>
+                        <p class="gx-process-desc"><?= esc($step['desc']); ?></p>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+
+    <div class="gx-divider"></div>
+
+    <section class="gx-section" id="simuladores">
+        <div class="gx-wrap">
+            <div class="gx-section-header is-split" data-gx-reveal>
+                <div>
+                    <p class="gx-label">Simuladores</p>
+                    <h2 class="gx-section-title">Ferramentas para antecipar custo, risco e estrutura.</h2>
+                </div>
+                <p class="gx-section-desc">
+                    Use os simuladores para testar cenarios antes da conversa comercial e chegue com a demanda mais madura.
+                </p>
+            </div>
+
+            <div data-gx-reveal data-gx-delay="80">
+                <?= view('marketing/_simulator_grid', [
+                    'simulators' => $simulators,
+                    'showPath' => false,
+                    'showLegacyBadge' => false
+                ]); ?>
+            </div>
+
+            <div style="margin-top: 28px;" data-gx-reveal>
+                <a href="<?= esc($simulatorsHubUrl); ?>" class="gx-btn gx-btn-ghost">Ver catalogo completo</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="gx-divider"></div>
+
+    <section class="gx-section gx-section-alt" id="blog-tecnico">
+        <div class="gx-wrap">
+            <div class="gx-section-header is-split" data-gx-reveal>
+                <div>
+                    <p class="gx-label">Conteudo tecnico</p>
+                    <h2 class="gx-section-title">Analises para acompanhar funding, cambio, patrimonio e mercado.</h2>
+                </div>
+                <p class="gx-section-desc">
+                    Publicamos leituras praticas para quem decide com responsabilidade financeira e precisa de contexto para agir.
+                </p>
+            </div>
+
+            <div class="gx-blog-grid" data-gx-reveal data-gx-delay="80">
+                <?php foreach ($latestPosts as $index => $post): ?>
+                    <article class="gx-blog-card<?= $index === 0 ? ' gx-blog-card-featured' : ''; ?>">
+                        <?php if (checkPostImg($post)): ?>
+                            <a href="<?= generatePostURL($post); ?>" class="gx-blog-image"<?php postURLNewTab($post); ?>>
+                                <img src="<?= getPostImage($post, 'mid'); ?>" alt="<?= esc($post->title); ?>" width="600" height="338" loading="lazy" decoding="async">
+                            </a>
+                        <?php endif; ?>
+                        <div class="gx-blog-body">
+                            <div class="gx-blog-top">
+                                <a href="<?= generateCategoryURLById($post->category_id, $baseCategories); ?>" class="gx-blog-kicker" style="--gx-badge: <?= esc($post->category_color); ?>;">
+                                    <?= esc($post->category_name); ?>
+                                </a>
+                                <?php if ($index === 0): ?>
+                                    <span class="gx-blog-label">Destaque</span>
+                                <?php endif; ?>
+                            </div>
+                            <h3 class="gx-blog-title">
+                                <a href="<?= generatePostURL($post); ?>"<?php postURLNewTab($post); ?>><?= esc(characterLimiter($post->title, 110, '...')); ?></a>
+                            </h3>
+                            <p class="gx-blog-meta"><?= loadView('post/_post_meta', ['postItem' => $post]); ?></p>
+                            <p class="gx-blog-summary"><?= esc(characterLimiter($post->summary, 160, '...')); ?></p>
+                            <a href="<?= generatePostURL($post); ?>" class="gx-text-link"<?php postURLNewTab($post); ?>>Ler analise</a>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+
+            <div style="margin-top: 28px;" data-gx-reveal>
+                <a href="<?= esc($blogUrl); ?>" class="gx-btn gx-btn-ghost">Ver todos os artigos</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="gx-section">
+        <div class="gx-wrap">
+            <div class="gx-cta-block" data-gx-reveal>
+                <div class="gx-cta-icon" aria-hidden="true">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(199,160,83,0.4)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                </div>
+                <div class="gx-cta-content">
+                    <p class="gx-label">Atendimento consultivo</p>
+                    <h2 class="gx-section-title">Leve a demanda financeira para a frente certa desde o primeiro contato.</h2>
+                    <p class="gx-section-desc" style="margin-left:auto;margin-right:auto;">
+                        Se a pauta envolver funding, hedge, recebiveis, consorcio, seguros ou patrimonio, centralize
+                        a conversa com a GX Capital.
+                    </p>
+                    <div class="gx-cta-actions">
+                        <a href="#fale-especialista" class="gx-btn gx-btn-primary gx-btn-lg">Falar com o time</a>
+                        <a href="<?= esc($simulatorsHubUrl); ?>" class="gx-btn gx-btn-ghost gx-btn-lg">Abrir simuladores</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="gx-lead-section" id="fale-especialista">
+        <div class="gx-wrap">
+            <div class="gx-lead-grid">
+                <aside class="gx-lead-aside" data-gx-reveal>
+                    <div class="gx-aside-icon" aria-hidden="true">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(199,160,83,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <p class="gx-label">Fale com a GX Capital</p>
+                    <h2 class="gx-section-title">Converse com um especialista.</h2>
+                    <p class="gx-section-desc" style="color:rgba(255,255,255,0.6);">
+                        Compartilhe o contexto da empresa, da operacao ou do objetivo patrimonial e direcionamos
+                        a conversa para a vertical mais aderente.
+                    </p>
+                    <div class="gx-contact-list">
+                        <?php if (!empty($baseSettings->contact_phone)): ?>
+                            <a href="<?= !empty($phoneHref) ? 'tel:' . esc($phoneHref) : '#'; ?>" class="gx-contact-chip">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                <?= esc($baseSettings->contact_phone); ?>
+                            </a>
+                        <?php endif; ?>
+                        <?php if (!empty($baseSettings->contact_email)): ?>
+                            <a href="mailto:<?= esc($baseSettings->contact_email); ?>" class="gx-contact-chip">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <?= esc($baseSettings->contact_email); ?>
+                            </a>
+                        <?php endif; ?>
+                        <a href="<?= esc($simulatorsHubUrl); ?>" class="gx-contact-chip">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+                            Ver simuladores
+                        </a>
+                        <a href="<?= esc($blogUrl); ?>" class="gx-contact-chip">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                            Explorar blog
+                        </a>
+                    </div>
+                </aside>
+
+                <div class="gx-lead-card" data-gx-reveal data-gx-delay="100">
+                    <?= view('marketing/_specialist_form', [
+                        'formId' => 'gx-home-specialist-form',
+                        'heading' => 'Envie sua demanda para o time GX Capital',
+                        'description' => 'Informe a estrutura, operacao ou objetivo patrimonial. O retorno parte da vertical mais aderente.',
+                        'buttonLabel' => 'Solicitar contato',
+                        'messagePlaceholder' => 'Ex.: preciso revisar hedge cambial, custo de capital, recebiveis, consorcio, seguros ou carteira de investimentos.'
+                    ]); ?>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+(function() {
+    var nav = document.getElementById('gx-nav');
+    var toggle = document.getElementById('gx-nav-toggle');
+    var links = document.getElementById('gx-nav-links');
+
+    if (nav) {
+        var check = function() {
+            nav.classList.toggle('is-scrolled', window.scrollY > 20);
+        };
+        check();
+        window.addEventListener('scroll', check, {passive: true});
+    }
+
+    if (toggle && links && nav) {
+        toggle.addEventListener('click', function() {
+            var open = nav.classList.toggle('is-open');
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        links.querySelectorAll('a').forEach(function(a) {
+            a.addEventListener('click', function() {
+                nav.classList.remove('is-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            });
+        });
+    }
+
+    var nodes = document.querySelectorAll('[data-gx-reveal]');
+    if ('IntersectionObserver' in window && nodes.length) {
+        var obs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) {
+                if (!e.isIntersecting) return;
+                var d = e.target.getAttribute('data-gx-delay');
+                if (d) e.target.style.transitionDelay = d + 'ms';
+                e.target.classList.add('is-visible');
+                obs.unobserve(e.target);
+            });
+        }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
+        nodes.forEach(function(n) { obs.observe(n); });
+    } else {
+        nodes.forEach(function(n) { n.classList.add('is-visible'); });
+    }
+})();
+</script>

@@ -66,13 +66,13 @@ class WebStoriesController extends BaseController
     public function view($id)
     {
         $webStory = $this->webStoriesModel->getWebStory($id);
-        
+
         if (empty($webStory) || $webStory->is_active != 1) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        // Increment view count
-        $this->webStoriesModel->incrementViewCount($id);
+        // Bot/crawler aware view counter — see WebStoriesModel::recordViewIfHuman.
+        $this->webStoriesModel->recordViewIfHuman($id, $this->request);
 
         $data['title'] = esc($webStory->title) . ' - ' . esc($this->settings->site_title);
         $data['description'] = esc($webStory->description);
@@ -81,10 +81,13 @@ class WebStoriesController extends BaseController
         $data['activeLanguages'] = $this->activeLanguages;
         $data['activeLang'] = $this->activeLang;
         $data['settings'] = $this->settings;
+        // Tells crawlers / Discover that this URL has an AMP equivalent.
+        $data['amphtmlUrl'] = base_url('web-stories/story/' . (int) $id);
 
         // Check if user wants AMP Stories format
-        $useAmpFormat = $this->request->getGet('amp') || 
-                       strpos($this->request->getUserAgent(), 'Mobile') !== false ||
+        $ampParam = $this->request->getGet('amp');
+        $useAmpFormat = ($ampParam !== null && $ampParam !== '0' && $ampParam !== 'false') ||
+                       $this->request->getUserAgent()->isMobile() ||
                        $this->request->getGet('format') === 'story';
 
         if ($useAmpFormat) {
@@ -104,13 +107,13 @@ class WebStoriesController extends BaseController
     public function story($id)
     {
         $webStory = $this->webStoriesModel->getWebStory($id);
-        
+
         if (empty($webStory) || $webStory->is_active != 1) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        // Increment view count
-        $this->webStoriesModel->incrementViewCount($id);
+        // Bot/crawler aware view counter.
+        $this->webStoriesModel->recordViewIfHuman($id, $this->request);
 
         $data['webStory'] = $webStory;
         $data['activeLanguages'] = $this->activeLanguages;
@@ -132,15 +135,19 @@ class WebStoriesController extends BaseController
     public function click($id)
     {
         $webStory = $this->webStoriesModel->getWebStory($id);
-        
+
         if (!empty($webStory) && $webStory->is_active == 1) {
-            $this->webStoriesModel->incrementClickCount($id);
-            
-            if (!empty($webStory->link_url)) {
-                return redirect()->to($webStory->link_url);
+            $this->webStoriesModel->recordClickIfHuman($id, $this->request);
+
+            // Validate the destination — link_url should already be sanitized
+            // at save time, but click() is a public redirect and must guard
+            // against legacy rows with javascript:/data: URLs.
+            $safeUrl = WebStoriesModel::sanitizeOutboundUrl($webStory->link_url ?? '');
+            if ($safeUrl !== '') {
+                return redirect()->to($safeUrl);
             }
         }
-        
+
         return redirect()->to('/');
     }
 
@@ -475,30 +482,39 @@ class WebStoriesController extends BaseController
      */
     public function apiGetStories()
     {
-        $langId = inputGet('lang_id') ?: $this->activeLang->id;
-        $limit = inputGet('limit') ?: null;
-        
-        $stories = $this->webStoriesModel->getActiveWebStories($langId, $limit);
-        
+        $langId = (int) (inputGet('lang_id') ?: $this->activeLang->id);
+        $limit  = (int) (inputGet('limit') ?: 20);
+        $offset = (int) (inputGet('offset') ?: 0);
+        $limit  = max(1, min(50, $limit));
+        $offset = max(0, $offset);
+
+        $stories = $this->webStoriesModel->getActiveWebStoriesPaginated($langId, $limit, $offset);
+        $total   = $this->webStoriesModel->countActiveWebStories($langId);
+
         $formattedStories = [];
         foreach ($stories as $story) {
             $formattedStories[] = [
-                'id' => $story->id,
-                'title' => $story->title,
+                'id'          => $story->id,
+                'title'       => $story->title,
                 'description' => $story->description,
-                'image_url' => !empty($story->image_path) ? base_url($story->image_path) : $story->image_url,
-                'link_url' => $story->link_url,
-                'view_count' => $story->view_count,
-                'click_count' => $story->click_count,
-                'created_at' => $story->created_at
+                'image_url'   => !empty($story->image_path) ? base_url($story->image_path) : $story->image_url,
+                'link_url'    => $story->link_url,
+                'view_count'  => (int) $story->view_count,
+                'click_count' => (int) $story->click_count,
+                'created_at'  => $story->created_at,
+                'amp_url'     => base_url('web-stories/story/' . (int) $story->id),
             ];
         }
-        
-        return $this->response->setJSON([
-            'success' => true,
-            'stories' => $formattedStories,
-            'total' => count($formattedStories)
-        ]);
+
+        return $this->response
+            ->setHeader('Cache-Control', 'public, max-age=300')
+            ->setJSON([
+                'success' => true,
+                'stories' => $formattedStories,
+                'total'   => $total,
+                'limit'   => $limit,
+                'offset'  => $offset,
+            ]);
     }
 
     /**
@@ -578,12 +594,36 @@ class WebStoriesController extends BaseController
         $ids = inputPost('ids');
         if (empty($ids) || !is_array($ids)) { return $this->response->setJSON(['success'=>false,'message'=>'IDs inválidos']); }
         $ids = array_map('intval', $ids);
-        $ids = array_filter($ids, fn($v) => $v>0);
-        $deleted = 0;
+        $ids = array_values(array_filter($ids, fn($v) => $v > 0));
+        if (empty($ids)) { return $this->response->setJSON(['success'=>false,'message'=>'IDs vazios']); }
+
+        $db = \Config\Database::connect();
+        $deleted = [];
+        $failed  = [];
+
+        $db->transStart();
         foreach ($ids as $id) {
-            if ($this->webStoriesModel->deleteWebStory($id)) { $deleted++; }
+            if ($this->webStoriesModel->deleteWebStory($id)) {
+                $deleted[] = $id;
+            } else {
+                $failed[] = $id;
+            }
         }
-        return $this->response->setJSON(['success'=>true, 'deleted'=>$deleted]);
+        $db->transComplete();
+
+        if ($db->transStatus() === false) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Falha na transação — nenhuma linha foi removida.',
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'success' => true,
+            'deleted' => count($deleted),
+            'deleted_ids' => $deleted,
+            'failed'  => $failed,
+        ]);
     }
     
     /**
@@ -795,7 +835,7 @@ IMPORTANTE: Responda APENAS com o JSON válido, sem texto adicional.";
     {
         $apiKey = $this->getOpenAIKey();
         
-        $model = (getenv('OPENAI_TEXT_MODEL') ?: 'gpt-5');
+        $model = (getenv('OPENAI_TEXT_MODEL') ?: 'gpt-5.4-mini');
         $data = [
             'model' => $model,
             'messages' => [
@@ -884,7 +924,7 @@ IMPORTANTE: Responda APENAS com o JSON válido, sem texto adicional.";
         }
 
         // Fallback to alternate model in case of timeout or error
-        $fallbackModel = getenv('OPENAI_TEXT_FALLBACK_MODEL') ?: 'gpt-4o-mini';
+        $fallbackModel = getenv('OPENAI_TEXT_FALLBACK_MODEL') ?: 'gpt-4.1-mini';
         if (!empty($fallbackModel) && $fallbackModel !== $model) {
             log_message('error', 'Primary model failed (' . $model . '). Falling back to ' . $fallbackModel);
             $useResponses = (strpos($fallbackModel, 'gpt-5') !== false);

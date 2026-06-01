@@ -53,13 +53,15 @@
 
     // Dynamic selects for model/size/quality
     function rebuildOpenAIOptions() {
-        var model = $('#openai_model_select').val() || 'gpt-image-1';
+        var model = $('#openai_model_select').val() || 'gpt-image-1-mini';
         var sizesByModel = {
+            'gpt-image-1-mini': ['1024x1024','1536x1024','1024x1536'],
             'gpt-image-1': ['1024x1024','1536x1024','1024x1536'],
             'dall-e-3': ['1024x1024','1792x1024','1024x1792'],
             'dall-e-2': ['256x256','512x512','1024x1024']
         };
         var qualitiesByModel = {
+            'gpt-image-1-mini': ['low','medium','high'],
             'gpt-image-1': ['low','medium','high'],
             'dall-e-3': ['standard','hd'],
             'dall-e-2': []
@@ -356,8 +358,9 @@
                     </div>
                     <div class="form-group">
                         <label>Modelo padrão</label>
-                        <?php $defModel = getenv('OPENAI_DEFAULT_MODEL') ?: 'gpt-image-1'; ?>
+                        <?php $defModel = getenv('OPENAI_DEFAULT_MODEL') ?: 'gpt-image-1-mini'; ?>
                         <select id="openai_model_select" class="form-control" name="openai_model">
+                            <option value="gpt-image-1-mini" <?= ($defModel=='gpt-image-1-mini'?'selected':''); ?>>GPT-Image-1 Mini (cost-efficient)</option>
                             <option value="gpt-image-1" <?= ($defModel=='gpt-image-1'?'selected':''); ?>>GPT-Image-1</option>
                             <option value="dall-e-3" <?= ($defModel=='dall-e-3'?'selected':''); ?>>DALL-E 3</option>
                             <option value="dall-e-2" <?= ($defModel=='dall-e-2'?'selected':''); ?>>DALL-E 2</option>
@@ -552,8 +555,9 @@
                     </script>
                     <div class="form-group">
                         <label>Modelo de texto (Chat)</label>
-                        <?php $defTextModel = getenv('OPENAI_TEXT_MODEL') ?: 'gpt-5'; ?>
+                        <?php $defTextModel = getenv('OPENAI_TEXT_MODEL') ?: 'gpt-5.4-mini'; ?>
                         <select id="openai_text_model_select" class="form-control" name="openai_text_model">
+                            <option value="gpt-5.4-mini" <?= ($defTextModel=='gpt-5.4-mini'?'selected':''); ?>>gpt-5.4-mini</option>
                             <option value="gpt-5" <?= ($defTextModel=='gpt-5'?'selected':''); ?>>gpt-5</option>
                             <option value="gpt-4.1-mini" <?= ($defTextModel=='gpt-4.1-mini'?'selected':''); ?>>gpt-4.1-mini</option>
                             <option value="gpt-4o-mini" <?= ($defTextModel=='gpt-4o-mini'?'selected':''); ?>>gpt-4o-mini</option>
@@ -562,11 +566,12 @@
                     </div>
                     <div class="form-group">
                         <label>Modelo de texto (fallback)</label>
-                        <?php $defTextFallback = getenv('OPENAI_TEXT_FALLBACK_MODEL') ?: 'gpt-4o-mini'; ?>
+                        <?php $defTextFallback = getenv('OPENAI_TEXT_FALLBACK_MODEL') ?: 'gpt-4.1-mini'; ?>
                         <select id="openai_text_fallback_model_select" class="form-control" name="openai_text_fallback_model">
-                            <option value="gpt-4o-mini" <?= ($defTextFallback=='gpt-4o-mini'?'selected':''); ?>>gpt-4o-mini</option>
                             <option value="gpt-4.1-mini" <?= ($defTextFallback=='gpt-4.1-mini'?'selected':''); ?>>gpt-4.1-mini</option>
+                            <option value="gpt-5.4-mini" <?= ($defTextFallback=='gpt-5.4-mini'?'selected':''); ?>>gpt-5.4-mini</option>
                             <option value="gpt-5" <?= ($defTextFallback=='gpt-5'?'selected':''); ?>>gpt-5</option>
+                            <option value="gpt-4o-mini" <?= ($defTextFallback=='gpt-4o-mini'?'selected':''); ?>>gpt-4o-mini</option>
                         </select>
                         <small class="text-muted">Usado automaticamente se o modelo principal falhar/estourar timeout.</small>
                     </div>

@@ -1,0 +1,17 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css">
+<style>
+.swatch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+.sw { padding: 16px; min-height: 110px; display: flex; flex-direction: column; justify-content: space-between; color: #fff;}
+.sw .name { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.sw .hex { font-family: var(--font-mono); font-size: 11px; }
+.sw .role { font-size: 11px; opacity: .8; }
+</style></head>
+<body>
+<div class="swatch-grid">
+  <div class="sw" style="background:#16a34a"><span class="name">Success</span><span class="role">Over target / positive</span><span class="hex">#16a34a</span></div>
+  <div class="sw" style="background:#d97706"><span class="name">Warning</span><span class="role">Attention required</span><span class="hex">#d97706</span></div>
+  <div class="sw" style="background:#dc2626"><span class="name">Danger</span><span class="role">Destructive / negative</span><span class="hex">#dc2626</span></div>
+  <div class="sw" style="background:#0c3163"><span class="name">Info</span><span class="role">Brand info / default</span><span class="hex">#0c3163</span></div>
+</div>
+</body></html>

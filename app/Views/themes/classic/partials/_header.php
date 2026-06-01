@@ -4,11 +4,30 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'analytics_storage': 'granted',
+    'functionality_storage': 'granted',
+    'personalization_storage': 'granted',
+    'security_storage': 'granted',
+    'wait_for_update': 500
+});
+gtag('set', 'ads_data_redaction', true);
+gtag('set', 'url_passthrough', true);
+if (document.cookie.indexOf('gx_cookie_consent=accepted') !== -1) {
+    gtag('consent', 'update', { 'ad_storage': 'granted', 'ad_user_data': 'granted', 'ad_personalization': 'granted', 'analytics_storage': 'granted' });
+}
+</script>
 <title><?= escMeta($title); ?> - <?= escMeta($baseSettings->site_title); ?></title>
 <meta name="description" content="<?= escMeta($description); ?>"/>
 <meta name="keywords" content="<?= escMeta($keywords); ?>"/>
 <meta name="author" content="<?= escMeta($baseSettings->application_name); ?>"/>
-<meta name="robots" content="all">
+<meta name="robots" content="max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <meta property="og:locale" content="<?= escMeta($activeLang->language_code); ?>"/>
 <meta property="og:site_name" content="<?= escMeta($baseSettings->application_name); ?>"/>
 <?= csrf_meta(); ?>
@@ -57,9 +76,13 @@ if ($generalSettings->pwa_status == 1): ?>
 <link rel="manifest" href="<?= base_url('manifest.json'); ?>">
 <link rel="apple-touch-icon" href="<?= base_url(getPwaLogo($generalSettings, 'sm')); ?>">
 <?php endif; ?>
+<link rel="alternate" type="application/rss+xml" title="<?= escMeta($baseSettings->application_name); ?> - RSS" href="<?= base_url('rss/latest-posts'); ?>">
 <link rel="shortcut icon" type="image/png" href="<?= getFavicon(); ?>"/>
 <link rel="canonical" href="<?= esc(base_url(uri_string()));?>"/>
 <link rel="alternate" href="<?= esc(currentFullURL()); ?>" hreflang="<?= escMeta($activeLang->language_code); ?>"/>
+<?php if (!empty($amphtmlUrl)): ?>
+<link rel="amphtml" href="<?= esc($amphtmlUrl); ?>"/>
+<?php endif; ?>
 <?= view('common/_fonts'); ?>
 <link href="<?= base_url($assetsPath . '/css/style-2.4.1.min.css'); ?>" rel="stylesheet"/>
 <?= loadView('partials/_css_js_header'); ?>

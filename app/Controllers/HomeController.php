@@ -2,10 +2,13 @@
 
 namespace App\Controllers;
 
+use App\Libraries\MarketingHomeDefaults;
+use App\Libraries\MarketingSimulatorsDefaults;
 use App\Models\AuthModel;
 use App\Models\CategoryModel;
 use App\Models\CommonModel;
 use App\Models\GalleryModel;
+use App\Models\MarketingHomeModel;
 use App\Models\PageModel;
 use App\Models\PostAdminModel;
 use App\Models\PostItemModel;
@@ -27,37 +30,56 @@ class HomeController extends BaseController
     public function index()
     {
         $simulators = $this->getSimulatorCatalog();
-        $latestPosts = array_slice($this->postModel->getLatestPosts($this->activeLang->id, 4, 0), 0, 4);
+        $latestPosts = getOrSetStableCache('marketing_home_latest_posts_lang_' . $this->activeLang->id, function () {
+            return array_slice($this->postModel->getLatestPosts($this->activeLang->id, 4, 0), 0, 4);
+        }, 300);
+        $marketingHomeModel = new MarketingHomeModel();
+        $homeConfig = $marketingHomeModel->getHomeConfig($this->activeLang->id, $this->getHomeConfigDefaults());
+        $contactChannels = $this->getMarketingContactChannels();
+        $homeWhatsAppMessage = 'Olá! Vim pela home institucional da GX Capital e quero falar com um especialista para entender a solução mais adequada para a minha empresa.';
+        $visibleQuickLinks = array_values(array_filter($homeConfig['nav']['quick_links'] ?? [], function ($item) {
+            return !empty($item['enabled']) && (!empty($item['label']) || !empty($item['href']));
+        }));
+        $visibleBusinessVerticals = array_values(array_filter($homeConfig['verticals']['items'] ?? [], function ($item) {
+            return !empty($item['enabled']);
+        }));
+        $heroStatLabels = $homeConfig['hero_stats_labels'] ?? [];
+        $homeDescription = $this->buildHomeDescription($homeConfig);
+        $socialImage = $this->resolveHomeSocialImage($homeConfig, $latestPosts);
 
         $data = [
-            'title' => 'Cambio estruturado, credito e consultoria para empresas',
-            'description' => $this->settings->site_description,
+            'title' => 'Câmbio estruturado, crédito e consultoria para empresas',
+            'description' => $homeDescription,
             'keywords' => $this->settings->keywords,
             'bodyClass' => 'gx-marketing-home',
             'pageHeadView' => 'marketing/_shared_styles',
+            'canonicalUrl' => langBaseUrl(),
+            'socialImage' => $socialImage['url'],
+            'socialImageWidth' => $socialImage['width'] ?? null,
+            'socialImageHeight' => $socialImage['height'] ?? null,
             'blogUrl' => langBaseUrl('blog'),
             'simulatorsHubUrl' => langBaseUrl('simuladores'),
             'wealthUrl' => base_url('wealth'),
-            'quickLinks' => [
-                ['label' => 'Solucoes', 'href' => '#verticais'],
-                ['label' => 'Simuladores', 'href' => '#simuladores'],
-                ['label' => 'Insights', 'href' => '#blog-tecnico'],
-                ['label' => 'Especialista', 'href' => '#fale-especialista'],
-            ],
+            'quickLinks' => $visibleQuickLinks,
             'heroStats' => [
-                ['value' => count($simulators), 'label' => 'simuladores disponiveis'],
-                ['value' => 5, 'label' => 'frentes de atuacao'],
-                ['value' => count($latestPosts), 'label' => 'analises recentes'],
+                ['value' => count($simulators), 'label' => $heroStatLabels['simulators'] ?? 'simuladores disponíveis'],
+                ['value' => count($visibleBusinessVerticals), 'label' => $heroStatLabels['verticals'] ?? 'frentes de atuação'],
+                ['value' => count($latestPosts), 'label' => $heroStatLabels['insights'] ?? 'análises recentes'],
             ],
-            'businessVerticals' => $this->getBusinessVerticals(),
+            'businessVerticals' => $visibleBusinessVerticals,
             'simulators' => $simulators,
             'latestPosts' => $latestPosts,
+            'homeConfig' => $homeConfig,
+            'contactChannels' => $contactChannels,
+            'whatsAppUrl' => $this->buildWhatsAppUrl($contactChannels['whatsapp_digits'] ?? '', $homeWhatsAppMessage),
+            'whatsAppMessage' => $homeWhatsAppMessage,
+            'marketingSchema' => $this->buildHomeMarketingSchema($homeConfig, $visibleBusinessVerticals, $homeDescription, $socialImage),
             'userSession' => getUserSession()
         ];
 
-        echo loadView('partials/_header', $data);
+        echo view('marketing/_home_head', $data);
         echo view('marketing/home_institutional', $data);
-        echo loadView('partials/_footer', $data);
+        echo view('marketing/_home_footer', $data);
     }
 
     /**
@@ -68,8 +90,8 @@ class HomeController extends BaseController
         $this->cachePage(300);
         $data = $this->buildEditorialHomeData([
             'title' => 'Blog GX Capital',
-            'description' => 'Conteudo tecnico sobre cambio, credito estruturado, mercado de capitais, consorcios e investimentos.',
-            'keywords' => trim($this->settings->keywords . ', blog gx capital, conteudo tecnico, mercado financeiro', ' ,'),
+            'description' => 'Conteúdo técnico sobre câmbio, crédito estruturado, mercado de capitais, consórcios e investimentos.',
+            'keywords' => trim($this->settings->keywords . ', blog gx capital, conteúdo técnico, mercado financeiro', ' ,'),
             'homeTitle' => 'Blog GX Capital'
         ]);
 
@@ -83,20 +105,403 @@ class HomeController extends BaseController
      */
     public function simulatorsHub()
     {
+        $canonicalUrl = langBaseUrl('simuladores');
+        $description = 'Central de simuladores da GX Capital para câmbio, trade finance, consórcio, crédito, mercado de capitais e recebíveis, organizada por frente e por ferramenta.';
+        $topicFronts = $this->getSimulatorTopics();
+        $simulators = $this->getSimulatorCatalog();
+        $legacySimulators = $this->getFxLegacySimulatorCatalog();
+        $contactChannels = $this->getMarketingContactChannels();
+        $whatsAppMessage = 'Olá! Vim pela Central de Simuladores da GX Capital e quero falar com um especialista para identificar a solução mais adequada para minha empresa.';
+
         $data = [
-            'title' => 'Hub de simuladores financeiros',
-            'description' => 'Catalogo central dos simuladores da GX Capital com preservacao das URLs individuais ja existentes.',
-            'keywords' => trim($this->settings->keywords . ', simuladores financeiros, simulador de risco cambial, simulador de custo de capital', ' ,'),
+            'title' => 'Central de simuladores GX Capital',
+            'description' => characterLimiter(preg_replace('/\s+/', ' ', $description), 160, ''),
+            'keywords' => trim($this->settings->keywords . ', central de simuladores, simuladores financeiros, simuladores de câmbio, simulador de consórcio, custo de capital', ' ,'),
             'pageHeadView' => 'marketing/_shared_styles',
+            'canonicalUrl' => $canonicalUrl,
+            'socialImage' => getLogo(),
+            'socialImageWidth' => (int)getLogoSize('width'),
+            'socialImageHeight' => (int)getLogoSize('height'),
             'homeUrl' => langBaseUrl(),
             'blogUrl' => langBaseUrl('blog'),
-            'simulators' => $this->getSimulatorCatalog(),
+            'simulatorsHubUrl' => $canonicalUrl,
+            'simulatorsFxHubUrl' => langBaseUrl('simuladores/cambio'),
+            'wealthUrl' => base_url('wealth'),
+            'bodyClass' => 'gx-marketing-page',
+            'simulators' => $simulators,
+            'topicFronts' => $topicFronts,
+            'legacySimulators' => $legacySimulators,
+            'contactChannels' => $contactChannels,
+            'whatsAppUrl' => $this->buildWhatsAppUrl($contactChannels['whatsapp_digits'] ?? '', $whatsAppMessage),
+            'whatsAppMessage' => $whatsAppMessage,
+            'hubStats' => [
+                ['value' => count($simulators), 'label' => 'ferramentas disponíveis'],
+                ['value' => count($topicFronts), 'label' => 'frentes organizadas'],
+                ['value' => count($legacySimulators), 'label' => 'estudos cambiais em destaque'],
+            ],
+            'marketingSchema' => [
+                '@context' => 'https://schema.org',
+                '@graph' => [
+                    [
+                        '@type' => 'CollectionPage',
+                        '@id' => $canonicalUrl . '#webpage',
+                        'url' => $canonicalUrl,
+                        'name' => 'Central de simuladores GX Capital',
+                        'description' => characterLimiter(preg_replace('/\s+/', ' ', $description), 160, ''),
+                        'inLanguage' => $this->activeLang->language_code,
+                        'isPartOf' => ['@id' => base_url() . '/#website'],
+                    ],
+                ],
+            ],
             'userSession' => getUserSession()
         ];
 
-        echo loadView('partials/_header', $data);
+        echo view('marketing/_home_head', $data);
         echo view('marketing/simulators_hub', $data);
-        echo loadView('partials/_footer', $data);
+        echo view('marketing/_home_footer', $data);
+    }
+
+    /**
+     * FX Simulators Hub
+     */
+    public function simulatorsFxHub()
+    {
+        $marketingHomeModel = new MarketingHomeModel();
+        $pageConfig = $marketingHomeModel->getSimulatorsHubConfig($this->activeLang->id, $this->getSimulatorsConfigDefaults());
+        $description = trim((string)($pageConfig['hero']['subtitle'] ?? ''));
+        if ($description === '') {
+            $description = 'Simuladores de câmbio, hedge, trade finance e operações 4131 para importadores e exportadores, com leitura consultiva da mesa GX Capital.';
+        }
+        $canonicalUrl = langBaseUrl('simuladores/cambio');
+        $contactChannels = $this->getMarketingContactChannels();
+        $defaultWhatsAppMessage = 'Olá! Vim pela página de simuladores de câmbio da GX Capital e tenho interesse em fazer um estudo para minhas operações de câmbio.';
+        $whatsAppMessagesByTool = [
+            'import' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e quero estudar a exposição das minhas operações de importação.',
+            'export' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e quero estudar a proteção de receita das minhas operações de exportação.',
+            'hedge' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e tenho interesse em estudar uma estratégia de hedge cambial para minha empresa.',
+            'funding4131' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e tenho interesse em avaliar uma operação 4131 ou funding internacional.',
+            'trade' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e tenho interesse em avaliar uma estrutura de trade finance para minha operação.',
+        ];
+        $whatsAppBaseUrl = '';
+        if (!empty($contactChannels['whatsapp_digits'])) {
+            $whatsAppBaseUrl = 'https://wa.me/' . $contactChannels['whatsapp_digits'];
+        }
+
+        $data = [
+            'title' => 'Simuladores de câmbio para importadores e exportadores',
+            'description' => characterLimiter(preg_replace('/\s+/', ' ', $description), 160, ''),
+            'keywords' => trim($this->settings->keywords . ', simuladores de câmbio, hedge cambial, trade finance, operação 4131, importação, exportação', ' ,'),
+            'pageHeadView' => 'marketing/_shared_styles',
+            'canonicalUrl' => $canonicalUrl,
+            'socialImage' => getLogo(),
+            'socialImageWidth' => (int)getLogoSize('width'),
+            'socialImageHeight' => (int)getLogoSize('height'),
+            'homeUrl' => langBaseUrl(),
+            'blogUrl' => langBaseUrl('blog'),
+            'simulatorsHubUrl' => langBaseUrl('simuladores'),
+            'simulatorsFxHubUrl' => $canonicalUrl,
+            'wealthUrl' => base_url('wealth'),
+            'bodyClass' => 'gx-marketing-page',
+            'legacySimulators' => $this->getFxLegacySimulatorCatalog(),
+            'contactChannels' => $contactChannels,
+            'whatsAppUrl' => $this->buildWhatsAppUrl($contactChannels['whatsapp_digits'] ?? '', $defaultWhatsAppMessage),
+            'whatsAppBaseUrl' => $whatsAppBaseUrl,
+            'whatsAppDefaultMessage' => $defaultWhatsAppMessage,
+            'whatsAppMessagesByTool' => $whatsAppMessagesByTool,
+            'pageConfig' => $pageConfig,
+            'marketingSchema' => [
+                '@context' => 'https://schema.org',
+                '@graph' => [
+                    [
+                        '@type' => 'WebPage',
+                        '@id' => $canonicalUrl . '#webpage',
+                        'url' => $canonicalUrl,
+                        'name' => trim((string)($pageConfig['hero']['title'] ?? 'Simuladores de câmbio GX Capital')),
+                        'description' => characterLimiter(preg_replace('/\s+/', ' ', $description), 160, ''),
+                        'inLanguage' => $this->activeLang->language_code,
+                        'isPartOf' => ['@id' => base_url() . '/#website'],
+                        'about' => ['@id' => $canonicalUrl . '#service'],
+                    ],
+                    [
+                        '@type' => 'FinancialService',
+                        '@id' => $canonicalUrl . '#service',
+                        'name' => 'Mesa de câmbio e trade finance GX Capital',
+                        'provider' => ['@id' => base_url() . '/#organization'],
+                        'employee' => ['@id' => base_url() . '/#person-vinicius-teixeira'],
+                        'serviceType' => [
+                            'Câmbio estruturado',
+                            'Hedge cambial',
+                            'Trade finance',
+                            'Operações 4131',
+                        ],
+                        'areaServed' => 'BR',
+                        'description' => 'Boutique financeira especializada em câmbio estruturado para importadores e exportadores. A mesa compara cotações entre mais de 10 instituições financeiras e recomenda a estrutura mais eficiente para cada operação.',
+                    ],
+                    [
+                        '@type' => 'FAQPage',
+                        '@id' => $canonicalUrl . '#faq',
+                        'mainEntity' => [
+                            [
+                                '@type' => 'Question',
+                                'name' => 'O que é câmbio estruturado para importadores e exportadores?',
+                                'acceptedAnswer' => [
+                                    '@type' => 'Answer',
+                                    'text' => 'Câmbio estruturado é uma operação que combina contratos de câmbio com instrumentos de proteção (hedge), permitindo que empresas importadoras e exportadoras travem taxas, reduzam exposição cambial e planejem fluxo de caixa com previsibilidade. A GX Capital estrutura operações sob medida comparando cotações entre mais de 10 instituições financeiras.',
+                                ],
+                            ],
+                            [
+                                '@type' => 'Question',
+                                'name' => 'Como funciona hedge cambial para empresas?',
+                                'acceptedAnswer' => [
+                                    '@type' => 'Answer',
+                                    'text' => 'Hedge cambial é uma estratégia de proteção contra variações na taxa de câmbio. Funciona por meio de contratos a termo (NDF), opções ou swaps que permitem fixar uma taxa futura. A mesa da GX Capital avalia exposição real, prazo de liquidação e margem da operação antes de propor a estrutura de proteção mais eficiente.',
+                                ],
+                            ],
+                            [
+                                '@type' => 'Question',
+                                'name' => 'Qual a diferença entre ACC, ACE e FINIMP?',
+                                'acceptedAnswer' => [
+                                    '@type' => 'Answer',
+                                    'text' => 'ACC (Adiantamento sobre Contrato de Câmbio) antecipa recursos ao exportador antes do embarque. ACE (Adiantamento sobre Cambiais Entregues) antecipa após o embarque. FINIMP (Financiamento à Importação) financia a compra de mercadorias do exterior. A escolha depende da etapa do fluxo internacional, pressão de caixa e custo comparado.',
+                                ],
+                            ],
+                            [
+                                '@type' => 'Question',
+                                'name' => 'O que é uma operação 4131 e quando vale a pena?',
+                                'acceptedAnswer' => [
+                                    '@type' => 'Answer',
+                                    'text' => 'A operação 4131 é um empréstimo internacional que permite captar recursos no exterior com taxas potencialmente mais competitivas que o crédito local. Vale a pena quando o custo all-in (taxa base SOFR + spread offshore + hedge cambial + fees) é inferior ao custo equivalente onshore (CDI + spread local). O simulador da GX Capital ajuda a filtrar a viabilidade antes de aprofundar a estrutura.',
+                                ],
+                            ],
+                            [
+                                '@type' => 'Question',
+                                'name' => 'O que é uma boutique financeira de câmbio?',
+                                'acceptedAnswer' => [
+                                    '@type' => 'Answer',
+                                    'text' => 'Uma boutique financeira de câmbio é uma empresa independente que não tem produto próprio para distribuir. Isso permite recomendar a instituição e a estrutura mais aderente ao momento do cliente, sem conflito de interesse. A GX Capital compara cotações de bancos de câmbio e corretoras para encontrar a operação mais eficiente para cada perfil de empresa.',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'userSession' => getUserSession()
+        ];
+
+        echo view('marketing/_home_head', $data);
+        echo view('marketing/simulators_fx_hub', $data);
+        echo view('marketing/_home_footer', $data);
+    }
+
+    public function simulatorsFxLegacyRedirect()
+    {
+        return redirect()->to(langBaseUrl('simuladores/cambio'), 301);
+    }
+
+    /**
+     * Playbook (ebook interativo) — Importação Blindada · 2026
+     * Landing dedicada para tráfego pago capturando leads de importadores/exportadores.
+     */
+    public function playbookImportacaoBlindada()
+    {
+        $canonicalUrl = base_url('playbook/importacao-blindada');
+        $contactChannels = $this->getMarketingContactChannels();
+        $whatsAppMessage = 'Olá! Vim pelo playbook Importação Blindada da GX Capital e quero falar com a mesa de câmbio para proteger minhas operações em 2026.';
+
+        $description = 'Playbook GX Capital · Importação Blindada 2026: hedge cambial, antecipação de estoque e Ex-Tarifário para atravessar o "dólar eleitoral" com a margem intacta.';
+
+        $playbookConfig = [
+            'id' => 'importacao-blindada',
+            'title' => 'Importação Blindada · Playbook 2026',
+            'description' => $description,
+            'canonicalUrl' => $canonicalUrl,
+            'section' => 'Câmbio · Importação',
+            'keywords' => 'importação, câmbio, hedge cambial, NDF, FINIMP, dólar eleitoral, trade finance, ex-tarifário, importadores, GX Capital',
+            'datePublished' => '2026-05-08T08:00:00-03:00',
+            'dateModified'  => '2026-05-08T08:00:00-03:00',
+            'readingTimeMin' => 18,
+            'wordCount' => 4200,
+            'image' => getLogo(),
+            'breadcrumb' => [
+                ['name' => 'Início',     'url' => base_url()],
+                ['name' => 'Playbooks',  'url' => base_url('playbook')],
+                ['name' => 'Importação Blindada', 'url' => $canonicalUrl],
+            ],
+            'chapters' => [
+                'Cenário de Risco 2026',
+                'Balança Comercial em Números',
+                'O Dólar Eleitoral',
+                'Análise Setorial',
+                'Simulações de Impacto',
+                'Hedge Cambial Defensivo',
+                'Antecipação Tática de Estoque',
+                'Ex-Tarifário & Benefícios Estaduais',
+                'Ferramentas GX Capital',
+                'Checklist de Ação Imediata',
+                'Conclusão e Próximos Passos',
+            ],
+            'faq' => [
+                [
+                    'q' => 'O que é o "dólar eleitoral" e por que ele afeta importadores em 2026?',
+                    'a' => 'É o padrão recorrente de alta volatilidade cambial em anos de eleição presidencial brasileira. Em 2026, projeções da mesa GX Capital indicam pico do USD/BRL entre R$ 5,45 e R$ 5,55 no Q3 (agosto a outubro), pressionando importadores que liquidem operações sem hedge — o custo do dólar contratado em agosto pode ser até 13% maior que o de maio.',
+                ],
+                [
+                    'q' => 'Qual a melhor estrutura de hedge cambial para importação?',
+                    'a' => 'Depende do perfil. NDF (Non-Deliverable Forward) é simples e funciona para 30 a 180 dias. Termo é mais barato quando há fatura/Incoterm definido. Swap migra dívida CDI para USD. Collar protege com piso e teto, mantendo parte do upside. A mesa GX Capital compara custo entre 10+ instituições antes de recomendar a estrutura.',
+                ],
+                [
+                    'q' => 'Vale a pena antecipar estoque em maio para evitar o pico de Q3?',
+                    'a' => 'Para importações de bens de capital com lead time longo, sim. Simulações mostram que antecipar 3 meses de estoque a R$ 5,10 (maio) versus R$ 5,50 (agosto) economiza ~R$ 600 mil em uma operação de US$ 500 mil/mês — sem contar economia adicional de frete e prêmio de hedge evitado.',
+                ],
+                [
+                    'q' => 'Como funciona o Ex-Tarifário e quanto economiza?',
+                    'a' => 'Ex-Tarifário é a redução ou eliminação do Imposto de Importação (II) para produtos sem similar nacional, aprovado pela SECEX/MDIC. Em uma máquina de embalagem de US$ 100 mil, com II normal de 14%, o Ex-Tarifário aprovado zera o II e economiza R$ 71.400 a R$ 5,10. Validade de 2 anos, renovável.',
+                ],
+                [
+                    'q' => 'Empilhar Ex-Tarifário, benefício estadual e hedge dá quanto de economia?',
+                    'a' => 'Em uma operação real de US$ 100 mil de máquina de embalagem, o empilhamento de Ex-Tarifário (-14% II), benefício estadual SUDENE/SUDAM (-75% impostos federais e estaduais) e hedge cambial reduz o custo total em até 44,7% — de R$ 637.500 para R$ 352.525.',
+                ],
+                [
+                    'q' => 'Quando é a janela ideal para travar câmbio em 2026?',
+                    'a' => 'Maio e Junho. Em julho a janela começa a fechar conforme o mercado precifica o estresse eleitoral. Q3 (agosto a outubro) é o pico de risco. A recomendação da mesa GX Capital para importadores é estruturar hedge defensivo em camadas começando agora, com prazo de 60 a 180 dias.',
+                ],
+            ],
+        ];
+
+        $data = [
+            'title' => $playbookConfig['title'],
+            'description' => $description,
+            'keywords' => $playbookConfig['keywords'],
+            'canonicalUrl' => $canonicalUrl,
+            'socialImage' => getLogo(),
+            'socialImageWidth' => (int)getLogoSize('width'),
+            'socialImageHeight' => (int)getLogoSize('height'),
+            'homeUrl' => langBaseUrl(),
+            'simuladorUrl' => langBaseUrl('simuladores/cambio'),
+            'specialistUrl' => langBaseUrl('simuladores/cambio') . '#contato',
+            'contactChannels' => $contactChannels,
+            'whatsAppUrl' => $this->buildWhatsAppUrl($contactChannels['whatsapp_digits'] ?? '', $whatsAppMessage),
+            'playbookConfig' => $playbookConfig,
+        ];
+
+        if (function_exists('trackMetaPageView')) {
+            try { trackMetaPageView($canonicalUrl); } catch (\Throwable $e) {}
+        }
+        if (function_exists('trackMetaEvent')) {
+            try {
+                trackMetaEvent('ViewContent', [
+                    'content_name' => 'Playbook Importação Blindada',
+                    'content_category' => 'Câmbio · Importação',
+                    'content_type' => 'playbook',
+                    'currency' => 'BRL',
+                ]);
+            } catch (\Throwable $e) {}
+        }
+
+        return view('marketing/playbook_importacao_blindada', $data);
+    }
+
+    /**
+     * Playbook (ebook interativo) — Exportação Premium · 2026
+     * Landing dedicada para tráfego pago capturando leads de exportadores.
+     */
+    public function playbookExportacaoPremium()
+    {
+        $canonicalUrl = base_url('playbook/exportacao-premium');
+        $contactChannels = $this->getMarketingContactChannels();
+        $whatsAppMessage = 'Olá! Vim pelo playbook Exportação Premium da GX Capital e quero falar com a mesa de câmbio para travar receita em moeda forte em 2026.';
+
+        $description = 'Playbook GX Capital · Exportação Premium 2026: hedge de venda em camadas, ACC/ACE, Drawback e conta offshore para capturar o pico do dólar eleitoral em receita extra.';
+
+        $playbookConfig = [
+            'id' => 'exportacao-premium',
+            'title' => 'Exportação Premium · Playbook 2026',
+            'description' => $description,
+            'canonicalUrl' => $canonicalUrl,
+            'section' => 'Câmbio · Exportação',
+            'keywords' => 'exportação, câmbio, hedge cambial, NDF venda, ACC, ACE, dólar eleitoral, trade finance, drawback, conta offshore, exportadores, GX Capital',
+            'datePublished' => '2026-05-08T08:00:00-03:00',
+            'dateModified'  => '2026-05-08T08:00:00-03:00',
+            'readingTimeMin' => 18,
+            'wordCount' => 4400,
+            'image' => getLogo(),
+            'breadcrumb' => [
+                ['name' => 'Início',     'url' => base_url()],
+                ['name' => 'Playbooks',  'url' => base_url('playbook')],
+                ['name' => 'Exportação Premium', 'url' => $canonicalUrl],
+            ],
+            'chapters' => [
+                'Cenário de Oportunidade 2026',
+                'Balança Comercial em Números',
+                'O Pico do Dólar Eleitoral',
+                'Setores Exportadores em Foco',
+                'Simulações de Receita',
+                'Hedge de Venda em Camadas',
+                'ACC, ACE & Antecipação',
+                'Drawback & Conta Offshore',
+                'Ferramentas GX Capital',
+                'Checklist de Ação Imediata',
+                'Conclusão e Próximos Passos',
+            ],
+            'faq' => [
+                [
+                    'q' => 'Por que o "dólar eleitoral" é uma oportunidade para exportadores brasileiros em 2026?',
+                    'a' => 'Em anos eleitorais, o USD/BRL costuma atingir picos de estresse no Q3 — projeções da mesa GX Capital apontam R$ 5,45 a R$ 5,55 entre agosto e outubro. Para exportadores que estruturam hedge de venda em camadas antes do pico, isso vira receita extra de até 13% por embarque versus liquidar no spot atual de R$ 4,91.',
+                ],
+                [
+                    'q' => 'Qual a diferença entre NDF Venda, Termo de Venda e ACC para exportadores?',
+                    'a' => 'NDF Venda fixa a taxa de venda futura sem entrega física da moeda — bom para 30 a 180 dias. Termo de Venda é com entrega da moeda na liquidação, exige DUE ou invoice. ACC (Adiantamento sobre Contrato de Câmbio) antecipa até 100% do valor em USD antes do embarque, com taxa SOFR + spread e hedge embutido. Cada um cobre uma necessidade diferente do pipeline.',
+                ],
+                [
+                    'q' => 'O que é hedge em camadas e por que é melhor que tentar acertar o pico do dólar?',
+                    'a' => 'Hedge em camadas é dividir o pipeline em 30/30/40% e travar cada parte em momentos diferentes da curva — primeira em junho, segunda no primeiro repique de julho/agosto, terceira no pico Q3. Captura ~85% do prêmio máximo sem o risco de perder a janela tentando cravar o topo exato.',
+                ],
+                [
+                    'q' => 'O que é Drawback e quanto economiza em uma operação de exportação?',
+                    'a' => 'Drawback é o regime aduaneiro que suspende II, IPI, PIS, COFINS e ICMS sobre insumos importados que serão usados na fabricação de produto exportado. Em insumos de US$ 200 mil a R$ 5,10, com tributos normais de ~30%, a economia direta chega a R$ 306 mil por lote.',
+                ],
+                [
+                    'q' => 'Vale a pena manter parte da receita em conta offshore (Bradesco Miami, BTG Cayman)?',
+                    'a' => 'Para volumes médios e altos, sim. Manter parte dos USD em conta offshore reduz dependência da liquidação no spot do dia, permite repatriar quando o câmbio for favorável e funciona como reserva estratégica em cenários fiscais adversos. Contas mais usadas: NCC no Brasil, Bradesco Miami / BB Americas para volume médio, BTG Cayman / Itaú BBA Nassau para reserva sofisticada.',
+                ],
+                [
+                    'q' => 'Empilhar hedge, ACC e Drawback eleva a receita em quanto?',
+                    'a' => 'Em uma operação real de US$ 1 milhão, o empilhamento de NDF Venda no pico Q3 (R$ 5,30 médio), Drawback sobre insumos (US$ 200k) e 30% mantido em conta offshore com timing favorável eleva a receita de R$ 4,91 mi (liquidando no spot Q2) para R$ 5,89 mi — ganho líquido de +R$ 981 mil ou +20%.',
+                ],
+            ],
+        ];
+
+        $data = [
+            'title' => $playbookConfig['title'],
+            'description' => $description,
+            'keywords' => $playbookConfig['keywords'],
+            'canonicalUrl' => $canonicalUrl,
+            'socialImage' => getLogo(),
+            'socialImageWidth' => (int)getLogoSize('width'),
+            'socialImageHeight' => (int)getLogoSize('height'),
+            'homeUrl' => langBaseUrl(),
+            'simuladorUrl' => langBaseUrl('simuladores/cambio'),
+            'specialistUrl' => langBaseUrl('simuladores/cambio') . '#contato',
+            'contactChannels' => $contactChannels,
+            'whatsAppUrl' => $this->buildWhatsAppUrl($contactChannels['whatsapp_digits'] ?? '', $whatsAppMessage),
+            'playbookConfig' => $playbookConfig,
+        ];
+
+        if (function_exists('trackMetaPageView')) {
+            try { trackMetaPageView($canonicalUrl); } catch (\Throwable $e) {}
+        }
+        if (function_exists('trackMetaEvent')) {
+            try {
+                trackMetaEvent('ViewContent', [
+                    'content_name' => 'Playbook Exportação Premium',
+                    'content_category' => 'Câmbio · Exportação',
+                    'content_type' => 'playbook',
+                    'currency' => 'BRL',
+                ]);
+            } catch (\Throwable $e) {}
+        }
+
+        return view('marketing/playbook_exportacao_premium', $data);
     }
 
     /**
@@ -149,48 +554,8 @@ class HomeController extends BaseController
      */
     private function getBusinessVerticals()
     {
-        return [
-            [
-                'title' => 'Credito Estruturado',
-                'eyebrow' => 'Funding e capital de giro',
-                'description' => 'Estruture capital, alongue prazos e compare linhas com mais clareza antes de negociar.',
-                'link_label' => 'Ver frente de credito',
-                'link_url' => $this->resolveCategoryUrl('credito-empresarial', langBaseUrl('simuladores')),
-                'accent' => '#0f766e'
-            ],
-            [
-                'title' => 'Cambio e Trade Finance',
-                'eyebrow' => 'Protecao cambial e execucao',
-                'description' => 'Combine hedge, fluxo internacional e leitura de exposicao cambial em uma unica frente.',
-                'link_label' => 'Explorar cambio',
-                'link_url' => $this->resolveCategoryUrl('cambio-6', langBaseUrl('simuladores')),
-                'accent' => '#0b5cab'
-            ],
-            [
-                'title' => 'Consorcios Estruturados',
-                'eyebrow' => 'Planejamento e alavancagem',
-                'description' => 'Avalie fluxo de pagamento, contemplacao e custo total antes de escolher a estrutura ideal.',
-                'link_label' => 'Abrir simulador',
-                'link_url' => $this->resolvePageUrl('simulador-consorcio', langBaseUrl('simuladores')),
-                'accent' => '#8f5b2e'
-            ],
-            [
-                'title' => 'Seguros',
-                'eyebrow' => 'Protecao patrimonial e operacional',
-                'description' => 'Desenhe coberturas aderentes ao risco real da empresa e traga a conversa para a mesa financeira.',
-                'link_label' => 'Falar com especialista',
-                'link_url' => '#fale-especialista',
-                'accent' => '#b45309'
-            ],
-            [
-                'title' => 'Consultoria de Investimentos',
-                'eyebrow' => 'Patrimonio, liquidez e estrategia',
-                'description' => 'Conecte tesouraria, objetivos patrimoniais e alocacao com uma leitura mais executavel do patrimonio.',
-                'link_label' => 'Conhecer wealth',
-                'link_url' => base_url('wealth'),
-                'accent' => '#7c3aed'
-            ],
-        ];
+        $defaults = new MarketingHomeDefaults($this->activeLang->id);
+        return $defaults->getBusinessVerticals();
     }
 
     /**
@@ -198,62 +563,285 @@ class HomeController extends BaseController
      */
     private function getSimulatorCatalog()
     {
-        $pageModel = new PageModel();
-        $definitions = [
-            'simulador-de-risco-cambial' => [
-                'label' => 'FX',
-                'eyebrow' => 'Cambio e trade finance',
-                'title' => 'Simulador de Risco Cambial',
-                'description' => 'Projete exposicao cambial e antecipe cenarios para importacao, exportacao e protecao de margem.',
-                'cta' => 'Abrir simulador'
-            ],
-            'aurum-simulador-de-custo-de-capital' => [
-                'label' => 'CAP',
-                'eyebrow' => 'Credito estruturado',
-                'title' => 'Simulador de Custo de Capital',
-                'description' => 'Compare custos de funding e entenda qual estrutura de credito faz mais sentido para a operacao.',
-                'cta' => 'Calcular custo'
-            ],
-            'simulador-mercado-de-capitais' => [
-                'label' => 'MKT',
-                'eyebrow' => 'Mercado de capitais',
-                'title' => 'Simulador de Mercado de Capitais',
-                'description' => 'Teste cenarios para debentures, CRA, CRI e outras estruturas de captacao fora do credito bancario.',
-                'cta' => 'Explorar estrutura'
-            ],
-            'simulador-de-custo-de-antecipacao' => [
-                'label' => 'FIDC',
-                'eyebrow' => 'Recebiveis e antecipacao',
-                'title' => 'Simulador de Custo de Antecipacao',
-                'description' => 'Compare desconto bancario e FIDC para decidir a melhor rota de antecipacao de recebiveis.',
-                'cta' => 'Comparar custos'
-            ],
-            'simulador-consorcio' => [
-                'label' => 'CONS',
-                'eyebrow' => 'Consorcio estruturado',
-                'title' => 'Simulador de Consorcio',
-                'description' => 'Entenda custo total, fluxo de parcelas e diferencas entre consorcio e financiamento tradicional.',
-                'cta' => 'Simular consorcio'
-            ],
-        ];
+        $defaults = new MarketingHomeDefaults($this->activeLang->id);
+        return $defaults->getSimulatorCatalog();
+    }
 
-        $items = [];
-        foreach ($definitions as $slug => $item) {
-            $page = $pageModel->getPageByLang($slug, $this->activeLang->id);
-            if (!empty($page) && (int)$page->visibility === 1) {
-                if (!empty($page->title)) {
-                    $item['title'] = $page->title;
-                }
-                if (!empty($page->description)) {
-                    $item['description'] = $page->description;
-                }
-                $item['slug'] = $page->slug;
-                $item['url'] = langBaseUrl($page->slug);
-                $items[] = $item;
+    private function getSimulatorTopics()
+    {
+        $defaults = new MarketingHomeDefaults($this->activeLang->id);
+        return $defaults->getSimulatorTopics();
+    }
+
+    private function getFxLegacySimulatorCatalog()
+    {
+        $defaults = new MarketingHomeDefaults($this->activeLang->id);
+        return $defaults->getFxLegacySimulatorCatalog();
+    }
+
+    private function getHomeConfigDefaults()
+    {
+        $defaults = new MarketingHomeDefaults($this->activeLang->id);
+        return $defaults->getHomeConfigDefaults();
+    }
+
+    private function getSimulatorsConfigDefaults()
+    {
+        $defaults = new MarketingSimulatorsDefaults($this->activeLang->id);
+        return $defaults->getPageConfigDefaults();
+    }
+
+    private function getMarketingContactChannels()
+    {
+        $contactInfo = [];
+        if (!empty($this->generalSettings->contact_info)) {
+            $decoded = json_decode($this->generalSettings->contact_info, true);
+            if (is_array($decoded)) {
+                $contactInfo = $decoded;
             }
         }
 
-        return $items;
+        $phone = trim((string)($contactInfo['contact_phone'] ?? ($this->settings->contact_phone ?? '')));
+        $email = trim((string)($contactInfo['contact_email'] ?? ($this->settings->contact_email ?? '')));
+        $whatsAppRaw = trim((string)($contactInfo['contact_whatsapp'] ?? ''));
+        if ($whatsAppRaw === '') {
+            $whatsAppRaw = $phone;
+        }
+
+        return [
+            'phone' => $phone,
+            'phone_href' => $phone !== '' ? 'tel:' . preg_replace('/[^0-9+]/', '', $phone) : '',
+            'email' => $email,
+            'whatsapp_raw' => $whatsAppRaw,
+            'whatsapp_digits' => $this->normalizeWhatsAppNumber($whatsAppRaw),
+        ];
+    }
+
+    private function normalizeWhatsAppNumber($value)
+    {
+        $digits = preg_replace('/\D+/', '', (string)$value);
+        if ($digits === '') {
+            return '';
+        }
+        if (strpos($digits, '00') === 0) {
+            $digits = substr($digits, 2);
+        }
+        if (!preg_match('/^55/', $digits) && (strlen($digits) === 10 || strlen($digits) === 11)) {
+            $digits = '55' . $digits;
+        }
+        return $digits;
+    }
+
+    private function buildWhatsAppUrl($digits, $message)
+    {
+        $digits = trim((string)$digits);
+        if ($digits === '') {
+            return '';
+        }
+        return 'https://wa.me/' . $digits . '?text=' . rawurlencode((string)$message);
+    }
+
+    private function buildHomeDescription(array $homeConfig)
+    {
+        $description = trim((string)($homeConfig['hero']['subtitle'] ?? ''));
+        if ($description !== '') {
+            $description = preg_replace('/\s+/', ' ', $description);
+            return characterLimiter($description, 160, '');
+        }
+
+        return 'GX Capital oferece soluções em câmbio estruturado, crédito, proteção patrimonial, seguros, wealth e consultoria estratégica para empresas e famílias.';
+    }
+
+    private function resolveHomeSocialImage(array $homeConfig, array $latestPosts)
+    {
+        $clippingItems = $homeConfig['clippings']['items'] ?? [];
+        foreach ($clippingItems as $item) {
+            if (!empty($item['enabled']) && !empty($item['image_url'])) {
+                return [
+                    'url' => $item['image_url'],
+                    'width' => 1600,
+                    'height' => 1200,
+                ];
+            }
+        }
+
+        foreach ($latestPosts as $post) {
+            if (checkPostImg($post)) {
+                return [
+                    'url' => getPostImage($post, 'big'),
+                    'width' => 870,
+                    'height' => 580,
+                ];
+            }
+        }
+
+        return [
+            'url' => getLogo(),
+            'width' => (int)getLogoSize('width'),
+            'height' => (int)getLogoSize('height'),
+        ];
+    }
+
+    private function buildHomeMarketingSchema(array $homeConfig, array $visibleBusinessVerticals, $description, array $socialImage)
+    {
+        $serviceTypes = array_values(array_filter(array_map(static function ($item) {
+            return trim((string)($item['title'] ?? ''));
+        }, $visibleBusinessVerticals)));
+
+        $pageName = trim((string)($homeConfig['hero']['title'] ?? ''));
+        if ($pageName === '') {
+            $pageName = 'GX Capital';
+        }
+
+        $webPageSchema = [
+            '@type' => 'WebPage',
+            '@id' => langBaseUrl() . '#webpage',
+            'url' => langBaseUrl(),
+            'name' => $pageName,
+            'description' => $description,
+            'inLanguage' => $this->activeLang->language_code,
+            'isPartOf' => ['@id' => base_url() . '/#website'],
+            'about' => ['@id' => langBaseUrl() . '#financial-service'],
+        ];
+
+        if (!empty($socialImage['url'])) {
+            $webPageSchema['primaryImageOfPage'] = [
+                '@type' => 'ImageObject',
+                'url' => $socialImage['url'],
+            ];
+            if (!empty($socialImage['width'])) {
+                $webPageSchema['primaryImageOfPage']['width'] = (int)$socialImage['width'];
+            }
+            if (!empty($socialImage['height'])) {
+                $webPageSchema['primaryImageOfPage']['height'] = (int)$socialImage['height'];
+            }
+        }
+
+        $financialServiceSchema = [
+            '@type' => 'FinancialService',
+            '@id' => langBaseUrl() . '#financial-service',
+            'name' => 'GX Capital',
+            'url' => langBaseUrl(),
+            'description' => $description,
+            'provider' => ['@id' => base_url() . '/#organization'],
+            'areaServed' => 'BR',
+        ];
+
+        if (!empty($serviceTypes)) {
+            $financialServiceSchema['serviceType'] = $serviceTypes;
+        }
+
+        if (!empty($socialImage['url'])) {
+            $financialServiceSchema['image'] = $socialImage['url'];
+        }
+
+        // FAQPage schema — perguntas frequentes sobre câmbio e serviços
+        $homeFaqItems = [
+            ['q' => 'O que é câmbio estruturado?', 'a' => 'Câmbio estruturado é uma operação financeira que combina contratos de câmbio com instrumentos de proteção (hedge), permitindo que empresas importadoras e exportadoras travem taxas, reduzam exposição cambial e planejem fluxo de caixa com previsibilidade. A GX Capital estrutura essas operações sob medida para cada perfil de empresa.'],
+            ['q' => 'Como funciona hedge cambial?', 'a' => 'Hedge cambial é uma estratégia de proteção contra variações na taxa de câmbio. Funciona por meio de contratos a termo (NDF), opções de câmbio ou swaps que permitem fixar uma taxa futura. Empresas que importam ou exportam usam hedge para eliminar o risco de oscilação do dólar sobre suas margens operacionais.'],
+            ['q' => 'Quais serviços a GX Capital oferece para empresas?', 'a' => 'A GX Capital oferece câmbio estruturado, hedge cambial, trade finance, crédito corporativo, operações 4131 (funding internacional), consultoria em mercado de capitais e wealth advisory para patrimônio de famílias e empresários.'],
+            ['q' => 'O que é uma operação 4131?', 'a' => 'A operação 4131 é um empréstimo internacional regulado pela Resolução 4131 do Banco Central, que permite a captação de recursos no exterior com taxas potencialmente mais competitivas. É indicada para empresas com exposição em moeda estrangeira ou que buscam diversificação de fontes de financiamento.'],
+            ['q' => 'Como funciona a consultoria de wealth advisory da GX Capital?', 'a' => 'O wealth advisory da GX Capital oferece diagnóstico patrimonial, leitura de liquidez, tese de alocação e plano executivo de próximos passos para famílias, executivos e empresários. O processo começa com um mapeamento do patrimônio e fluxo de caixa, seguido de recomendações consultivas integradas.'],
+        ];
+
+        $faqEntities = [];
+        foreach ($homeFaqItems as $i => $faq) {
+            $faqEntities[] = [
+                '@type' => 'Question',
+                'name' => $faq['q'],
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => $faq['a'],
+                ],
+                'position' => $i + 1,
+            ];
+        }
+
+        $faqPageSchema = [
+            '@type' => 'FAQPage',
+            '@id' => langBaseUrl() . '#faq',
+            'mainEntity' => $faqEntities,
+        ];
+
+        return [
+            '@context' => 'https://schema.org',
+            '@graph' => [$webPageSchema, $financialServiceSchema, $faqPageSchema],
+        ];
+    }
+
+    private function buildConsorcioSimulatorSchema(string $canonicalUrl, string $title, string $description)
+    {
+        $consorcioFaqItems = [
+            [
+                'q' => 'O que é consórcio estruturado?',
+                'a' => 'Consórcio estruturado é uma estratégia que vai além de simplesmente aderir a um grupo. Envolve comparar dezenas de administradoras, analisar taxa administrativa, fundo de reserva, frequência de assembleias e definir uma estratégia de lance calculada para contemplar no prazo desejado. A GX Capital cruza mais de 20 administradoras e 1.000+ grupos com IA para encontrar a combinação mais eficiente.',
+            ],
+            [
+                'q' => 'Consórcio ou financiamento: qual é mais vantajoso?',
+                'a' => 'Depende de entrada disponível, urgência, custo total e capacidade de lance. O consórcio não cobra juros, mas tem taxa administrativa e fundo de reserva. O financiamento libera o crédito imediatamente, mas o custo total com juros compostos costuma ser significativamente maior. O simulador da GX Capital coloca os dois cenários lado a lado com números reais para que a decisão seja técnica.',
+            ],
+            [
+                'q' => 'Como funciona a contemplação por lance?',
+                'a' => 'Contemplação por lance é quando o consorciado oferece um valor antecipado (lance) na assembleia para antecipar a liberação da carta de crédito. O lance pode ser livre (valor que o participante define), fixo (pré-determinado pela administradora) ou embutido (usando parte da própria carta). A estratégia de lance ideal depende do grupo, da concorrência média e do caixa disponível.',
+            ],
+            [
+                'q' => 'Consórcio serve como investimento?',
+                'a' => 'Sim. A tese de investimento com consórcio funciona quando o consorciado contempla a carta de crédito, adquire o bem (geralmente imóvel) com desconto e revende com margem. O retorno líquido depende do custo de carregamento (parcelas até a contemplação), do tempo até a revenda e da margem de valorização. O simulador da GX Capital projeta ROI, break-even e custo real da operação.',
+            ],
+            [
+                'q' => 'O que a GX Capital faz de diferente no consórcio?',
+                'a' => 'A GX Capital é uma boutique financeira independente — não é administradora e não tem cota própria para vender. Isso permite recomendar o grupo, a administradora e a estratégia de lance mais eficiente para cada perfil, sem viés comercial. O simulador com IA filtra mais de 20 administradoras e gera um plano de contemplação personalizado que é validado por especialista antes da decisão.',
+            ],
+        ];
+
+        $faqEntities = [];
+        foreach ($consorcioFaqItems as $i => $faq) {
+            $faqEntities[] = [
+                '@type' => 'Question',
+                'name' => $faq['q'],
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => $faq['a'],
+                ],
+                'position' => $i + 1,
+            ];
+        }
+
+        return [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                [
+                    '@type' => 'WebPage',
+                    '@id' => $canonicalUrl . '#webpage',
+                    'url' => $canonicalUrl,
+                    'name' => $title,
+                    'description' => $description,
+                    'inLanguage' => $this->activeLang->language_code,
+                    'isPartOf' => ['@id' => base_url() . '/#website'],
+                    'about' => ['@id' => $canonicalUrl . '#service'],
+                ],
+                [
+                    '@type' => 'FinancialService',
+                    '@id' => $canonicalUrl . '#service',
+                    'name' => 'Simulação e planejamento estratégico de consórcio',
+                    'description' => 'Boutique financeira independente que compara mais de 20 administradoras e 1.000+ grupos de consórcio com IA para encontrar a rota de contemplação mais eficiente para cada perfil.',
+                    'serviceType' => [
+                        'Consórcio para investimento com revenda',
+                        'Compra planejada de imóvel com consórcio',
+                        'Comparativo entre consórcio e financiamento',
+                        'Planejamento de contemplação por lance',
+                    ],
+                    'provider' => ['@id' => base_url() . '/#organization'],
+                    'employee' => ['@id' => base_url() . '/#person-vinicius-teixeira'],
+                    'areaServed' => 'BR',
+                ],
+                [
+                    '@type' => 'FAQPage',
+                    '@id' => $canonicalUrl . '#faq',
+                    'mainEntity' => $faqEntities,
+                ],
+            ],
+        ];
     }
 
     private function resolveCategoryUrl($slug, $fallback)
@@ -413,6 +1001,11 @@ class HomeController extends BaseController
         } else {
             $this->checkPageAuth($page);
 
+            if (($page->slug ?? '') === 'simulador-consorcio') {
+                $this->renderConsorcioSimulatorPage($page);
+                return;
+            }
+
             $data['title'] = $page->title;
             $data['description'] = $page->description;
             $data['keywords'] = $page->keywords;
@@ -429,6 +1022,57 @@ class HomeController extends BaseController
                 echo loadView('partials/_footer');
             }
         }
+    }
+
+    private function renderConsorcioSimulatorPage($page)
+    {
+        $canonicalUrl = langBaseUrl($page->slug ?? 'simulador-consorcio');
+        $title = 'Simulador de Consórcio Inteligente';
+        $description = 'Simule seu consórcio grátis. Compare com financiamento, planeje sua compra e descubra a rota de contemplação mais rápida com IA. 20+ administradoras analisadas pela GX Capital.';
+        $contactChannels = $this->getMarketingContactChannels();
+        $defaultWhatsAppMessage = 'Olá! Vim pelo simulador de consórcio da GX Capital e quero validar a melhor estratégia para o meu caso.';
+        $whatsAppBaseUrl = '';
+        if (!empty($contactChannels['whatsapp_digits'])) {
+            $whatsAppBaseUrl = 'https://wa.me/' . $contactChannels['whatsapp_digits'];
+        }
+
+        $consorcioDefaults = (new \App\Libraries\MarketingConsorcioDefaults($this->activeLang->id))->getPageConfigDefaults();
+        $consorcioConfig = (new \App\Models\MarketingHomeModel())->getConsorcioPageConfig($this->activeLang->id, $consorcioDefaults);
+
+        $ogImagePath = trim((string)($consorcioConfig['seo']['og_image'] ?? ''));
+        $socialImage = !empty($ogImagePath) ? base_url($ogImagePath) : getLogo();
+        $socialImageWidth = !empty($ogImagePath) ? 1200 : (int) getLogoSize('width');
+        $socialImageHeight = !empty($ogImagePath) ? 630 : (int) getLogoSize('height');
+
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'keywords' => trim($this->settings->keywords . ', simulador de consorcio, consorcio estruturado, comparativo consorcio financiamento, planejamento de contemplacao', ' ,'),
+            'bodyClass' => 'gx-marketing-home gx-consorcio-simulator-page',
+            'pageHeadView' => 'simulators/_consorcio_head',
+            'canonicalUrl' => $canonicalUrl,
+            'socialImage' => $socialImage,
+            'socialImageWidth' => $socialImageWidth,
+            'socialImageHeight' => $socialImageHeight,
+            'ogDescription' => 'Descubra quanto você pode economizar. Compare consórcio vs financiamento em minutos com IA.',
+            'consorcioConfig' => $consorcioConfig,
+            'blogUrl' => langBaseUrl('blog'),
+            'simulatorsHubUrl' => langBaseUrl('simuladores'),
+            'wealthUrl' => base_url('wealth'),
+            'contactUrl' => getPageLinkByDefaultName('contact', $this->activeLang->id),
+            'termsUrl' => getPageLinkByDefaultName('terms_conditions', $this->activeLang->id),
+            'simulatorPage' => $page,
+            'contactChannels' => $contactChannels,
+            'whatsAppUrl' => $this->buildWhatsAppUrl($contactChannels['whatsapp_digits'] ?? '', $defaultWhatsAppMessage),
+            'whatsAppBaseUrl' => $whatsAppBaseUrl,
+            'whatsAppDefaultMessage' => $defaultWhatsAppMessage,
+            'marketingSchema' => $this->buildConsorcioSimulatorSchema($canonicalUrl, $title, $description),
+            'userSession' => getUserSession(),
+        ];
+
+        echo view('marketing/_home_head', $data);
+        echo view('simulators/consorcio', $data);
+        echo view('marketing/_home_footer', $data);
     }
 
     /**
@@ -594,24 +1238,67 @@ class HomeController extends BaseController
      */
     public function contactPost()
     {
+        $recaptchaEnabled = isRecaptchaEnabled($this->generalSettings);
+        $ip = preg_replace('/[^0-9a-fA-F:.]/', '', (string) getIPAddress());
+        $rateKey = 'contact_rl_' . md5($ip);
+        $rateWindow = 3600;
+        $rateMax = 3;
+        $rateHits = (int) (cache($rateKey) ?? 0);
+        if ($rateHits >= $rateMax) {
+            setErrorMessage('Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente novamente.', false);
+            return redirect()->back()->withInput();
+        }
+
         $robotCheck = inputPost('message_content');
         if (!empty($robotCheck)) {
+            cache()->save($rateKey, $rateHits + 1, $rateWindow);
             setErrorMessage("msg_recaptcha");
             return redirect()->back()->withInput();
         }
 
+        $formTs = (int) inputPost('form_ts');
+        $elapsed = time() - $formTs;
+        if ($formTs <= 0 || $elapsed < 2 || $elapsed > 7200) {
+            cache()->save($rateKey, $rateHits + 1, $rateWindow);
+            setErrorMessage('Envio recusado. Recarregue a página e tente novamente.', false);
+            return redirect()->back()->withInput();
+        }
+
+        $message = (string) inputPost('message');
+        $hasSpamUrl = preg_match('#(https?://|www\.|bit\.ly|tinyurl|t\.co/|goo\.gl|shorturl|ow\.ly)#i', $message) === 1;
+        if ($hasSpamUrl && !$recaptchaEnabled) {
+            cache()->save($rateKey, $rateHits + 1, $rateWindow);
+            setErrorMessage('Não é possível enviar links na mensagem. Descreva sua necessidade em texto.', false);
+            return redirect()->back()->withInput();
+        }
+
         $val = \Config\Services::validation();
+        $countryValidationList = implode(',', \App\Libraries\LeadPhoneFormatter::getCountryCodes());
         $val->setRule('name', trans("name"), 'required|max_length[200]');
         $val->setRule('email', trans("email"), 'required|valid_email|max_length[200]');
+        $val->setRule('phone_country', 'País', 'required|in_list[' . $countryValidationList . ']');
+        $val->setRule('phone', trans("phone"), 'required|max_length[40]');
         $val->setRule('message', trans("message"), 'required|max_length[5000]');
         if (!$this->validate(getValRules($val))) {
             $this->session->setFlashdata('errors', $val->getErrors());
             return redirect()->back()->withInput();
         } else {
-            if (reCAPTCHA('validate', $this->generalSettings) == 'invalid') {
+            $normalizedPhone = \App\Libraries\LeadPhoneFormatter::toInternational(
+                inputPost('phone_country'),
+                inputPost('phone')
+            );
+            if ($normalizedPhone === null) {
+                $errors = $val->getErrors();
+                $errors['phone'] = 'Informe um telefone válido.';
+                $this->session->setFlashdata('errors', $errors);
+                return redirect()->back()->withInput();
+            }
+            if ($recaptchaEnabled && reCAPTCHA('validate', $this->generalSettings) == 'invalid') {
+                cache()->save($rateKey, $rateHits + 1, $rateWindow);
                 setErrorMessage("msg_recaptcha");
                 return redirect()->back()->withInput();
             }
+            cache()->save($rateKey, $rateHits + 1, $rateWindow);
             $model = new CommonModel();
             if ($model->addContactMessage()) {
                 setSuccessMessage("message_contact_success");

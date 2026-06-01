@@ -45,7 +45,7 @@ try {
             formData.append("sim_data", JSON.stringify(simData));
         }
         
-        return fetch("/tmp/api_direct.php", {
+        return fetch("/api/save-simulator-lead", {
             method: "POST",
             body: formData
         })
@@ -249,7 +249,7 @@ try {
     }
     
     // Exibir o conteúdo da página após a atualização
-    echo "\nConteúdo atualizado com sucesso! A página agora usa o endpoint: /tmp/api_direct.php\n";
+    echo "\nConteúdo atualizado com sucesso! A página agora usa o endpoint: /api/save-simulator-lead\n";
     echo "Foi adicionado um formulário de captura de leads com estilo compatível com Tailwind CSS.\n";
     
 } catch (PDOException $e) {

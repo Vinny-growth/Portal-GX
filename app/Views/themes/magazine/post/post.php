@@ -101,6 +101,7 @@
                         <div class="post-text mt-4">
                             <?= loadView('post/_post_content'); ?>
                         </div>
+                        <?= view('common/_newsletter_cta_inline', ['post' => $post]); ?>
                     <?php endif;
                     if (!empty($post->optional_url)) : ?>
                         <div class="d-flex flex-row-reverse mt-4">

@@ -1,2 +1,1 @@
-<?= view('wealth/results'); ?>
-
+<?= view('wealth/results', get_defined_vars()); ?>

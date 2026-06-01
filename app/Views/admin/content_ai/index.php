@@ -98,7 +98,13 @@ if (!empty($settings->allowed_category_ids)) {
 
                     <div class="box">
                         <div class="box-header with-border">
-                            <h3 class="box-title">Itens do calendario</h3>
+                            <h3 class="box-title">Itens do calendario
+                                <?php if (!empty($calendarPagination)): ?>
+                                    <small class="text-muted" style="margin-left:10px;">
+                                        <?= number_format((int) $calendarPagination['total'], 0, ',', '.'); ?> itens no total
+                                    </small>
+                                <?php endif; ?>
+                            </h3>
                             <div class="pull-right">
                                 <form action="<?= adminUrl('content-ai/run-now'); ?>" method="post" style="display:inline;">
                                     <?= csrf_field(); ?>
@@ -106,121 +112,410 @@ if (!empty($settings->allowed_category_ids)) {
                                 </form>
                             </div>
                         </div>
+                        <div class="box-body">
+                            <?php
+                            $fStatus = $calendarFilters['status'] ?? '';
+                            $fSource = $calendarFilters['source_type'] ?? '';
+                            $fDate   = $calendarFilters['date'] ?? '';
+                            $fQuery  = $calendarFilters['q'] ?? '';
+                            $statusCounts = $calendarStatusCounts ?? [];
+                            $sourceCounts = $calendarSourceCounts ?? [];
+                            $statusOptions = [
+                                'planned'      => 'Planejado',
+                                'queued'       => 'Na fila',
+                                'generating'   => 'Gerando',
+                                'generated'    => 'Gerado',
+                                'needs_review' => 'Aguardando revisao',
+                                'failed'       => 'Falhou',
+                            ];
+                            $sourceOptions = [
+                                'manual'  => 'Manual',
+                                'trend'   => 'Tendencia',
+                                'popular' => 'Popular',
+                            ];
+                            ?>
+                            <form method="get" action="<?= adminUrl('content-ai'); ?>" class="form-inline" style="margin-bottom:15px;">
+                                <div class="form-group" style="margin-right:8px;">
+                                    <select name="status" class="form-control input-sm">
+                                        <option value="">Todos os status</option>
+                                        <?php foreach ($statusOptions as $k => $label): ?>
+                                            <option value="<?= $k; ?>" <?= $fStatus === $k ? 'selected' : ''; ?>>
+                                                <?= $label; ?><?= isset($statusCounts[$k]) ? ' (' . $statusCounts[$k] . ')' : ''; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-right:8px;">
+                                    <select name="source_type" class="form-control input-sm">
+                                        <option value="">Todas as origens</option>
+                                        <?php foreach ($sourceOptions as $k => $label): ?>
+                                            <option value="<?= $k; ?>" <?= $fSource === $k ? 'selected' : ''; ?>>
+                                                <?= $label; ?><?= isset($sourceCounts[$k]) ? ' (' . $sourceCounts[$k] . ')' : ''; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-right:8px;">
+                                    <input type="date" name="date" class="form-control input-sm" value="<?= esc($fDate); ?>" placeholder="Data">
+                                </div>
+                                <div class="form-group" style="margin-right:8px;">
+                                    <input type="text" name="q" class="form-control input-sm" value="<?= esc($fQuery); ?>" placeholder="Buscar titulo" style="width:200px;">
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-default"><i class="fa fa-filter"></i> Filtrar</button>
+                                <?php if ($fStatus || $fSource || $fDate || $fQuery): ?>
+                                    <a href="<?= adminUrl('content-ai'); ?>" class="btn btn-sm btn-link">Limpar</a>
+                                <?php endif; ?>
+                            </form>
+                        </div>
                         <div class="box-body table-responsive">
                             <table class="table table-bordered table-striped">
                                 <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th style="width:50px;">ID</th>
                                     <th>Titulo</th>
-                                    <th>Status</th>
-                                    <th>Publicar em</th>
-                                    <th>Origem</th>
-                                    <th>Post</th>
-                                    <th>Acoes</th>
+                                    <th style="width:140px;">Status</th>
+                                    <th style="width:160px;">Publicar em</th>
+                                    <th style="width:100px;">Origem</th>
+                                    <th style="width:90px;">Post</th>
+                                    <th style="width:160px;">Acoes</th>
                                 </tr>
                                 </thead>
                                 <tbody>
+                                <?php
+                                $statusLabels = [
+                                    'planned'      => ['default', 'Planejado'],
+                                    'queued'       => ['primary', 'Na fila'],
+                                    'generating'   => ['info',    'Gerando'],
+                                    'generated'    => ['success', 'Gerado'],
+                                    'needs_review' => ['warning', 'Revisao'],
+                                    'failed'       => ['danger',  'Falhou'],
+                                ];
+                                $srcLabels = [
+                                    'manual'  => ['default', 'Manual'],
+                                    'trend'   => ['info',    'Tendencia'],
+                                    'popular' => ['warning', 'Popular'],
+                                ];
+                                $todayStr = date('Y-m-d');
+                                ?>
                                 <?php if (!empty($calendarItems)):
-                                    foreach ($calendarItems as $item): ?>
-                                        <tr>
+                                    foreach ($calendarItems as $item):
+                                        [$stCls, $stTxt] = $statusLabels[$item->status] ?? ['default', ucfirst((string) $item->status)];
+                                        [$srcCls, $srcTxt] = $srcLabels[$item->source_type] ?? ['default', ucfirst((string) ($item->source_type ?? '—'))];
+                                        $isToday = !empty($item->publish_at) && strpos($item->publish_at, $todayStr) === 0;
+                                        $isPast = !empty($item->publish_at) && $item->publish_at < date('Y-m-d H:i:s');
+                                        ?>
+                                        <tr<?= $isToday ? ' style="background:#fff8e1;"' : ''; ?>>
                                             <td><?= $item->id; ?></td>
-                                            <td><?= esc($item->title); ?></td>
-                                            <td><?= esc($item->status); ?></td>
-                                            <td><?= esc($item->publish_at); ?></td>
-                                            <td><?= esc($item->source_type); ?></td>
-                                            <td><?= !empty($item->post_id) ? (int) $item->post_id : '-'; ?></td>
+                                            <td>
+                                                <?= esc($item->title); ?>
+                                                <?php if (!empty($item->source_url)): ?>
+                                                    <br><small class="text-muted" title="<?= esc($item->source_url); ?>"><i class="fa fa-link"></i> <?= esc(mb_substr((string) $item->source_url, 0, 60)); ?><?= mb_strlen((string) $item->source_url) > 60 ? '…' : ''; ?></small>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?php if ($item->status === 'failed' && !empty($item->last_error)): ?>
+                                                    <button type="button" class="btn btn-xs btn-danger" data-toggle="modal" data-target="#errorModal-<?= (int) $item->id; ?>" title="Ver detalhes do erro">
+                                                        <i class="fa fa-exclamation-triangle"></i> <?= esc($stTxt); ?>
+                                                    </button>
+                                                    <div class="modal fade" id="errorModal-<?= (int) $item->id; ?>" tabindex="-1" role="dialog">
+                                                        <div class="modal-dialog modal-lg" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                                    <h4 class="modal-title"><i class="fa fa-exclamation-triangle text-danger"></i> Erro na geração — item #<?= (int) $item->id; ?></h4>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <p><strong>Título:</strong> <?= esc($item->title); ?></p>
+                                                                    <p><strong>Última tentativa:</strong> <?= esc($item->last_run_finished_at ?? '—'); ?></p>
+                                                                    <p><strong>Status do run:</strong> <span class="label label-danger"><?= esc($item->last_run_status ?? '—'); ?></span></p>
+                                                                    <p><strong>Mensagem de erro:</strong></p>
+                                                                    <pre style="white-space:pre-wrap; word-break:break-word; background:#f9f2f2; border-left:3px solid #d9534f; padding:10px; max-height:300px; overflow:auto;"><?= esc($item->last_error); ?></pre>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <form action="<?= adminUrl('content-ai/calendar/retry'); ?>" method="post" style="display:inline;" onsubmit="return confirm('Reenviar este item para a fila e tentar gerar novamente agora?');">
+                                                                        <?= csrf_field(); ?>
+                                                                        <input type="hidden" name="id" value="<?= (int) $item->id; ?>">
+                                                                        <button type="submit" class="btn btn-primary"><i class="fa fa-refresh"></i> Gerar novamente</button>
+                                                                    </form>
+                                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <span class="label label-<?= $stCls; ?>"><?= esc($stTxt); ?></span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?= esc($item->publish_at); ?>
+                                                <?php if ($isToday): ?>
+                                                    <br><small class="text-warning"><strong>HOJE</strong></small>
+                                                <?php elseif ($isPast && in_array($item->status, ['planned', 'queued'], true)): ?>
+                                                    <br><small class="text-danger"><strong>ATRASADO</strong></small>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td><span class="label label-<?= $srcCls; ?>"><?= esc($srcTxt); ?></span></td>
+                                            <td>
+                                                <?php if (!empty($item->post_id)): ?>
+                                                    <a href="<?= adminUrl('edit-post/' . (int) $item->post_id); ?>" target="_blank" class="btn btn-xs btn-default" title="Editar post #<?= (int) $item->post_id; ?>">
+                                                        <i class="fa fa-edit"></i> #<?= (int) $item->post_id; ?>
+                                                    </a>
+                                                <?php else: ?>
+                                                    <span class="text-muted">—</span>
+                                                <?php endif; ?>
+                                            </td>
                                             <td>
                                                 <?php if ($item->status === 'needs_review'): ?>
-                                                    <form action="<?= adminUrl('content-ai/calendar/approve'); ?>" method="post" style="display:inline;">
+                                                    <form action="<?= adminUrl('content-ai/calendar/approve'); ?>" method="post" style="display:inline;" onsubmit="return confirm('Aprovar e publicar este post agora?');">
                                                         <?= csrf_field(); ?>
                                                         <input type="hidden" name="id" value="<?= $item->id; ?>">
-                                                        <button type="submit" class="btn btn-xs btn-warning">Aprovar</button>
+                                                        <button type="submit" class="btn btn-xs btn-warning"><i class="fa fa-check"></i> Aprovar</button>
                                                     </form>
                                                 <?php endif; ?>
-                                                <form action="<?= adminUrl('content-ai/calendar/delete'); ?>" method="post" style="display:inline;">
+                                                <?php if ($item->status === 'failed'): ?>
+                                                    <form action="<?= adminUrl('content-ai/calendar/retry'); ?>" method="post" style="display:inline;" onsubmit="return confirm('Reenviar este item para a fila e tentar gerar novamente agora?');">
+                                                        <?= csrf_field(); ?>
+                                                        <input type="hidden" name="id" value="<?= $item->id; ?>">
+                                                        <button type="submit" class="btn btn-xs btn-primary" title="Gerar novamente"><i class="fa fa-refresh"></i></button>
+                                                    </form>
+                                                <?php endif; ?>
+                                                <form action="<?= adminUrl('content-ai/calendar/delete'); ?>" method="post" style="display:inline;" onsubmit="return confirm('Excluir este item do calendario? Esta acao nao pode ser desfeita.');">
                                                     <?= csrf_field(); ?>
                                                     <input type="hidden" name="id" value="<?= $item->id; ?>">
-                                                    <button type="submit" class="btn btn-xs btn-danger">Excluir</button>
+                                                    <button type="submit" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
                                                 </form>
                                             </td>
                                         </tr>
                                     <?php endforeach;
-                                endif; ?>
+                                else: ?>
+                                    <tr><td colspan="7" class="text-center text-muted" style="padding:30px;">Nenhum item encontrado com os filtros atuais.</td></tr>
+                                <?php endif; ?>
                                 </tbody>
                             </table>
+
+                            <?php if (!empty($calendarPagination) && $calendarPagination['pages'] > 1):
+                                $cp = $calendarPagination;
+                                $qs = array_filter([
+                                    'status'      => $fStatus,
+                                    'source_type' => $fSource,
+                                    'date'        => $fDate,
+                                    'q'           => $fQuery,
+                                ], fn($v) => $v !== '' && $v !== null);
+                                $buildUrl = function ($p) use ($qs) {
+                                    $qs['page'] = $p;
+                                    return adminUrl('content-ai') . '?' . http_build_query($qs) . '#tab_calendar';
+                                };
+                                $cur = (int) $cp['page'];
+                                $last = (int) $cp['pages'];
+                                $start = max(1, $cur - 3);
+                                $end = min($last, $cur + 3);
+                                ?>
+                                <nav style="margin-top:10px;">
+                                    <ul class="pagination pagination-sm" style="margin:0;">
+                                        <li class="<?= $cur <= 1 ? 'disabled' : ''; ?>">
+                                            <?php if ($cur > 1): ?><a href="<?= $buildUrl($cur - 1); ?>">&laquo;</a><?php else: ?><span>&laquo;</span><?php endif; ?>
+                                        </li>
+                                        <?php if ($start > 1): ?>
+                                            <li><a href="<?= $buildUrl(1); ?>">1</a></li>
+                                            <?php if ($start > 2): ?><li class="disabled"><span>…</span></li><?php endif; ?>
+                                        <?php endif; ?>
+                                        <?php for ($p = $start; $p <= $end; $p++): ?>
+                                            <li class="<?= $p === $cur ? 'active' : ''; ?>">
+                                                <?php if ($p === $cur): ?><span><?= $p; ?></span><?php else: ?><a href="<?= $buildUrl($p); ?>"><?= $p; ?></a><?php endif; ?>
+                                            </li>
+                                        <?php endfor; ?>
+                                        <?php if ($end < $last): ?>
+                                            <?php if ($end < $last - 1): ?><li class="disabled"><span>…</span></li><?php endif; ?>
+                                            <li><a href="<?= $buildUrl($last); ?>"><?= $last; ?></a></li>
+                                        <?php endif; ?>
+                                        <li class="<?= $cur >= $last ? 'disabled' : ''; ?>">
+                                            <?php if ($cur < $last): ?><a href="<?= $buildUrl($cur + 1); ?>">&raquo;</a><?php else: ?><span>&raquo;</span><?php endif; ?>
+                                        </li>
+                                    </ul>
+                                    <small class="text-muted" style="margin-left:10px;">Pagina <?= $cur; ?> de <?= $last; ?> · <?= $cp['per_page']; ?> por pagina</small>
+                                </nav>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
 
                 <div class="tab-pane" id="tab_trends">
+                    <?php if (!empty($xPulseItems)): ?>
+                        <div class="box box-warning">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"><i class="fa fa-twitter"></i> X Pulse — temas quentes nas ultimas 24h</h3>
+                                <div class="pull-right">
+                                    <form action="<?= adminUrl('content-ai/x-pulse/run'); ?>" method="post" style="display:inline;" onsubmit="return confirm('Disparar X Pulse agora? Isso usa creditos da API Grok.');">
+                                        <?= csrf_field(); ?>
+                                        <button class="btn btn-warning btn-sm"><i class="fa fa-refresh"></i> Rodar X Pulse</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="box-body table-responsive">
+                                <table class="table table-condensed" style="margin:0;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:30px;">#</th>
+                                            <th>Tema</th>
+                                            <th style="width:80px;">Sentimento</th>
+                                            <th style="width:100px;">Menções~</th>
+                                            <th style="width:90px;">Relevância</th>
+                                            <th>Tickers / Entidades</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($xPulseItems as $xp):
+                                            $sentMap = ['positive'=>'success','negative'=>'danger','neutral'=>'default','mixed'=>'warning'];
+                                            $sentCls = $sentMap[$xp->sentiment] ?? 'default';
+                                            $tickers = json_decode((string) ($xp->tickers_json ?? '[]'), true) ?: [];
+                                            $entities = json_decode((string) ($xp->entities_json ?? '[]'), true) ?: [];
+                                        ?>
+                                            <tr>
+                                                <td><?= $xp->rank; ?></td>
+                                                <td>
+                                                    <strong><?= esc(mb_substr($xp->theme, 0, 110)); ?></strong>
+                                                    <?php if (!empty($xp->summary)): ?>
+                                                        <br><small class="text-muted"><?= esc(mb_substr($xp->summary, 0, 200)); ?></small>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td><span class="label label-<?= $sentCls; ?>"><?= esc($xp->sentiment); ?></span></td>
+                                                <td><?= number_format((int) $xp->mentions_estimate, 0, ',', '.'); ?></td>
+                                                <td><?= $xp->relevance_score; ?>/100</td>
+                                                <td>
+                                                    <?php foreach (array_slice($tickers, 0, 4) as $tk): ?>
+                                                        <small class="label label-primary">$<?= esc($tk); ?></small>
+                                                    <?php endforeach; ?>
+                                                    <?php foreach (array_slice($entities, 0, 4) as $en): ?>
+                                                        <small class="label label-default"><?= esc($en); ?></small>
+                                                    <?php endforeach; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php elseif (!empty($settings->x_pulse_enabled)): ?>
+                        <div class="callout callout-warning">
+                            <h4><i class="fa fa-twitter"></i> X Pulse habilitado, sem snapshot ainda</h4>
+                            <p>Rode <code>php spark x:pulse</code> ou clique abaixo para coletar agora.</p>
+                            <form action="<?= adminUrl('content-ai/x-pulse/run'); ?>" method="post" style="display:inline;" onsubmit="return confirm('Disparar X Pulse agora? Isso usa creditos da API Grok.');">
+                                <?= csrf_field(); ?>
+                                <button class="btn btn-warning btn-sm"><i class="fa fa-refresh"></i> Rodar X Pulse</button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
+                    <?php if (!empty($sourceHealth)): ?>
+                        <div class="box box-solid">
+                            <div class="box-header with-border">
+                                <h3 class="box-title"><i class="fa fa-heartbeat"></i> Saude das fontes (ultimas 24h)</h3>
+                            </div>
+                            <div class="box-body table-responsive">
+                                <table class="table table-condensed" style="margin:0;">
+                                    <thead>
+                                        <tr>
+                                            <th>Fonte</th>
+                                            <th style="width:90px;">Status</th>
+                                            <th style="width:90px;">Tentativas</th>
+                                            <th style="width:90px;">Sucessos</th>
+                                            <th style="width:90px;">Falhas</th>
+                                            <th style="width:90px;">Itens</th>
+                                            <th style="width:110px;">Latencia</th>
+                                            <th>Ultima</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($sourceHealth as $sh):
+                                            $statusCls = $sh['status'] === 'healthy' ? 'success' : ($sh['status'] === 'down' ? 'danger' : 'warning');
+                                            $statusLbl = $sh['status'] === 'healthy' ? 'OK' : ($sh['status'] === 'down' ? 'OFFLINE' : 'DEGRADADA');
+                                        ?>
+                                            <tr>
+                                                <td><code><?= esc($sh['source']); ?></code></td>
+                                                <td><span class="label label-<?= $statusCls; ?>"><?= $statusLbl; ?></span></td>
+                                                <td><?= $sh['attempts']; ?></td>
+                                                <td><?= $sh['successes']; ?> <small class="text-muted">(<?= $sh['success_rate']; ?>%)</small></td>
+                                                <td><?= $sh['failures']; ?></td>
+                                                <td><?= $sh['items']; ?></td>
+                                                <td><?= $sh['avg_latency_ms']; ?> ms</td>
+                                                <td><small><?= esc($sh['last_attempt']); ?></small></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                     <div class="box">
                         <div class="box-header with-border">
                             <h3 class="box-title">Tendencias</h3>
                             <div class="pull-right">
                                 <form action="<?= adminUrl('content-ai/trends/fetch'); ?>" method="post" style="display:inline;">
                                     <?= csrf_field(); ?>
-                                    <button class="btn btn-info btn-sm">Atualizar tendencias</button>
+                                    <button class="btn btn-info btn-sm"><i class="fa fa-refresh"></i> Buscar tendencias</button>
                                 </form>
                             </div>
                         </div>
                         <div class="box-body table-responsive">
-                            <form action="<?= adminUrl('content-ai/trends/update'); ?>" method="post">
+                            <form id="form-trends" action="<?= adminUrl('content-ai/trends/add'); ?>" method="post">
                                 <?= csrf_field(); ?>
-                                <input type="hidden" name="mode" value="select">
                                 <table class="table table-bordered table-striped">
                                     <thead>
                                     <tr>
-                                        <th></th>
+                                        <th style="width:30px"><input type="checkbox" id="check-all-trends"></th>
                                         <th>Titulo</th>
-                                        <th>Origem</th>
-                                        <th>Selecionado</th>
-                                        <th>Auto</th>
-                                        <th>Usado</th>
+                                        <th>Fonte</th>
+                                        <th style="width:60px">Status</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <?php if (!empty($trendItems)):
                                         foreach ($trendItems as $trend): ?>
-                                            <tr>
-                                                <td><input type="checkbox" name="trend_ids[]" value="<?= $trend->id; ?>"></td>
+                                            <tr class="<?= !empty($trend->used) ? 'text-muted' : ''; ?>">
+                                                <td>
+                                                    <?php if (empty($trend->used)): ?>
+                                                        <input type="checkbox" name="trend_ids[]" value="<?= $trend->id; ?>" class="trend-check">
+                                                    <?php endif; ?>
+                                                </td>
                                                 <td><?= esc($trend->title); ?></td>
-                                                <td><?= esc($trend->source); ?></td>
-                                                <td><?= !empty($trend->selected) ? 'Sim' : 'Nao'; ?></td>
-                                                <td><?= !empty($trend->auto_add) ? 'Sim' : 'Nao'; ?></td>
-                                                <td><?= !empty($trend->used) ? 'Sim' : 'Nao'; ?></td>
+                                                <td><small class="label label-default"><?= esc($trend->source); ?></small></td>
+                                                <td>
+                                                    <?php if (!empty($trend->used)): ?>
+                                                        <small class="label label-success">Publicado</small>
+                                                    <?php else: ?>
+                                                        <small class="label label-info">Disponivel</small>
+                                                    <?php endif; ?>
+                                                </td>
                                             </tr>
                                         <?php endforeach;
                                     endif; ?>
                                     </tbody>
                                 </table>
-                                <div class="m-t-10">
-                                    <button type="submit" class="btn btn-primary btn-sm">Marcar selecionados</button>
+                                <div style="margin-top:15px;">
+                                    <button type="submit" class="btn btn-success"><i class="fa fa-send"></i> Enviar para publicacao</button>
+                                    <span class="text-muted" style="margin-left:10px;" id="trends-count">0 selecionadas</span>
                                 </div>
-                            </form>
-                            <form action="<?= adminUrl('content-ai/trends/update'); ?>" method="post" class="m-t-10">
-                                <?= csrf_field(); ?>
-                                <input type="hidden" name="mode" value="auto_add">
-                                <?php if (!empty($trendItems)): ?>
-                                    <?php foreach ($trendItems as $trend): ?>
-                                        <input type="hidden" name="trend_ids[]" value="<?= $trend->id; ?>">
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                                <button type="submit" class="btn btn-warning btn-sm">Marcar todos como auto</button>
-                            </form>
-                            <form action="<?= adminUrl('content-ai/trends/add'); ?>" method="post" class="m-t-10">
-                                <?= csrf_field(); ?>
-                                <?php if (!empty($trendItems)): ?>
-                                    <?php foreach ($trendItems as $trend): ?>
-                                        <?php if (!empty($trend->selected)): ?>
-                                            <input type="hidden" name="trend_ids[]" value="<?= $trend->id; ?>">
-                                        <?php endif; ?>
-                                    <?php endforeach; ?>
-                                <?php endif; ?>
-                                <button type="submit" class="btn btn-success btn-sm">Adicionar selecionadas ao calendario</button>
                             </form>
                         </div>
                     </div>
                 </div>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var checkAll = document.getElementById('check-all-trends');
+                    var checks = document.querySelectorAll('.trend-check');
+                    var countEl = document.getElementById('trends-count');
+                    function updateCount() {
+                        var c = document.querySelectorAll('.trend-check:checked').length;
+                        countEl.textContent = c + ' selecionada' + (c !== 1 ? 's' : '');
+                    }
+                    if (checkAll) {
+                        checkAll.addEventListener('change', function() {
+                            checks.forEach(function(cb) { cb.checked = checkAll.checked; });
+                            updateCount();
+                        });
+                    }
+                    checks.forEach(function(cb) { cb.addEventListener('change', updateCount); });
+                });
+                </script>
 
                 <div class="tab-pane" id="tab_settings">
                     <div class="box">
@@ -393,6 +688,238 @@ if (!empty($settings->allowed_category_ids)) {
                                     </div>
                                 </div>
 
+                                <hr>
+                                <h4><i class="fa fa-tags"></i> Palavras-chave de relevancia (filtro de trends)</h4>
+                                <p class="text-muted">
+                                    Define o vocabulario que decide se uma trend e "do nosso escopo" antes de entrar no calendario.
+                                    Uma palavra/frase por linha. Linhas iniciando com <code>#</code> sao ignoradas (comentarios).
+                                    Tudo e normalizado (lowercase, sem acentos) — pode escrever com ou sem acento.
+                                </p>
+                                <?php
+                                $tkRaw = $settings->trend_keywords_json ?? '';
+                                $tk = !empty($tkRaw) ? json_decode($tkRaw, true) : null;
+                                if (!is_array($tk)) $tk = \App\Models\ContentAISettingsModel::getDefaultTrendKeywords();
+                                $tkPhrases  = implode("\n", $tk['phrases'] ?? []);
+                                $tkWords    = implode("\n", $tk['words'] ?? []);
+                                $tkContext  = implode("\n", $tk['context_words'] ?? []);
+                                ?>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Frases (match por substring)</label>
+                                            <textarea class="form-control" name="trend_keywords_phrases" rows="10" style="font-family:monospace;font-size:12px;"><?= esc($tkPhrases); ?></textarea>
+                                            <p class="help-block">Use para combinacoes de 2+ palavras (ex: <code>mercado financeiro</code>). Ja sao especificas o suficiente para nao precisar de palavra-inteira.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Palavras (match palavra inteira)</label>
+                                            <textarea class="form-control" name="trend_keywords_words" rows="10" style="font-family:monospace;font-size:12px;"><?= esc($tkWords); ?></textarea>
+                                            <p class="help-block">Palavras simples — o sistema usa borda de palavra (\b) para evitar falsos positivos. Ex: <code>credito</code> nao casa em "creditorio".</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Contextuais (siglas curtas)</label>
+                                            <textarea class="form-control" name="trend_keywords_context" rows="10" style="font-family:monospace;font-size:12px;"><?= esc($tkContext); ?></textarea>
+                                            <p class="help-block">Siglas/abreviacoes (PIB, Fed, CDI, ETF...). Mesmo tratamento de palavra inteira mas listadas separadas para clareza.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p class="text-info"><i class="fa fa-info-circle"></i> Mudancas afetam apenas trends coletadas a partir do proximo cron — trends ja armazenadas mantem o estado anterior.</p>
+
+                                <hr>
+                                <h4><i class="fa fa-twitter"></i> X Pulse (analise de tendencias no X via Grok)</h4>
+                                <p class="text-muted">
+                                    Usa a API do <strong>Grok (xAI)</strong> com busca em tempo real no X para identificar temas financeiros quentes.
+                                    Funciona como <strong>3a fonte de sinal</strong> ao lado de trends (RSS) e populares (analytics do portal).
+                                    Quando habilitado, alimenta o editor IA com convergencia de sinais — temas que aparecem tanto em trends quanto no X
+                                    sao priorizados (sinal duplo de demanda real).
+                                </p>
+                                <p>
+                                    <strong>Custo:</strong> ~$0,025 por execucao (cada chamada com live search). Rodando 1x/dia = ~$0,75/mes.
+                                    <br><strong>Setup:</strong> definir <code>GROK_API_KEY</code> ou <code>XAI_API_KEY</code> no <code>.env</code>.
+                                    Sem a chave, o sistema apenas pula a etapa silenciosamente.
+                                </p>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Habilitar X Pulse</label>
+                                            <select class="form-control" name="x_pulse_enabled">
+                                                <option value="1" <?= !empty($settings->x_pulse_enabled) ? 'selected' : ''; ?>>Sim</option>
+                                                <option value="0" <?= empty($settings->x_pulse_enabled) ? 'selected' : ''; ?>>Nao</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Janela de analise</label>
+                                            <?php $xw = (int) ($settings->x_window_hours ?? 6); ?>
+                                            <select class="form-control" name="x_window_hours">
+                                                <?php foreach ([3,6,12,24] as $h): ?>
+                                                    <option value="<?= $h; ?>" <?= $xw === $h ? 'selected' : ''; ?>>Ultimas <?= $h; ?>h</option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Temas por execucao</label>
+                                            <input type="number" class="form-control" name="x_themes_per_day" min="3" max="30" value="<?= (int) ($settings->x_themes_per_day ?? 10); ?>">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Menções minimas</label>
+                                            <input type="number" class="form-control" name="x_min_mentions" min="0" value="<?= (int) ($settings->x_min_mentions ?? 100); ?>">
+                                            <p class="help-block">Filtra temas com pouco volume.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Modelo Grok</label>
+                                            <?php
+                                            $xm = (string) ($settings->x_grok_model ?? 'grok-4.3');
+                                            $grokModels = [
+                                                'grok-4.3'                       => 'grok-4.3 (recomendado — 1M ctx)',
+                                                'grok-4.20-0309-reasoning'       => 'grok-4.20 reasoning',
+                                                'grok-4.20-0309-non-reasoning'   => 'grok-4.20 non-reasoning',
+                                                'grok-4.20-multi-agent-0309'     => 'grok-4.20 multi-agent',
+                                                'grok-build-0.1'                 => 'grok-build-0.1 (256k, mais barato)',
+                                            ];
+                                            // Preserve any custom value the user already saved (forward-compat)
+                                            if ($xm && !isset($grokModels[$xm])) {
+                                                $grokModels = [$xm => $xm . ' (custom)'] + $grokModels;
+                                            }
+                                            ?>
+                                            <select class="form-control" name="x_grok_model">
+                                                <?php foreach ($grokModels as $k => $label): ?>
+                                                    <option value="<?= $k; ?>" <?= $xm === $k ? 'selected' : ''; ?>><?= $label; ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <p class="help-block">Doc oficial: <a href="https://docs.x.ai/developers/models" target="_blank">docs.x.ai/developers/models</a></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label>Ultima execucao</label>
+                                            <input type="text" class="form-control" value="<?= esc($settings->last_run_x_pulse ?? '—'); ?>" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Prompt do X Pulse Analyzer</label>
+                                    <textarea class="form-control" name="x_pulse_prompt" rows="10" style="font-family:monospace;font-size:12px;"><?= esc($settings->x_pulse_prompt ?? ''); ?></textarea>
+                                    <p class="help-block">Placeholders: <code>{themes_per_day}</code>, <code>{window_hours}</code>, <code>{min_mentions}</code>. Use para refinar escopo, fontes preferidas, criterios de relevancia.</p>
+                                </div>
+
+                                <hr>
+                                <h4><i class="fa fa-fire"></i> Conteudos Populares (Derivados do Portal)</h4>
+                                <p class="text-muted">
+                                    Analisa diariamente os posts com mais trafego e engajamento do portal e o editor-chefe IA propoe NOVAS pautas derivadas (aprofundamentos, atualizacoes, angulos novos).
+                                    Esses artigos sao <strong>ADICIONADOS</strong> ao total diario — somam aos posts da linha editorial (tendencias). Se nao houver dados suficientes na janela escolhida, esta rotina e pulada silenciosamente.
+                                </p>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Habilitar conteudos populares</label>
+                                            <select class="form-control" name="popular_enabled">
+                                                <option value="1" <?= !empty($settings->popular_enabled) ? 'selected' : ''; ?>>Sim</option>
+                                                <option value="0" <?= empty($settings->popular_enabled) ? 'selected' : ''; ?>>Nao</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Posts populares por dia</label>
+                                            <input type="number" class="form-control" name="popular_posts_per_day" min="0" max="20" value="<?= (int) ($settings->popular_posts_per_day ?? 0); ?>">
+                                            <p class="help-block">Soma ao total da linha editorial.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Janela de analise</label>
+                                            <?php $popWin = (int) ($settings->popular_window_days ?? 7); ?>
+                                            <select class="form-control" name="popular_window_days">
+                                                <option value="1"  <?= $popWin === 1  ? 'selected' : ''; ?>>Ultimas 24h</option>
+                                                <option value="3"  <?= $popWin === 3  ? 'selected' : ''; ?>>Ultimos 3 dias</option>
+                                                <option value="7"  <?= $popWin === 7  ? 'selected' : ''; ?>>Ultimos 7 dias</option>
+                                                <option value="30" <?= $popWin === 30 ? 'selected' : ''; ?>>Ultimos 30 dias</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Metrica</label>
+                                            <?php $popMetric = (string) ($settings->popular_metric ?? 'mixed'); ?>
+                                            <select class="form-control" name="popular_metric">
+                                                <option value="mixed"      <?= $popMetric === 'mixed'      ? 'selected' : ''; ?>>Mista (60% views + 40% engajamento)</option>
+                                                <option value="pageviews"  <?= $popMetric === 'pageviews'  ? 'selected' : ''; ?>>Pageviews</option>
+                                                <option value="engagement" <?= $popMetric === 'engagement' ? 'selected' : ''; ?>>Engajamento (comentarios + reacoes)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Pageviews minimos para considerar popular</label>
+                                            <input type="number" class="form-control" name="popular_min_pageviews" min="0" value="<?= (int) ($settings->popular_min_pageviews ?? 5); ?>">
+                                            <p class="help-block">Posts abaixo desse limiar sao ignorados na selecao.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label>Ultima execucao da rotina popular</label>
+                                            <input type="text" class="form-control" value="<?= esc($settings->last_run_popular ?? '—'); ?>" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Prompt do Editor-Chefe IA (Populares)</label>
+                                    <textarea class="form-control" name="popular_editor_prompt" rows="8"><?= esc($settings->popular_editor_prompt ?? ''); ?></textarea>
+                                    <p class="help-block">Placeholders: {popular_per_day}, {window_days}, {metric}, {categories}, {recent_titles}.</p>
+                                </div>
+
+                                <hr>
+                                <h4><i class="fa fa-newspaper-o"></i> Editor-Chefe IA (Distribuicao de Topicos)</h4>
+                                <p class="text-muted">Configure o peso de cada topico. A IA editora vai distribuir os posts diarios respeitando esses percentuais.</p>
+
+                                <?php
+                                $topicWeights = ['cambio' => 20, 'credito' => 20, 'consorcio' => 20, 'investimentos' => 15, 'economia' => 25];
+                                if (!empty($settings->topic_weights_json)) {
+                                    $decoded = json_decode($settings->topic_weights_json, true);
+                                    if (is_array($decoded)) $topicWeights = $decoded;
+                                }
+                                $topicLabels = [
+                                    'cambio' => 'Cambio e Trade Finance',
+                                    'credito' => 'Credito Empresarial',
+                                    'consorcio' => 'Consorcio',
+                                    'investimentos' => 'Investimentos',
+                                    'economia' => 'Economia e Mercado',
+                                    'tecnologia' => 'Tecnologia para Negocios',
+                                ];
+                                ?>
+                                <div class="row">
+                                    <?php foreach ($topicLabels as $key => $label): ?>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label><?= $label; ?> <span class="text-muted">(%)</span></label>
+                                            <input type="number" class="form-control topic-weight" name="topic_weights[<?= $key; ?>]" min="0" max="100" step="5" value="<?= (int) ($topicWeights[$key] ?? 0); ?>">
+                                        </div>
+                                    </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <p id="weight-total" class="text-info" style="font-weight:bold;"></p>
+
+                                <div class="form-group">
+                                    <label>Prompt do Editor-Chefe IA</label>
+                                    <textarea class="form-control" name="editor_prompt" rows="8"><?= esc($settings->editor_prompt ?? ''); ?></textarea>
+                                    <p class="help-block">Placeholders: {posts_per_day}, {topic_weights}, {categories}, {recent_titles}. A IA usara este prompt para decidir quais artigos produzir automaticamente.</p>
+                                </div>
+
                                 <button type="submit" class="btn btn-success">Salvar configuracoes</button>
                             </form>
                         </div>
@@ -402,3 +929,17 @@ if (!empty($settings->allowed_category_ids)) {
         </div>
     </section>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var weights = document.querySelectorAll('.topic-weight');
+    var totalEl = document.getElementById('weight-total');
+    function updateTotal() {
+        var sum = 0;
+        weights.forEach(function(w) { sum += parseInt(w.value) || 0; });
+        totalEl.textContent = 'Total: ' + sum + '%';
+        totalEl.style.color = sum === 100 ? '#00a65a' : '#dd4b39';
+    }
+    weights.forEach(function(w) { w.addEventListener('input', updateTotal); });
+    updateTotal();
+});
+</script>

@@ -26,6 +26,6 @@ $showLegacyBadge = $showLegacyBadge ?? true;
     </div>
 <?php else: ?>
     <div class="gx-empty-state">
-        Nenhum simulador publico foi encontrado para o idioma atual. O hub continua preparado para receber novas entradas sem mexer nas rotas existentes.
+        Nenhum simulador público foi encontrado para o idioma atual. O hub continua preparado para receber novas entradas sem mexer nas rotas existentes.
     </div>
 <?php endif; ?>

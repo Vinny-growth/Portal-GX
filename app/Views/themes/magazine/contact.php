@@ -23,16 +23,27 @@
                             <?= loadView('partials/_messages'); ?>
                             <form action="<?= base_url('contact-post'); ?>" method="post" class="needs-validation">
                                 <?= csrf_field(); ?>
+                                <input type="hidden" name="landing_page" value="<?= esc(current_url()); ?>">
+                                <input type="hidden" name="lead_origin" value="<?= esc('Página de contato - ' . $page->title); ?>">
                                 <div class="mb-3">
                                     <input type="text" class="form-control form-input" name="name" placeholder="<?= trans("name"); ?>" maxlength="199" minlength="1" pattern=".*\S+.*" value="<?= old('name'); ?>" required>
                                 </div>
                                 <div class="mb-3">
                                     <input type="email" class="form-control form-input" name="email" maxlength="199" placeholder="<?= trans("email"); ?>" value="<?= old('email'); ?>" required>
                                 </div>
+                                <?= view('partials/_lead_phone_field', [
+                                    'fieldIdPrefix' => 'magazine-contact-phone',
+                                    'wrapperClass' => 'mb-3',
+                                    'label' => false,
+                                    'countryClass' => 'form-control form-input',
+                                    'inputClass' => 'form-control form-input',
+                                    'countryValue' => old('phone_country'),
+                                    'phoneValue' => old('phone'),
+                                ]); ?>
                                 <div class="mb-3">
                                     <textarea class="form-control form-input" name="message" placeholder="<?= trans("message"); ?>" maxlength="4970" minlength="5" required><?= old('message'); ?></textarea>
                                 </div>
-                                <input type="text" name="message_content">
+                                <input type="text" name="message_content" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off">
                                 <div class="mb-3 form-check display-flex">
                                     <input type="checkbox" class="form-check-input flex-shrink-0" id="checkboxContactTerms" required>
                                     <label class="form-check-label" for="checkboxContactTerms">

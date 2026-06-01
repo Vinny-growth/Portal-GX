@@ -60,7 +60,11 @@ class AjaxController extends BaseController
             $isValid = true;
         }
         if ($isValid) {
-            $this->postModel->incrementPostViews($postId);
+            $clientContext = [
+                'page_referrer' => (string) inputPost('pageReferrer'),
+                'page_url'      => (string) inputPost('pageUrl'),
+            ];
+            $this->postModel->incrementPostViews($postId, $clientContext);
         }
     }
 
@@ -476,32 +480,64 @@ class AjaxController extends BaseController
      */
     public function addNewsletterPost()
     {
+        // honeypot
         $url = inputPost('url');
         if (!empty($url)) {
             exit();
         }
         $data = [
-            'result' => 0,
+            'result' => 1,
             'message' => '',
             'isSuccess' => '',
         ];
         $email = cleanStr(inputPost('email'));
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $data['message'] = trans("message_invalid_email");
-        } else {
-            if (!empty($email)) {
-                $newsletterModel = new NewsletterModel();
-                if (empty($newsletterModel->getSubscriber($email))) {
-                    if ($newsletterModel->addSubscriber($email)) {
-                        $data['message'] = trans("message_newsletter_success");
-                        $data['isSuccess'] = 1;
-                    }
-                } else {
-                    $data['message'] = trans("message_newsletter_error");
-                }
-            }
+            echo json_encode($data);
+            return;
         }
-        $data['result'] = 1;
+
+        // explicit editorial-line selection (optional); otherwise the service maps
+        // from the source category. Route everything through the subscription service
+        // so the public form honours double opt-in + welcome/magnet delivery.
+        $lineIds = inputPost('line_ids');
+        if (!is_array($lineIds)) $lineIds = [];
+        $lineIds = array_values(array_filter(array_map('intval', $lineIds), fn($v) => $v > 0));
+
+        $source = [
+            'source_category_id' => (int) inputPost('source_category_id'),
+            'source_post_id'     => (int) inputPost('source_post_id'),
+            'source_url'         => (string) inputPost('source_url'),
+        ];
+
+        $svc = new \App\Libraries\NewsletterSubscriptionService();
+        $result = $svc->subscribe($email, $source, $lineIds);
+
+        if (empty($result['ok'])) {
+            $data['message'] = trans("message_invalid_email");
+            echo json_encode($data);
+            return;
+        }
+
+        switch ($result['status'] ?? '') {
+            case 'existing':
+                // already an active subscriber — warning, not success
+                $data['message'] = trans("message_newsletter_error");
+                break;
+            case 'pending':
+            case 'pending_resent':
+                $msg = trans("message_newsletter_confirm");
+                if ($msg === '') $msg = trans("message_newsletter_success");
+                if ($msg === '') $msg = 'Inscrição recebida. Confira seu e-mail para confirmar.';
+                $data['message']   = $msg;
+                $data['isSuccess'] = 1;
+                break;
+            case 'active':
+            default:
+                $data['message']   = trans("message_newsletter_success");
+                $data['isSuccess'] = 1;
+                break;
+        }
         echo json_encode($data);
     }
 
@@ -559,7 +595,7 @@ class AjaxController extends BaseController
      */
     public function addSimulatorLeadPost()
     {
-        $jsonData = ["result" => 0, "message" => ""];
+        $jsonData = ["result" => 0, "status" => "error", "message" => ""];
         
         try {
             // Log da requisição para debug
@@ -618,13 +654,16 @@ class AjaxController extends BaseController
             $simLeadModel = new SimLeadModel();
             if ($simLeadModel->addSimLead($data)) {
                 $jsonData['result'] = 1;
+                $jsonData['status'] = 'success';
                 $jsonData['message'] = "Lead salvo com sucesso";
                 log_message('info', 'Lead salvo com sucesso: ' . $email);
             } else {
+                $jsonData['status'] = 'error';
                 $jsonData['message'] = "Ocorreu um erro ao salvar os dados";
                 log_message('error', 'Erro ao salvar lead: ' . $email);
             }
         } catch (\Exception $e) {
+            $jsonData['status'] = 'error';
             $jsonData['message'] = "Erro no servidor: " . $e->getMessage();
             log_message('error', 'Exceção ao processar lead: ' . $e->getMessage());
         }

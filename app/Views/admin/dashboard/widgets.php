@@ -28,19 +28,17 @@
                 </div>
             </div>
             <div class="box-body">
-                <p class="text-muted">Arraste e solte os widgets para reordenar. Use os interruptores para ativar/desativar widgets.</p>
+                <p class="text-muted">Arraste para reordenar. Ative só o que precisa e reflita a operação real do time no dashboard principal.</p>
                 
                 <div id="widget-list" class="sortable-widgets">
-                    <?php 
-                    $widgetConfigJson = $widgetConfig['widgets'] ?? '{}';
-                    $currentConfig = json_decode($widgetConfigJson, true);
-                    if (!$currentConfig) {
-                        $currentConfig = [];
-                    }
+                    <?php
+                    $currentConfig = is_array($widgetConfig) ? $widgetConfig : [];
                     $sortedWidgets = [];
-                    
-                    // Sort widgets by position
+                    $defaultPositions = [];
+                    $defaultPosition = 1;
+
                     foreach ($availableWidgets as $key => $widget) {
+                        $defaultPositions[$key] = $defaultPosition++;
                         $position = isset($currentConfig[$key]['position']) ? $currentConfig[$key]['position'] : 999;
                         $enabled = isset($currentConfig[$key]['enabled']) ? $currentConfig[$key]['enabled'] : true;
                         $sortedWidgets[] = [
@@ -57,12 +55,15 @@
                     ?>
                     
                     <?php foreach ($sortedWidgets as $item): ?>
-                        <div class="widget-item" data-widget="<?= $item['key']; ?>">
+                        <div class="widget-item" data-widget="<?= $item['key']; ?>" data-default-position="<?= esc($defaultPositions[$item['key']] ?? 0); ?>">
                             <div class="widget-header">
                                 <div class="widget-drag-handle">
                                     <i class="fa fa-bars"></i>
                                 </div>
                                 <div class="widget-title">
+                                    <?php if (!empty($item['widget']['icon'])): ?>
+                                        <i class="fa <?= esc($item['widget']['icon']); ?>"></i>
+                                    <?php endif; ?>
                                     <?= esc($item['widget']['name']); ?>
                                 </div>
                                 <div class="widget-controls">
@@ -136,7 +137,7 @@
             </div>
             <div class="box-body">
                 <p class="text-muted text-sm">
-                    As mudanças serão aplicadas ao dashboard principal após salvar a configuração.
+                    A ordem abaixo será aplicada no dashboard principal após salvar a configuração.
                 </p>
                 
                 <div id="widget-preview">
@@ -147,8 +148,7 @@
     </div>
 </div>
 
-<!-- Include Sortable.js -->
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<script src="<?= base_url('assets/admin/plugins/sortable/Sortable.min.js'); ?>"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -193,19 +193,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function saveConfiguration() {
         const config = getCurrentConfiguration();
-        
-        // Show loading
         const saveBtn = document.getElementById('save-config');
         const originalText = saveBtn.innerHTML;
         saveBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Salvando...';
         saveBtn.disabled = true;
-        
+        const payload = new URLSearchParams();
+        const requestData = setAjaxData({
+            config: JSON.stringify(config)
+        });
+        Object.keys(requestData).forEach(key => {
+            payload.append(key, requestData[key]);
+        });
+
         fetch('<?= adminUrl('dashboard/save-widget-config'); ?>', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
             },
-            body: 'config=' + encodeURIComponent(JSON.stringify(config))
+            body: payload.toString()
         })
         .then(response => {
             if (!response.ok) {
@@ -271,8 +276,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function resetConfiguration() {
         if (confirm('Tem certeza que deseja restaurar a configuração padrão?')) {
-            // Reload page to get default configuration
-            window.location.reload();
+            const list = document.getElementById('widget-list');
+            const items = Array.from(list.querySelectorAll('.widget-item'));
+
+            items.sort((a, b) => {
+                return Number(a.dataset.defaultPosition) - Number(b.dataset.defaultPosition);
+            });
+
+            items.forEach(item => {
+                const toggle = item.querySelector('.widget-toggle');
+                if (toggle) {
+                    toggle.checked = true;
+                }
+                list.appendChild(item);
+            });
+
+            updateStatistics();
+            generatePreview();
         }
     }
     
@@ -295,12 +315,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Sort by position
         activeWidgets.sort((a, b) => a.position - b.position);
         
         let previewHtml = '';
         if (activeWidgets.length > 0) {
-            previewHtml = '<small class="text-muted">Ordem dos widgets no dashboard:</small><ol class="preview-list">';
+            previewHtml = '<small class="text-muted">Ordem aplicada no dashboard:</small><ol class="preview-list">';
             activeWidgets.forEach(widget => {
                 previewHtml += `<li>${widget.name}</li>`;
             });
@@ -314,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function getWidgetName(key) {
         const widgetItem = document.querySelector(`[data-widget="${key}"]`);
-        return widgetItem ? widgetItem.querySelector('.widget-title').textContent : key;
+        return widgetItem ? widgetItem.querySelector('.widget-title').textContent.trim() : key;
     }
     
     function showNotification(message, type) {
@@ -374,6 +393,9 @@ document.addEventListener('DOMContentLoaded', function() {
     flex: 1;
     font-weight: 600;
     color: #333;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .widget-controls {

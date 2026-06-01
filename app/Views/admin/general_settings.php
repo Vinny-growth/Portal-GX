@@ -77,6 +77,18 @@
             <form action="<?= base_url('Admin/contactSettingsPost'); ?>" method="post">
                 <?= csrf_field(); ?>
                 <div class="box-body">
+                    <div class="alert alert-success" style="margin-bottom: 20px;">
+                        <strong>WhatsApp dos botões comerciais</strong><br>
+                        O número registrado abaixo será usado nos botões de WhatsApp das páginas de simuladores e demais páginas comerciais.
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">WhatsApp Comercial</label>
+                        <input type="text" class="form-control" name="contact_whatsapp" placeholder="+55 11 99999-9999"
+                               value="<?= esc($generalSettings->contact_whatsapp ?? ''); ?>">
+                        <p class="help-block" style="margin-bottom: 0;">Informe o número com DDD e, de preferência, com código do país. Exemplo: +55 11 99999-9999.</p>
+                    </div>
+
                     <div class="form-group">
                         <label class="control-label">Endereço</label>
                         <input type="text" class="form-control" name="contact_address" placeholder="Rua, número, bairro, cidade"

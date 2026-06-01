@@ -406,9 +406,12 @@ class AdminController extends BaseAdminController
         
         // Read the simulator content file
         $file_path = ROOTPATH . 'tmp/simulator_content.html';
-        if (file_exists($file_path)) {
-            $html_content = file_get_contents($file_path);
-            
+        $realPath = realpath($file_path);
+        if ($realPath && strpos($realPath, realpath(ROOTPATH . 'tmp/')) === 0 && is_file($realPath)) {
+            $html_content = file_get_contents($realPath);
+            // Strip script tags to prevent XSS
+            $html_content = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $html_content);
+
             // Get page 12
             $page = $this->pageModel->getPageById(12);
             if (!empty($page)) {
@@ -732,7 +735,7 @@ class AdminController extends BaseAdminController
     public function deleteSelectedContactMessages()
     {
         checkPermission('comments_contact');
-        $messages = inputPost('messages');
+        $messages = inputPost('messages_ids');
         $this->commonModel->deleteMultiMessages($messages);
         redirectToBackURL();
     }
@@ -1299,8 +1302,23 @@ class AdminController extends BaseAdminController
     public function googleIndexingApiPost()
     {
         checkSuperAdmin();
-        $this->settingsModel->updateGoogleIndexingSettings();
+        $this->settingsModel->updateGoogleIndexingApiSettings();
         setSuccessMessage("msg_updated");
+        return redirect()->to(adminUrl('seo-tools'));
+    }
+
+    /**
+     * IndexNow Settings Post
+     */
+    public function indexNowSettingsPost()
+    {
+        checkSuperAdmin();
+        $settingsModel = new SettingsModel();
+        if ($settingsModel->updateIndexNowSettings()) {
+            setSuccessMessage("msg_updated");
+        } else {
+            setErrorMessage("msg_error");
+        }
         return redirect()->to(adminUrl('seo-tools'));
     }
 
@@ -2136,6 +2154,7 @@ class AdminController extends BaseAdminController
         $generalSettings->contact_address = $contactInfo['contact_address'] ?? '';
         $generalSettings->contact_email = $contactInfo['contact_email'] ?? '';
         $generalSettings->contact_phone = $contactInfo['contact_phone'] ?? '';
+        $generalSettings->contact_whatsapp = $contactInfo['contact_whatsapp'] ?? '';
         $generalSettings->contact_text = $contactInfo['contact_text'] ?? '';
         // Decodificar URLs das redes sociais do JSON
         $socialUrls = [];
@@ -2248,6 +2267,7 @@ class AdminController extends BaseAdminController
             'contact_address' => inputPost('contact_address'),
             'contact_email' => inputPost('contact_email'),
             'contact_phone' => inputPost('contact_phone'),
+            'contact_whatsapp' => inputPost('contact_whatsapp'),
             'contact_text' => inputPost('contact_text')
         ];
         

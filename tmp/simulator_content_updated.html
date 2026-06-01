@@ -267,7 +267,7 @@
 
         // --- Função para enviar o lead diretamente sem formulário ---
         function submitLead(name, email, phone, simData = null) {
-            const url = "/Ajax/addSimulatorLeadPost"; 
+            const url = "/api/save-simulator-lead"; 
             const formData = new FormData();
             
             formData.append('name', name);

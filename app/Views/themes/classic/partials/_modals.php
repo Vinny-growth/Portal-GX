@@ -222,6 +222,7 @@ if ($generalSettings->post_format_recipe == 1): ?>
 <input type="email" name="email" class="form-control form-input newsletter-input" placeholder="<?= trans('email') ?>">
 <button type="submit" id="btn_modal_newsletter" class="btn btn-custom"><?= trans("subscribe"); ?></button>
 <input type="text" name="url">
+<?= view('common/_newsletter_source_fields'); ?>
 </form>
 </div>
 </div>

@@ -1,0 +1,47 @@
+/* Shared preview card base — used by all preview/*.html cards */
+@import url('../colors_and_type.css');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: var(--font-sans);
+  color: var(--fg1);
+  background: var(--bg1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  padding: 24px;
+  width: 700px;
+  min-height: 200px;
+}
+
+.row { display: flex; gap: 12px; align-items: stretch; }
+.col { display: flex; flex-direction: column; gap: 12px; }
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.grid { display: grid; gap: 12px; }
+
+.eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gx-secondary-dark);
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg2);
+}
+
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+.gold-stripe {
+  height: 2px;
+  width: 32px;
+  background: var(--gx-primary);
+}

@@ -45,6 +45,7 @@ class FileModel extends BaseModel
                 $data['image_mime'] = 'gif';
                 $data['file_name'] = $tempFile['orjName'];
             } else {
+                $data['image_discover'] = $this->uploadModel->uploadPostImage($tempFile['path'], 'discover');
                 $data['image_big'] = $this->uploadModel->uploadPostImage($tempFile['path'], 'big');
                 $data['image_default'] = $this->uploadModel->uploadPostImage($tempFile['path'], 'default');
                 $data['image_slider'] = $this->uploadModel->uploadPostImage($tempFile['path'], 'slider');

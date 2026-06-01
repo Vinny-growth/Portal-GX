@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>GX Capital · Nexus UI Kit</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  body { margin: 0; background: var(--bg2); color: var(--fg1); font-family: var(--font-sans); }
+  .shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  .main { display: flex; flex-direction: column; min-width: 0; }
+  .content { padding: 32px; flex: 1; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .grid-2-gap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .row-tabs { padding: 24px 32px 0; background: var(--bg2); }
+  .stack-md { display: flex; flex-direction: column; gap: 24px; }
+  .crm-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--gx-border); }
+  .crm-table th { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--gx-secondary-dark); text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--gx-border); background: var(--bg2); }
+  .crm-table td { padding: 14px 16px; font-size: 13px; color: var(--gx-primary-dark); border-bottom: 1px solid var(--gx-border); }
+  .crm-table tr:last-child td { border-bottom: 0; }
+  .crm-table tr:hover td { background: var(--bg2); cursor: pointer; }
+  .pill { display:inline-block; padding: 3px 10px; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .pill.gold { background: var(--gx-secondary-light); color: var(--gx-primary); }
+  .pill.green { background: #dcfce7; color: #166534; }
+  .pill.red { background: #fee2e2; color: #991b1b; }
+  .order-row { display: grid; grid-template-columns: 100px 1fr 80px 120px 120px 90px; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--gx-border); align-items: center; font-size: 12px; }
+  .order-row.head { background: var(--bg2); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--gx-secondary-dark); }
+  .pos { color: #16a34a; font-weight: 700; font-family: var(--font-mono); }
+  .neg { color: #dc2626; font-weight: 700; font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+<script type="text/babel" src="Sidebar.jsx"></script>
+<script type="text/babel" src="PageHeader.jsx"></script>
+<script type="text/babel" src="KpiTile.jsx"></script>
+<script type="text/babel" src="Card.jsx"></script>
+<script type="text/babel" src="Button.jsx"></script>
+<script type="text/babel" src="Tabs.jsx"></script>
+<script type="text/babel" src="QuickActions.jsx"></script>
+<script type="text/babel" src="ActivityList.jsx"></script>
+<script type="text/babel" src="LoginScreen.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+const fmtBRL = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
+
+function DashboardView() {
+  const [tab, setTab] = useState('overview');
+  return (
+    <div>
+      <PageHeader eyebrow="Visão consolidada · Wealth Operations" title={<>Dashboard<br/>Executivo</>} right={
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <div style={{ width: 28, height: 28, background: 'var(--gx-secondary-dark)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight: 900, fontSize: 12 }}>LV</div>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700 }}>Lucas Veiga</div>
+            <div style={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', fontWeight: 700 }}>Sócio · Wealth</div>
+          </div>
+        </div>
+      } />
+
+      <div className="row-tabs">
+        <Tabs value={tab} onChange={setTab} tabs={[
+          { id: 'overview', label: 'Visão Geral', icon: 'activity' },
+          { id: 'analytics', label: 'Analytics', icon: 'bar-chart-3' },
+          { id: 'kpis', label: 'KPIs Executivos', icon: 'trending-up' },
+          { id: 'ai', label: 'Nexus IA', icon: 'bot' },
+        ]}/>
+      </div>
+
+      <div className="content stack-md">
+        <div className="grid-2">
+          <KpiTile variant="dark" label="Volume Total (AUM)" value={fmtBRL(124_758_000)} sub="Ativos sob gestão · Escopo atual" icon="pie-chart" />
+          <KpiTile variant="light" label="Meta do Mês" sub="Meta: R$ 138.000.000" icon="target" accent={{ value: '90', unit: '%' }} progress={90} />
+        </div>
+
+        <div className="grid-2-gap">
+          <QuickActions actions={[
+            { title: 'Novo Lead', desc: 'Cadastrar novo lead' },
+            { title: 'Nova Oportunidade', desc: 'Criar oportunidade' },
+            { title: 'Novo Funcionário', desc: 'Cadastrar colaborador' },
+            { title: 'Transação Financeira', desc: 'Registrar movimentação' },
+          ]} />
+          <ActivityList items={[
+            { icon: 'user-plus', title: 'Lead criado · Marina Castro', desc: 'CRM · Comercial', time: '14:08', tone: 'navy' },
+            { icon: 'dollar-sign', title: 'Comissão liberada R$ 12.840', desc: 'Comissionamento', time: '13:42', tone: 'gold' },
+            { icon: 'briefcase', title: 'Ordem executada · CDB Pré 13,2%', desc: 'Mesa de Operações', time: '11:15', tone: 'navy' },
+            { icon: 'sparkles', title: 'Consultor IA · Análise gerada', desc: 'Cliente Pereira & Filhos', time: '09:30', tone: 'gold' },
+          ]}/>
+        </div>
+
+        <Card>
+          <div style={{ display:'flex', alignItems:'center', gap: 8, marginBottom: 18 }}>
+            <span style={{ height: 2, width: 32, background: 'var(--gx-primary)' }}></span>
+            <h3 style={{ fontSize: 12, fontWeight: 900, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--gx-secondary-dark)', margin: 0 }}>Evolução do Faturamento (últimos 12 meses)</h3>
+          </div>
+          <svg viewBox="0 0 600 160" style={{ width: '100%', height: 160 }}>
+            <defs>
+              <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#0c3163" stopOpacity="0.25"/>
+                <stop offset="100%" stopColor="#0c3163" stopOpacity="0"/>
+              </linearGradient>
+            </defs>
+            {[0, 1, 2, 3].map(i => <line key={i} x1="0" y1={i * 40 + 20} x2="600" y2={i * 40 + 20} stroke="#d3d9e0" strokeDasharray="2 4"/>)}
+            <path d="M0,120 L50,110 L100,118 L150,90 L200,95 L250,72 L300,78 L350,55 L400,60 L450,40 L500,50 L550,28 L600,32 L600,160 L0,160 Z" fill="url(#fg)"/>
+            <path d="M0,120 L50,110 L100,118 L150,90 L200,95 L250,72 L300,78 L350,55 L400,60 L450,40 L500,50 L550,28 L600,32" stroke="#0c3163" strokeWidth="2" fill="none"/>
+            <path d="M0,135 L50,130 L100,128 L150,115 L200,110 L250,98 L300,100 L350,85 L400,82 L450,75 L500,68 L550,60 L600,55" stroke="#87704a" strokeWidth="1.5" strokeDasharray="4 4" fill="none"/>
+          </svg>
+          <div style={{ display: 'flex', gap: 16, fontSize: 11, marginTop: 12 }}>
+            <span style={{ display:'flex', alignItems:'center', gap: 6 }}><span style={{ width: 12, height: 2, background: '#0c3163' }}></span>Realizado</span>
+            <span style={{ display:'flex', alignItems:'center', gap: 6 }}><span style={{ width: 12, height: 2, background: '#87704a', borderTop: '1px dashed' }}></span>Meta</span>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function CrmView() {
+  const leads = [
+    { name: 'Marina Castro', co: 'Castro Holdings', stage: 'Qualificação', val: 4_200_000, owner: 'Lucas V.', status: 'gold' },
+    { name: 'Otávio Pereira', co: 'Pereira & Filhos', stage: 'Proposta', val: 1_840_000, owner: 'Ana B.', status: 'gold' },
+    { name: 'Beatriz Lemos', co: 'Lemos Patrimonial', stage: 'Fechado', val: 6_120_000, owner: 'Lucas V.', status: 'green' },
+    { name: 'Roberto Aquino', co: 'Aquino Capital', stage: 'Perdido', val: 2_300_000, owner: 'Diego N.', status: 'red' },
+    { name: 'Helena Souza', co: 'Souza Family Office', stage: 'Reunião', val: 9_400_000, owner: 'Ana B.', status: 'gold' },
+  ];
+  return (
+    <div>
+      <PageHeader eyebrow="Comercial · Funil ativo" title="CRM" />
+      <div className="content stack-md">
+        <div style={{ display:'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0 }}>
+          <KpiTile variant="light" label="Leads Ativos" value="247" sub="↑ 12 esta semana" icon="users" />
+          <KpiTile variant="light" label="Pipeline" value={fmtBRL(48_300_000)} sub="62 oportunidades" icon="git-branch" />
+          <KpiTile variant="light" label="Taxa Conversão" value="34%" sub="Meta 30%" icon="target" />
+          <KpiTile variant="dark" label="Fechado · Mês" value={fmtBRL(8_240_000)} sub="6 contratos" icon="trophy" />
+        </div>
+
+        <Card style={{ padding: 0 }}>
+          <table className="crm-table">
+            <thead><tr>
+              <th>Lead</th><th>Empresa</th><th>Estágio</th><th>Volume</th><th>Owner</th><th></th>
+            </tr></thead>
+            <tbody>{leads.map(l => (
+              <tr key={l.name}>
+                <td style={{ fontWeight: 600 }}>{l.name}</td>
+                <td>{l.co}</td>
+                <td><span className={`pill ${l.status}`}>{l.stage}</span></td>
+                <td className="mono" style={{ fontFamily:'var(--font-mono)' }}>{fmtBRL(l.val)}</td>
+                <td>{l.owner}</td>
+                <td><i data-lucide="chevron-right" style={{ width: 14, height: 14, color: 'var(--fg-muted, #5a6a80)' }}></i></td>
+              </tr>
+            ))}</tbody>
+          </table>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function MesaView() {
+  const orders = [
+    { code: 'PETR4', desc: 'Petrobras PN', side: 'BUY', qty: 1200, px: 38.42, chg: +1.8 },
+    { code: 'VALE3', desc: 'Vale ON', side: 'SELL', qty: 800, px: 67.15, chg: -0.6 },
+    { code: 'ITUB4', desc: 'Itaú PN', side: 'BUY', qty: 2400, px: 33.22, chg: +0.4 },
+    { code: 'CDB13', desc: 'CDB Pré 13,2% 24m', side: 'BUY', qty: 1, px: 500_000, chg: +2.1 },
+  ];
+  return (
+    <div>
+      <PageHeader eyebrow="Trading desk · Sessão aberta" title="Mesa de Operações" />
+      <div className="content stack-md">
+        <div style={{ display:'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0 }}>
+          <KpiTile variant="dark" label="Volume hoje" value={fmtBRL(24_840_000)} sub="62 ordens" icon="activity" />
+          <KpiTile variant="light" label="P&L Sessão" value="+R$ 184.220" sub="↑ 0,74%" icon="trending-up" />
+          <KpiTile variant="light" label="Ibovespa" value="138.420" sub="+1,2% · 14:32" icon="line-chart" />
+        </div>
+
+        <Card style={{ padding: 0 }}>
+          <div className="order-row head">
+            <span>Código</span><span>Ativo</span><span>Lado</span><span>Qtd</span><span>Preço</span><span>Δ</span>
+          </div>
+          {orders.map(o => (
+            <div key={o.code} className="order-row">
+              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--gx-primary-dark)' }}>{o.code}</span>
+              <span>{o.desc}</span>
+              <span><span className="pill" style={{ background: o.side === 'BUY' ? '#dcfce7' : '#fee2e2', color: o.side === 'BUY' ? '#166534' : '#991b1b' }}>{o.side}</span></span>
+              <span style={{ fontFamily: 'var(--font-mono)' }}>{o.qty.toLocaleString('pt-BR')}</span>
+              <span style={{ fontFamily: 'var(--font-mono)' }}>{o.px.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+              <span className={o.chg >= 0 ? 'pos' : 'neg'}>{o.chg >= 0 ? '▲' : '▼'} {Math.abs(o.chg).toFixed(1)}%</span>
+            </div>
+          ))}
+        </Card>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button variant="primary" icon="plus">Nova Ordem</Button>
+          <Button variant="outline" icon="file-text">Exportar Sessão</Button>
+          <Button variant="ghost" icon="settings">Preferências</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [route, setRoute] = useState('login');
+
+  useEffect(() => {
+    if (window.lucide) window.lucide.createIcons();
+  }, [route]);
+
+  if (route === 'login') {
+    return <LoginScreen onSubmit={() => setRoute('dashboard')} />;
+  }
+
+  return (
+    <div className="shell">
+      <Sidebar activeRoute={route} onNavigate={setRoute} />
+      <div className="main">
+        {route === 'dashboard' && <DashboardView/>}
+        {route === 'crm' && <CrmView/>}
+        {route === 'opps' && <CrmView/>}
+        {route === 'mesa' && <MesaView/>}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

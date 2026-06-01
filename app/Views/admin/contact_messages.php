@@ -15,6 +15,7 @@
                             <th width="20"><?= trans('id'); ?></th>
                             <th><?= trans('name'); ?></th>
                             <th><?= trans('email'); ?></th>
+                            <th><?= trans('phone'); ?></th>
                             <th><?= trans('message'); ?></th>
                             <th><?= trans('date'); ?></th>
                             <th class="max-width-120"><?= trans('options'); ?></th>
@@ -28,6 +29,7 @@
                                     <td><?= esc($item->id); ?></td>
                                     <td><?= esc($item->name); ?></td>
                                     <td><?= esc($item->email); ?></td>
+                                    <td><?= esc($item->phone ?? ''); ?></td>
                                     <td class="break-word"><?= esc($item->message); ?></td>
                                     <td><?= formatDate($item->created_at); ?></td>
                                     <td class="td-select-option">

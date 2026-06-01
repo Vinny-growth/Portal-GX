@@ -1,2 +1,7 @@
 User-agent: *
-Disallow: 
+Disallow: /admin/
+Disallow: /uploads/tmp/
+Disallow: /tmp/
+Allow: /
+
+Sitemap: https://gx.capital/sitemap.xml

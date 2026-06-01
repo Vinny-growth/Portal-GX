@@ -38,7 +38,11 @@
                                     <button type="submit" name="submit" value="form" class="btn btn-custom newsletter-button"><?= trans("subscribe"); ?></button>
                                 </div>
                                 <input type="text" name="url">
+                                <?= view('common/_newsletter_source_fields'); ?>
                             </form>
+                            <p style="margin-top:10px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;">
+                                <a href="<?= base_url('newsletter'); ?>" style="color:inherit;opacity:0.7;text-decoration:underline;">Conheça as frentes editoriais &rarr;</a>
+                            </p>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -117,6 +121,18 @@ document.addEventListener('DOMContentLoaded', function () {
 <?= $generalSettings->adsense_activation_code; ?>
 <?= $generalSettings->google_analytics; ?>
 <?= $generalSettings->custom_footer_codes; ?>
+<script>
+(function() {
+    var origClose = window.closeCookiesWarning;
+    window.closeCookiesWarning = function() {
+        if (typeof gtag === 'function') {
+            gtag('consent', 'update', { 'ad_storage': 'granted', 'ad_user_data': 'granted', 'ad_personalization': 'granted', 'analytics_storage': 'granted' });
+        }
+        document.cookie = 'gx_cookie_consent=accepted;path=/;max-age=31536000;SameSite=Lax';
+        if (typeof origClose === 'function') origClose();
+    };
+})();
+</script>
 </body>
 </html>
 <?php if (!empty($isPage404)): exit(); endif; ?>

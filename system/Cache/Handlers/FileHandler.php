@@ -232,7 +232,16 @@ class FileHandler extends BaseHandler
             return false;
         }
 
-        $data = @unserialize(file_get_contents($this->path . $filename));
+        if (! is_readable($this->path . $filename)) {
+            @unlink($this->path . $filename);
+            return false;
+        }
+
+        $contents = file_get_contents($this->path . $filename);
+        if ($contents === false) {
+            return false;
+        }
+        $data = @unserialize($contents);
 
         if (! is_array($data)) {
             return false;

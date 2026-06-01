@@ -36,13 +36,21 @@ class BioLinksController extends BaseController
     public function click($id)
     {
         $link = $this->bioLinksModel->getBioLink($id);
-        
+
         if (!$link || !$link['is_active']) {
             return redirect()->to('/bio');
         }
 
         // Incrementa contador de cliques
         $this->bioLinksModel->incrementClickCount($id);
+
+        // Registra clique detalhado para analytics
+        $this->bioLinksModel->logClick(
+            $id,
+            $this->request->getIPAddress(),
+            $this->request->getUserAgent()->getAgentString(),
+            $this->request->getServer('HTTP_REFERER')
+        );
 
         // Redireciona para o link
         return redirect()->to($link['url']);
@@ -197,6 +205,33 @@ class BioLinksController extends BaseController
         }
 
         return $this->response->setJSON(['success' => false]);
+    }
+
+    public function adminAnalytics()
+    {
+        if (!isAdmin()) {
+            return redirect()->to(base_url());
+        }
+
+        $days = (int) ($this->request->getGet('days') ?: 30);
+        if ($days < 1) {
+            $days = 30;
+        }
+
+        $data = [
+            'title'          => 'Bio Links - Analytics',
+            'days'           => $days,
+            'stats'          => $this->bioLinksModel->getBioLinksStats(),
+            'analytics'      => $this->bioLinksModel->getClicksAnalytics($days),
+            'clicksByDay'    => $this->bioLinksModel->getClicksByDay($days),
+            'clicksByLink'   => $this->bioLinksModel->getClicksByLink($days),
+            'clicksByLinkDay'=> $this->bioLinksModel->getClicksByLinkPerDay($days),
+            'recentClicks'   => $this->bioLinksModel->getRecentClicks(20),
+            'bioLinks'       => $this->bioLinksModel->getAllBioLinks(),
+            'baseAIWriter'   => aiWriter(),
+        ];
+
+        return view('admin/bio_links/analytics', $data);
     }
 
     public function updateBioSettings()

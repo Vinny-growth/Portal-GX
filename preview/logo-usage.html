@@ -1,0 +1,23 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css">
+<style>
+.row-logos { display:grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.tile { padding: 20px; display:flex; align-items:center; justify-content:center; min-height: 110px; }
+.tile.dark { background: var(--gx-primary-dark); }
+.tile.navy { background: var(--gx-primary); }
+.tile.light { background: var(--bg2); }
+.tile.white { background: #fff; border: 1px solid var(--gx-border); }
+.tile img { max-height: 70px; max-width: 100%; }
+.tile .tag { position: absolute; left: 8px; top: 8px; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 700; }
+.tile.dark .tag, .tile.navy .tag { color: var(--gx-secondary-light); }
+.tile.light .tag, .tile.white .tag { color: var(--gx-secondary-dark); }
+.tile { position: relative; }
+</style></head>
+<body>
+<div class="row-logos">
+  <div class="tile dark"><span class="tag">On dark</span><img src="../assets/logo-app-blue.png" alt=""></div>
+  <div class="tile white"><span class="tag">On white</span><img src="../assets/logo-app-blue.png" alt=""></div>
+  <div class="tile light"><span class="tag">On muted</span><img src="../assets/logo-icon.png" alt=""></div>
+  <div class="tile navy"><span class="tag">App icon</span><img src="../assets/logo-icon.png" alt="" style="max-height:90px;"></div>
+</div>
+</body></html>

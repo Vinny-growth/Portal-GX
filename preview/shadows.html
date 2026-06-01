@@ -1,0 +1,19 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css">
+<style>
+.row-shadow { display:grid; grid-template-columns: repeat(3, 1fr); gap: 24px; padding: 16px 8px; }
+.box { background:#fff; border:1px solid var(--gx-border); padding:16px; min-height:80px; display:flex; flex-direction:column; justify-content:space-between; }
+.box .lbl { font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--gx-secondary-dark); font-weight:700;}
+.box .v { font-family: var(--font-mono); font-size:10px; color:var(--fg2); }
+.b1 { box-shadow: var(--shadow-card); }
+.b2 { box-shadow: var(--shadow-gx); }
+.b3 { box-shadow: var(--shadow-elevated); }
+</style></head>
+<body>
+<div class="eyebrow" style="margin-bottom:8px">Hard-offset shadow system — no blur, brutalist signature</div>
+<div class="row-shadow">
+  <div class="box b1"><span class="lbl">Card</span><span class="v">2px 2px 0 border/.5</span></div>
+  <div class="box b2"><span class="lbl">GX (default hover)</span><span class="v">4px 4px 0 navy/.2</span></div>
+  <div class="box b3"><span class="lbl">Elevated</span><span class="v">8px 8px 0 navy/.2</span></div>
+</div>
+</body></html>

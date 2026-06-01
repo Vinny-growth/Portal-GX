@@ -1,6 +1,7 @@
 <?php namespace App\Models;
 
-use CodeIgniter\Model;
+use App\Libraries\CrmLeadClient;
+use App\Libraries\LeadPhoneFormatter;
 
 class CommonModel extends BaseModel
 {
@@ -8,6 +9,7 @@ class CommonModel extends BaseModel
     protected $builderComments;
     protected $builderAds;
     protected $builderWidgets;
+    protected $hasContactPhoneColumn = false;
 
     public function __construct()
     {
@@ -16,6 +18,7 @@ class CommonModel extends BaseModel
         $this->builderComments = $this->db->table('comments');
         $this->builderAds = $this->db->table('ad_spaces');
         $this->builderWidgets = $this->db->table('widgets');
+        $this->hasContactPhoneColumn = $this->db->fieldExists('phone', 'contacts');
     }
 
     /*
@@ -27,13 +30,110 @@ class CommonModel extends BaseModel
     //add contact message
     public function addContactMessage()
     {
+        $normalizedPhone = LeadPhoneFormatter::toInternational(
+            inputPost('phone_country'),
+            inputPost('phone')
+        );
+
+        $email = trim((string) inputPost('email'));
+        $dedupMinutes = (int) (getenv('LEAD_DEDUP_MINUTES') ?: 60);
+        if ($dedupMinutes < 1) {
+            $dedupMinutes = 60;
+        }
+
+        if (!empty($email) || !empty($normalizedPhone)) {
+            $cutoff = date('Y-m-d H:i:s', time() - ($dedupMinutes * 60));
+            $dedupBuilder = $this->db->table('contacts');
+            $dedupBuilder->groupStart();
+            if (!empty($email)) {
+                $dedupBuilder->where('email', $email);
+            }
+            if (!empty($normalizedPhone) && $this->hasContactPhoneColumn) {
+                if (!empty($email)) {
+                    $dedupBuilder->orWhere('phone', $normalizedPhone);
+                } else {
+                    $dedupBuilder->where('phone', $normalizedPhone);
+                }
+            }
+            $dedupBuilder->groupEnd();
+            $dedupBuilder->where('created_at >=', $cutoff);
+            $existing = $dedupBuilder->orderBy('id', 'DESC')->get(1)->getRow();
+            if (!empty($existing)) {
+                // Lead duplicado recente — silenciosamente retorna sucesso sem reinserir
+                return true;
+            }
+        }
+
         $data = [
             'name' => inputPost('name'),
             'email' => inputPost('email'),
             'message' => inputPost('message'),
             'created_at' => date('Y-m-d H:i:s')
         ];
-        return $this->builderContact->insert($data);
+        if ($this->hasContactPhoneColumn) {
+            $data['phone'] = $normalizedPhone;
+        }
+        $result = $this->builderContact->insert($data);
+
+        if ($result) {
+            // Capturar tudo que depende do request ANTES do defer (inputPost não funciona após finish_request)
+            $insertId = $this->db->insertID();
+            $contactEmail = $data['email'] ?? null;
+            $contactName = $data['name'] ?? null;
+            $contactPhone = $normalizedPhone ?? ($data['phone'] ?? null);
+            $contactMessage = trim((string) ($data['message'] ?? ''));
+            $sourceLabel = trim((string) inputPost('lead_origin')) ?: 'Formulário de contato GX Capital';
+            $crmPayload = [
+                'external_id' => $insertId,
+                'name' => $contactName,
+                'email' => $contactEmail,
+                'phone' => $contactPhone,
+                'message' => $contactMessage,
+                'observations' => $contactMessage !== ''
+                    ? 'Contato salvo na tabela contacts do site.'
+                    : 'Lead salvo na tabela contacts sem mensagem detalhada.',
+                'origem' => $sourceLabel,
+                'landing_page' => trim((string) inputPost('landing_page')),
+                'utm_source' => trim((string) inputPost('utm_source')),
+                'utm_medium' => trim((string) inputPost('utm_medium')),
+                'utm_campaign' => trim((string) inputPost('utm_campaign')),
+                'utm_term' => trim((string) inputPost('utm_term')),
+                'utm_content' => trim((string) inputPost('utm_content')),
+                'source_system' => 'site-gx-php-contact',
+            ];
+
+            // Capturar event_id do client-side (se enviado pelo formulário) p/ deduplicação Pixel↔CAPI
+            $clientEventId = trim((string) inputPost('event_id')) ?: null;
+
+            // Agendar Meta API + CRM APÓS a resposta HTTP (non-blocking)
+            deferAfterResponse(function () use ($contactEmail, $contactName, $contactPhone, $sourceLabel, $crmPayload, $clientEventId) {
+                $firstName = null;
+                $lastName = null;
+                if (!empty($contactName)) {
+                    $nameParts = explode(' ', trim($contactName), 2);
+                    $firstName = $nameParts[0];
+                    $lastName = $nameParts[1] ?? null;
+                }
+
+                trackMetaContact(
+                    $contactEmail,
+                    [
+                        'content_name' => $sourceLabel,
+                        'content_category' => 'Contact Form',
+                        'currency' => 'BRL',
+                        'value' => 1,
+                    ],
+                    $clientEventId,
+                    $contactPhone,
+                    $firstName,
+                    $lastName
+                );
+
+                (new CrmLeadClient())->send($crmPayload);
+            });
+        }
+
+        return $result;
     }
 
     //get contact messages

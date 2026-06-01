@@ -84,8 +84,49 @@
 </div>
 
 <script>
+    function escapeHtml(value) {
+        return String(value == null ? '' : value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function humanizeKey(key) {
+        return String(key || '')
+            .replace(/_/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .replace(/\b\w/g, function(char) { return char.toUpperCase(); });
+    }
+
+    function renderJsonValue(value) {
+        if (value === null || value === undefined || value === '') {
+            return '<span class="lead-json-muted">n/a</span>';
+        }
+
+        if (Array.isArray(value)) {
+            if (!value.length) {
+                return '<span class="lead-json-muted">n/a</span>';
+            }
+
+            return '<ul class="lead-json-list">' + value.map(function(item) {
+                return '<li>' + renderJsonValue(item) + '</li>';
+            }).join('') + '</ul>';
+        }
+
+        if (typeof value === 'object') {
+            var rows = Object.keys(value).map(function(key) {
+                return '<div class="lead-json-item"><strong>' + escapeHtml(humanizeKey(key)) + '</strong><div>' + renderJsonValue(value[key]) + '</div></div>';
+            }).join('');
+            return '<div class="lead-json-grid">' + rows + '</div>';
+        }
+
+        return escapeHtml(value);
+    }
+
     function showLeadDetails(leadId) {
-        // Buscar detalhes do lead
         var leads = <?= json_encode($leads); ?>;
         var lead = leads.find(function(item) {
             return item.id == leadId;
@@ -94,49 +135,24 @@
         if (lead && lead.sim_data) {
             try {
                 var data = JSON.parse(lead.sim_data);
-                var content = '<div class="row">';
-                
-                // Informações do lead
-                content += '<div class="col-md-12"><h4>Informações do Contato</h4></div>';
-                content += '<div class="col-md-4"><strong>Nome:</strong> ' + lead.name + '</div>';
-                content += '<div class="col-md-4"><strong>Email:</strong> ' + lead.email + '</div>';
-                content += '<div class="col-md-4"><strong>Telefone:</strong> ' + lead.phone + '</div>';
-                
+                var content = '<div class="lead-detail-stack">';
+                content += '<section class="lead-detail-section">';
+                content += '<h4>Informações do Contato</h4>';
+                content += '<div class="lead-json-grid">';
+                content += '<div class="lead-json-item"><strong>Nome</strong><div>' + escapeHtml(lead.name || '') + '</div></div>';
+                content += '<div class="lead-json-item"><strong>Email</strong><div>' + escapeHtml(lead.email || '') + '</div></div>';
+                content += '<div class="lead-json-item"><strong>Telefone</strong><div>' + escapeHtml(lead.phone || '') + '</div></div>';
+                content += '<div class="lead-json-item"><strong>Status</strong><div>' + escapeHtml(lead.status || '') + '</div></div>';
                 if (lead.observations) {
-                    content += '<div class="col-md-12"><strong>Observações:</strong> ' + lead.observations + '</div>';
+                    content += '<div class="lead-json-item"><strong>Observações</strong><div>' + escapeHtml(lead.observations) + '</div></div>';
                 }
-                
-                content += '<div class="col-md-12"><hr></div>';
-                
-                // Dados da empresa e necessidade
-                if (data.companyInputs) {
-                    content += '<div class="col-md-12"><h4>Dados da Empresa e Necessidade</h4></div>';
-                    content += '<div class="col-md-4"><strong>Valor da Necessidade:</strong> ' + data.companyInputs.valorNecessidade + '</div>';
-                    content += '<div class="col-md-4"><strong>Prazo (meses):</strong> ' + data.companyInputs.numParcelas + '</div>';
-                    content += '<div class="col-md-4"><strong>Objetivo do Crédito:</strong> ' + data.companyInputs.objetivoCredito + '</div>';
-                    content += '<div class="col-md-4"><strong>Faturamento Anual:</strong> ' + data.companyInputs.faturamentoAnual + '</div>';
-                    content += '<div class="col-md-4"><strong>EBITDA Anual:</strong> ' + data.companyInputs.ebitdaAnual + '</div>';
-                    content += '<div class="col-md-4"><strong>Dívida Bruta Atual:</strong> ' + data.companyInputs.dividaBrutaAtual + '</div>';
-                    content += '<div class="col-md-12"><hr></div>';
-                }
-                
-                // Linhas simuladas
-                if (data.simulatedLines && data.simulatedLines.length > 0) {
-                    content += '<div class="col-md-12"><h4>Linhas de Crédito Simuladas</h4></div>';
-                    
-                    data.simulatedLines.forEach(function(line, index) {
-                        content += '<div class="col-md-12"><h5>' + line.nome + '</h5></div>';
-                        content += '<div class="col-md-4"><strong>Taxa Nominal Anual:</strong> ' + line.taxaNominalAnual + '</div>';
-                        content += '<div class="col-md-4"><strong>Parcela:</strong> ' + line.parcela + '</div>';
-                        content += '<div class="col-md-4"><strong>CET Mensal:</strong> ' + line.cetMensal + '</div>';
-                        content += '<div class="col-md-4"><strong>CET Anual:</strong> ' + line.cetAnual + '</div>';
-                        content += '<div class="col-md-4"><strong>Valor Liberado:</strong> ' + line.valorLiberado + '</div>';
-                        if (index < data.simulatedLines.length - 1) {
-                            content += '<div class="col-md-12"><hr></div>';
-                        }
-                    });
-                }
-                
+                content += '</div>';
+                content += '</section>';
+
+                content += '<section class="lead-detail-section">';
+                content += '<h4>Dados da Simulação</h4>';
+                content += renderJsonValue(data);
+                content += '</section>';
                 content += '</div>';
                 $('#leadDetailsContent').html(content);
             } catch (e) {
@@ -198,7 +214,7 @@
             let confirmText = "<?= trans("confirm_delete"); ?>";
             swalAreYouSure(confirmText, function () {
                 let data = {
-                    'leads_ids': itemsArray
+                    'lead_ids': itemsArray
                 };
                 data[csrfName] = csrfHash;
                 $.ajax({
@@ -260,5 +276,38 @@
     .status-lost {
         color: #dd4b39;
         border-color: #dd4b39;
+    }
+    .lead-detail-stack {
+        display: grid;
+        gap: 18px;
+    }
+    .lead-detail-section h4 {
+        margin: 0 0 10px;
+        font-weight: 700;
+    }
+    .lead-json-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+    }
+    .lead-json-item {
+        padding: 12px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fafbfd;
+    }
+    .lead-json-item strong {
+        display: block;
+        margin-bottom: 6px;
+    }
+    .lead-json-list {
+        margin: 0;
+        padding-left: 18px;
+    }
+    .lead-json-list li + li {
+        margin-top: 6px;
+    }
+    .lead-json-muted {
+        color: #9ca3af;
     }
 </style>

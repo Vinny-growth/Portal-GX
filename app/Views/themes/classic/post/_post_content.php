@@ -13,7 +13,14 @@ if (!empty($adSpaces)) {
     }
 }
 if (!empty($post->content)) {
-    $arrayContent = explode('</p>', $post->content);
+    // SEO: sanitizar conteúdo — remover tags de documento e converter H1→H2
+    $postContent = $post->content;
+    $postContent = preg_replace('/<\/?(html|head|body|meta|link|!DOCTYPE)[^>]*>/i', '', $postContent);
+    $postContent = preg_replace('/<title[^>]*>.*?<\/title>/is', '', $postContent);
+    $postContent = preg_replace('/<h1([^>]*)>/i', '<h2$1>', $postContent);
+    $postContent = str_ireplace('</h1>', '</h2>', $postContent);
+    $postContent = str_ireplace('<h2></h2>', '', $postContent);
+    $arrayContent = explode('</p>', $postContent);
 }
 
 if (!empty($arrayContent)) {

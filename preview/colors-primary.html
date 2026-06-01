@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css">
+<style>
+.swatch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+.sw { padding: 16px; min-height: 120px; display: flex; flex-direction: column; justify-content: space-between; }
+.sw .name { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.sw .hex { font-family: var(--font-mono); font-size: 11px; }
+.sw.navy { background: var(--gx-primary); color: var(--gx-secondary-light); }
+.sw.navy-dark { background: var(--gx-primary-dark); color: #fff; }
+.sw.gold-light { background: var(--gx-secondary-light); color: var(--gx-primary); }
+.sw.gold-dark { background: var(--gx-secondary-dark); color: #fff; }
+</style></head>
+<body>
+<div class="swatch-grid">
+  <div class="sw navy"><span class="name">Primary / Navy</span><span class="hex">#0c3163</span></div>
+  <div class="sw navy-dark"><span class="name">Primary Dark</span><span class="hex">#000d23</span></div>
+  <div class="sw gold-light"><span class="name">Champagne</span><span class="hex">#dbc7a2</span></div>
+  <div class="sw gold-dark"><span class="name">Antique Gold</span><span class="hex">#87704a</span></div>
+</div>
+</body></html>

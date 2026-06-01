@@ -14,15 +14,33 @@ $customRoutes = Globals::$customRoutes;
 $routes->get('/', 'HomeController::index');
 $routes->get('blog', 'HomeController::blog');
 $routes->get('simuladores', 'HomeController::simulatorsHub');
+$routes->get('simuladores/cambio', 'HomeController::simulatorsFxHub');
+$routes->get('simuladores-cambio', 'HomeController::simulatorsFxLegacyRedirect');
+$routes->get('simulador-de-risco-cambial', 'HomeController::simulatorsFxLegacyRedirect');
+$routes->get('fx-loan', 'HomeController::simulatorsFxLegacyRedirect');
 $routes->get('cron/update-feeds', 'CronController::checkFeedPosts');
 $routes->get('cron/update-sitemap', 'CronController::updateSitemap');
 $routes->get('unsubscribe', 'AuthController::unsubscribe');
+
+// Newsletter tracking (open pixel + click redirect)
+$routes->get('nl/pixel/(:any)', 'NewsletterTrackingController::pixel/$1');
+$routes->get('r/(:any)', 'NewsletterTrackingController::redirect/$1');
+
+// Newsletter capture (landing + subscribe + confirm + magnet)
+$routes->get('newsletter', 'NewsletterController::landing');
+$routes->post('newsletter/subscribe', 'NewsletterController::subscribe');
+$routes->get('newsletter/confirme-seu-email', 'NewsletterController::pendingConfirmation');
+$routes->get('newsletter/confirmar/(:any)', 'NewsletterController::confirm/$1');
+$routes->get('newsletter/obrigado', 'NewsletterController::thankYou');
+$routes->get('newsletter/magnet/(:any)', 'NewsletterController::magnetDownload/$1');
 $routes->get('connect-with-facebook', 'AuthController::connectWithFacebook');
 $routes->get('facebook-callback', 'AuthController::facebookCallback');
 $routes->get('connect-with-google', 'AuthController::connectWithGoogle');
 $routes->get('connect-with-vk', 'AuthController::connectWithVK');
 $routes->get('gnews/feed', 'HomeController::googleNewsFeeds');
 $routes->get('simulador-aurum', 'HomeController::simuladorAurum');
+$routes->get('playbook/importacao-blindada', 'HomeController::playbookImportacaoBlindada');
+$routes->get('playbook/exportacao-premium', 'HomeController::playbookExportacaoPremium');
 $routes->post('api/save-simulator-lead', 'ApiController::saveSimulatorLead');
 
 // Bio Links Routes
@@ -39,6 +57,7 @@ $routes->get('api/web-stories', 'WebStoriesController::apiGetStories');
 // Wealth Manager (public)
 $routes->get('wealth', 'WealthManagerController::index');
 $routes->get('wealth/conversa', 'WealthManagerController::conversa', ['filter' => 'auth']);
+$routes->post('wealth/lead', 'WealthManagerController::leadCapture');
 $routes->post('WealthManager/sendMessage', 'WealthManagerController::sendMessage', ['filter' => 'auth']);
 $routes->post('WealthManager/acceptConsent', 'WealthManagerController::acceptConsent', ['filter' => 'auth']);
 $routes->post('WealthManager/saveProfileBasic', 'WealthManagerController::saveProfileBasic', ['filter' => 'auth']);
@@ -51,8 +70,8 @@ $routes->post('WealthManager/saveLiabilitiesForm', 'WealthManagerController::sav
 $routes->post('WealthManager/saveGoalsForm', 'WealthManagerController::saveGoalsForm', ['filter' => 'auth']);
 $routes->get('wealth/resultado', 'WealthManagerController::resultado', ['filter' => 'auth']);
 $routes->get('wealth/resultado/pdf', 'WealthManagerController::resumoPdf', ['filter' => 'auth']);
-$routes->get('wealth/agendar', 'WealthManagerController::agendar', ['filter' => 'auth']);
-$routes->post('wealth/agendar', 'WealthManagerController::agendarPost', ['filter' => 'auth']);
+$routes->get('wealth/agendar', 'WealthManagerController::agendar');
+$routes->post('wealth/agendar', 'WealthManagerController::agendarPost');
 $routes->post('WealthManager/trackEvent', 'WealthManagerController::trackEvent');
 
 // CMS Pages (public)
@@ -115,10 +134,12 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->post('content-ai/calendar/add', 'ContentAIController::addCalendarItemPost');
     $routes->post('content-ai/calendar/delete', 'ContentAIController::deleteCalendarItemPost');
     $routes->post('content-ai/calendar/approve', 'ContentAIController::approveCalendarItemPost');
+    $routes->post('content-ai/calendar/retry', 'ContentAIController::retryCalendarItemPost');
     $routes->post('content-ai/run-now', 'ContentAIController::runNowPost');
     $routes->post('content-ai/trends/fetch', 'ContentAIController::fetchTrendsPost');
     $routes->post('content-ai/trends/update', 'ContentAIController::updateTrendFlagsPost');
     $routes->post('content-ai/trends/add', 'ContentAIController::addSelectedTrendsToCalendarPost');
+    $routes->post('content-ai/x-pulse/run', 'ContentAIController::runXPulseNowPost');
     //rss feeds
     $routes->get('feeds', 'RssController::feeds');
     $routes->get('import-feed', 'RssController::importFeed');
@@ -155,6 +176,32 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     //newsletter
     $routes->get('newsletter', 'AdminController::newsletter');
     $routes->post('newsletter-send-email', 'AdminController::newsletterSendEmail');
+    //newsletter IA (editorial lines + queue + analytics)
+    $routes->get('newsletter/editorial-lines', 'NewsletterAdminController::editorialLines');
+    $routes->get('newsletter/editorial-lines/new', 'NewsletterAdminController::editorialLineForm');
+    $routes->get('newsletter/editorial-lines/edit/(:num)', 'NewsletterAdminController::editorialLineForm/$1');
+    $routes->post('newsletter/editorial-lines/save', 'NewsletterAdminController::editorialLineSave');
+    $routes->post('newsletter/editorial-lines/delete/(:num)', 'NewsletterAdminController::editorialLineDelete/$1');
+    $routes->post('newsletter/editorial-lines/generate/(:num)', 'NewsletterAdminController::editorialLineGenerate/$1');
+    $routes->get('newsletter/queue', 'NewsletterAdminController::queue');
+    $routes->get('newsletter/queue/view/(:num)', 'NewsletterAdminController::queueView/$1');
+    $routes->post('newsletter/queue/update/(:num)', 'NewsletterAdminController::queueUpdate/$1');
+    $routes->post('newsletter/queue/approve/(:num)', 'NewsletterAdminController::queueApprove/$1');
+    $routes->post('newsletter/queue/cancel/(:num)', 'NewsletterAdminController::queueCancel/$1');
+    $routes->post('newsletter/queue/dispatch/(:num)', 'NewsletterAdminController::queueDispatch/$1');
+    $routes->get('newsletter/analytics', 'NewsletterAdminController::analytics');
+    //newsletter settings + magnets
+    $routes->get('newsletter/settings', 'NewsletterAdminController::settings');
+    $routes->post('newsletter/settings/save', 'NewsletterAdminController::settingsSave');
+    $routes->get('newsletter/magnets', 'NewsletterAdminController::magnets');
+    $routes->get('newsletter/magnets/new', 'NewsletterAdminController::magnetForm');
+    $routes->get('newsletter/magnets/edit/(:num)', 'NewsletterAdminController::magnetForm/$1');
+    $routes->post('newsletter/magnets/save', 'NewsletterAdminController::magnetSave');
+    $routes->post('newsletter/magnets/delete/(:num)', 'NewsletterAdminController::magnetDelete/$1');
+    //newsletter CRM sync
+    $routes->get('newsletter/crm-sync', 'NewsletterAdminController::crmSync');
+    $routes->post('newsletter/crm-sync/run', 'NewsletterAdminController::crmSyncRun');
+    $routes->get('newsletter/crm-sync/view/(:num)', 'NewsletterAdminController::crmSyncView/$1');
     //reward-system
     $routes->get('reward-system', 'RewardController::rewardSystem');
     $routes->get('reward-system/earnings', 'RewardController::earnings');
@@ -192,6 +239,12 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->get('general-settings', 'AdminController::generalSettings');
     //dashboard
     $routes->get('dashboard', 'DashboardController::index');
+    $routes->get('dashboard/google-analytics', 'DashboardController::googleAnalytics');
+    $routes->post('dashboard/google-analytics/credentials', 'DashboardController::saveGoogleAnalyticsCredentials');
+    $routes->get('dashboard/google-analytics/connect', 'DashboardController::connectGoogleAnalytics');
+    $routes->get('dashboard/google-analytics/callback', 'DashboardController::googleAnalyticsCallback');
+    $routes->post('dashboard/google-analytics/property', 'DashboardController::saveGoogleAnalyticsProperty');
+    $routes->post('dashboard/google-analytics/disconnect', 'DashboardController::disconnectGoogleAnalytics');
     $routes->get('dashboard/widgets', 'DashboardController::widgets');
     $routes->post('dashboard/save-widget-config', 'DashboardController::saveWidgetConfig');
     $routes->get('dashboard/live-data', 'DashboardController::liveData');
@@ -214,6 +267,7 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->get('bio-links/toggle/(:num)', 'BioLinksController::adminToggle/$1');
     $routes->post('bio-links/update-order', 'BioLinksController::adminUpdateOrder');
     $routes->post('bio-links/update-settings', 'BioLinksController::updateBioSettings');
+    $routes->get('bio-links/analytics', 'BioLinksController::adminAnalytics');
     //web stories
     $routes->get('web-stories', 'WebStoriesController::admin');
     $routes->get('web-stories/add', 'WebStoriesController::adminAdd');
@@ -241,6 +295,14 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->get('wealth/diagnostics', 'WealthAdminController::diagnostics');
     $routes->get('wealth/sessions', 'WealthAdminController::sessions');
     $routes->get('wealth/session/(:num)', 'WealthAdminController::session/$1');
+
+    // marketing home cms
+    $routes->get('marketing/home-cms', 'MarketingAdminController::homeCms');
+    $routes->post('marketing/home-cms', 'MarketingAdminController::homeCmsPost');
+    $routes->get('marketing/simulators-cms', 'MarketingAdminController::simulatorsCms');
+    $routes->post('marketing/simulators-cms', 'MarketingAdminController::simulatorsCmsPost');
+    $routes->get('marketing/consorcio-cms', 'MarketingAdminController::consorcioCms');
+    $routes->post('marketing/consorcio-cms', 'MarketingAdminController::consorcioCmsPost');
 
     // CMS Pages (admin) - visual builder (avoid conflict with AdminController::pages)
     $routes->get('cms-pages', 'PagesAdminController::index');
@@ -278,6 +340,8 @@ $postRoutesArray = [
     'Admin/googleNewsPost',
     'Admin/seoToolsPost',
     'Admin/googleIndexingApiPost',
+    'Admin/indexNowSettingsPost',
+    'Post/testIndexNowApiPost',
     'Admin/sitemapSettingsPost',
     'Admin/sitemapPost',
     'Admin/socialLoginSettingsPost',
@@ -509,6 +573,10 @@ if (!empty($languages)) {
             $routes->get($language->short_form, 'HomeController::index');
             $routes->get($key . 'blog', 'HomeController::blog');
             $routes->get($key . 'simuladores', 'HomeController::simulatorsHub');
+            $routes->get($key . 'simuladores/cambio', 'HomeController::simulatorsFxHub');
+            $routes->get($key . 'simuladores-cambio', 'HomeController::simulatorsFxLegacyRedirect');
+            $routes->get($key . 'simulador-de-risco-cambial', 'HomeController::simulatorsFxLegacyRedirect');
+            $routes->get($key . 'fx-loan', 'HomeController::simulatorsFxLegacyRedirect');
         }
         $routes->get($key . $customRoutes->register, 'AuthController::register');
         $routes->get($key . $customRoutes->forgot_password, 'AuthController::forgotPassword');

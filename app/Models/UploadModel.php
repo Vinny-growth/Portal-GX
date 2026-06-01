@@ -87,7 +87,10 @@ class UploadModel extends BaseModel
     {
         $img = Image::make($tempPath)->orientate();
         $name = '';
-        if ($type == 'big') {
+        if ($type == 'discover') {
+            $name = 'image_1200x675_';
+            $img->fit(1200, 675);
+        } elseif ($type == 'big') {
             $name = 'image_870x580_';
             $img->fit(870, 580);
         } elseif ($type == 'default') {
@@ -200,6 +203,12 @@ class UploadModel extends BaseModel
     public function uploadAd($inputName)
     {
         return $this->upload($inputName, "uploads/blocks/", "block_", ['jpg', 'jpeg', 'png', 'gif']);
+    }
+
+    //marketing image upload (testimonials, og images, etc.)
+    public function uploadMarketingImage($inputName, $prefix = 'mk_')
+    {
+        return $this->upload($inputName, "uploads/marketing/", $prefix, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
     }
 
     //upload pwa logo

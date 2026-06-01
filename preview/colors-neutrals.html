@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="_base.css">
+<style>
+.swatch-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; }
+.sw { padding: 14px; min-height: 100px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--gx-border); }
+.sw + .sw { border-left: none; }
+.sw .name { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; }
+.sw .hex { font-family: var(--font-mono); font-size: 10px; }
+</style></head>
+<body>
+<div class="swatch-grid">
+  <div class="sw" style="background:#fff;color:#000d23"><span class="name">BG / White</span><span class="hex">#ffffff</span></div>
+  <div class="sw" style="background:#f5f3ee;color:#000d23"><span class="name">BG Muted</span><span class="hex">#f5f3ee</span></div>
+  <div class="sw" style="background:#ebe6dc;color:#000d23"><span class="name">BG3</span><span class="hex">#ebe6dc</span></div>
+  <div class="sw" style="background:#d3d9e0;color:#000d23"><span class="name">Border</span><span class="hex">#d3d9e0</span></div>
+  <div class="sw" style="background:#5a6a80;color:#fff"><span class="name">FG Muted</span><span class="hex">#5a6a80</span></div>
+</div>
+</body></html>

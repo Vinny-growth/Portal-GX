@@ -281,7 +281,7 @@
                     const formData = new FormData(leadForm);
                     
                     // Enviar para nosso endpoint personalizado
-                    const response = await fetch('/Ajax/addSimulatorLeadPost', {
+                    const response = await fetch('/api/save-simulator-lead', {
                         method: 'POST',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
@@ -613,7 +613,7 @@
                     formData.append('phone', currentLeadData.phone);
                     formData.append('sim_data', JSON.stringify(simData));
                     
-                    const response = await fetch('/Ajax/addSimulatorLeadPost', {
+                    const response = await fetch('/api/save-simulator-lead', {
                         method: 'POST',
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'

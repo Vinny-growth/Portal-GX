@@ -13,6 +13,9 @@
                     <h3 class="box-title">Bio Links</h3>
                 </div>
                 <div class="right">
+                    <a href="<?= adminUrl('bio-links/analytics'); ?>" class="btn btn-info">
+                        <i class="fa fa-bar-chart"></i>&nbsp;&nbsp;Analytics
+                    </a>
                     <a href="<?= adminUrl('bio-links/add'); ?>" class="btn btn-success btn-add-new">
                         <i class="fa fa-plus"></i>&nbsp;&nbsp;Adicionar Link
                     </a>

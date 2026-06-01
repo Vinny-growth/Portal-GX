@@ -25,16 +25,25 @@ class OpenAIImageHelper
     }
 
     /**
+     * Models that belong to the GPT-Image family (gpt-image-1, gpt-image-1-mini, ...).
+     * They share endpoint, sizes, qualities and request params.
+     */
+    private function isGptImageModel($model)
+    {
+        return is_string($model) && strpos($model, 'gpt-image-1') === 0;
+    }
+
+    /**
      * Generate image using OpenAI GPT-Image or DALL-E
      *
      * @param string $prompt The text prompt for image generation
-     * @param string $model The model to use (default: gpt-image-1)
+     * @param string $model The model to use (default: gpt-image-1-mini)
      * @param string $size The size of the generated image
      * @param string $quality The quality of the image
      * @param int $n Number of images to generate (1-10 for dall-e-2, only 1 for newer models)
      * @return array|false
      */
-    public function generateImage($prompt, $model = 'gpt-image-1', $size = '1024x1024', $quality = 'standard', $n = 1)
+    public function generateImage($prompt, $model = 'gpt-image-1-mini', $size = '1024x1024', $quality = 'standard', $n = 1)
     {
         if (empty($this->apiKey)) {
             log_message('error', 'OpenAI API key not configured');
@@ -47,15 +56,15 @@ class OpenAIImageHelper
         }
 
         // Validate model
-        $allowedModels = ['dall-e-2', 'dall-e-3', 'gpt-image-1'];
+        $allowedModels = ['dall-e-2', 'dall-e-3', 'gpt-image-1', 'gpt-image-1-mini'];
         if (!in_array($model, $allowedModels)) {
-            $model = 'gpt-image-1';
+            $model = 'gpt-image-1-mini';
         }
 
         // Validate size based on model
-        if ($model === 'gpt-image-1') {
+        if ($this->isGptImageModel($model)) {
             $allowedSizes = ['1024x1024', '1536x1024', '1024x1536'];
-            $n = 1; // GPT-Image-1 only supports n=1
+            $n = 1; // GPT-Image only supports n=1
         } elseif ($model === 'dall-e-3') {
             $allowedSizes = ['1024x1024', '1792x1024', '1024x1792'];
             $n = 1; // DALL-E 3 only supports n=1
@@ -68,10 +77,10 @@ class OpenAIImageHelper
         }
 
         // Validate quality based on model
-        if ($model === 'gpt-image-1') {
+        if ($this->isGptImageModel($model)) {
             $allowedQualities = ['low', 'medium', 'high'];
             if (!in_array($quality, $allowedQualities)) {
-                $quality = 'high'; // Default for gpt-image-1
+                $quality = 'high'; // Default for gpt-image family
             }
         } else {
             // For DALL-E models
@@ -90,9 +99,9 @@ class OpenAIImageHelper
         ];
 
         // Add quality parameter based on model
-        if ($model === 'gpt-image-1') {
+        if ($this->isGptImageModel($model)) {
             $requestData['quality'] = $quality;
-            // Add output format for gpt-image-1
+            // Add output format for gpt-image family
             $requestData['output_format'] = 'png';
         } elseif ($model === 'dall-e-3') {
             $requestData['quality'] = $quality;
@@ -109,7 +118,7 @@ class OpenAIImageHelper
                 ];
             } else {
                 log_message('error', 'Invalid response from OpenAI API: ' . json_encode($response));
-                if ($model === 'gpt-image-1') {
+                if ($this->isGptImageModel($model)) {
                     return $this->generateImageWithFallback($prompt, $size);
                 }
                 return false;
@@ -133,21 +142,22 @@ class OpenAIImageHelper
         $optimizedPrompt = $this->optimizePromptForWebStories($prompt, $style);
 
         // Read defaults from environment (with sensible fallbacks)
-        $model = getenv('OPENAI_DEFAULT_MODEL') ?: 'gpt-image-1';
+        $model = getenv('OPENAI_DEFAULT_MODEL') ?: 'gpt-image-1-mini';
         $size = getenv('OPENAI_DEFAULT_SIZE') ?: ($model === 'dall-e-3' ? '1024x1792' : '1024x1536');
-        $quality = getenv('OPENAI_DEFAULT_QUALITY') ?: ($model === 'gpt-image-1' ? 'high' : 'hd');
+        $quality = getenv('OPENAI_DEFAULT_QUALITY') ?: ($this->isGptImageModel($model) ? 'high' : 'hd');
 
         // Validate model and adapt size/quality accordingly
-        $allowedModels = ['dall-e-2', 'dall-e-3', 'gpt-image-1'];
+        $allowedModels = ['dall-e-2', 'dall-e-3', 'gpt-image-1', 'gpt-image-1-mini'];
         if (!in_array($model, $allowedModels)) {
-            $model = 'gpt-image-1';
+            $model = 'gpt-image-1-mini';
         }
 
         // Ensure size belongs to selected model
         $allowedSizesByModel = [
-            'gpt-image-1' => ['1024x1024', '1536x1024', '1024x1536'],
-            'dall-e-3' => ['1024x1024', '1792x1024', '1024x1792'],
-            'dall-e-2' => ['256x256', '512x512', '1024x1024'],
+            'gpt-image-1'      => ['1024x1024', '1536x1024', '1024x1536'],
+            'gpt-image-1-mini' => ['1024x1024', '1536x1024', '1024x1536'],
+            'dall-e-3'         => ['1024x1024', '1792x1024', '1024x1792'],
+            'dall-e-2'         => ['256x256', '512x512', '1024x1024'],
         ];
         $allowedSizes = $allowedSizesByModel[$model];
         if (!in_array($size, $allowedSizes)) {
@@ -156,7 +166,7 @@ class OpenAIImageHelper
         }
 
         // Validate quality
-        if ($model === 'gpt-image-1') {
+        if ($this->isGptImageModel($model)) {
             $allowedQualities = ['low', 'medium', 'high'];
             if (!in_array($quality, $allowedQualities)) {
                 $quality = 'high';
@@ -220,9 +230,9 @@ class OpenAIImageHelper
             log_message('error', 'OpenAI API returned HTTP ' . $httpCode . ': ' . $response);
             log_message('error', 'Request data was: ' . json_encode($data));
             
-            // Check if it's a gpt-image-1 verification error and try fallback to dall-e-3
+            // Check if it's a gpt-image verification error and try fallback to dall-e-3
             if ($httpCode === 403 && strpos($response, 'gpt-image-1') !== false && strpos($response, 'verified') !== false) {
-                log_message('info', 'gpt-image-1 requires verification, falling back to dall-e-3');
+                log_message('info', 'gpt-image-* requires verification, falling back to dall-e-3');
                 return $this->generateImageWithFallback($data['prompt'], $data['size']);
             }
             
@@ -303,9 +313,9 @@ class OpenAIImageHelper
             return false;
         }
 
-        // Make a simple request to validate the key
+        // Make a simple request to validate the key (using cheap mini model)
         try {
-            $response = $this->generateImage('test', 'gpt-image-1', '1024x1024');
+            $response = $this->generateImage('test', 'gpt-image-1-mini', '1024x1024', 'low');
             return $response !== false;
         } catch (Exception $e) {
             return false;
@@ -320,8 +330,15 @@ class OpenAIImageHelper
     public function getAvailableModels()
     {
         return [
+            'gpt-image-1-mini' => [
+                'name' => 'GPT-Image-1 Mini (cost-efficient)',
+                'sizes' => ['1024x1024', '1536x1024', '1024x1536'],
+                'max_images' => 1,
+                'qualities' => ['low', 'medium', 'high'],
+                'output_formats' => ['png', 'jpeg', 'webp'],
+            ],
             'gpt-image-1' => [
-                'name' => 'GPT-Image-1 (Latest)',
+                'name' => 'GPT-Image-1',
                 'sizes' => ['1024x1024', '1536x1024', '1024x1536'],
                 'max_images' => 1,
                 'qualities' => ['low', 'medium', 'high'],
@@ -360,7 +377,7 @@ class OpenAIImageHelper
     }
     
     /**
-     * Convert gpt-image-1 sizes to dall-e-3 compatible sizes
+     * Convert gpt-image-* sizes to dall-e-3 compatible sizes
      *
      * @param string $size
      * @return string

@@ -59,12 +59,16 @@ class SitemapModel extends BaseModel
                 $this->add($baseUrl, 'always', $now, 1.0);
                 $this->add($baseUrl . 'blog', 'hourly', $now, 0.9);
                 $this->add($baseUrl . 'simuladores', 'weekly', $now, 0.9);
+                $this->add($baseUrl . 'simuladores/cambio', 'weekly', $now, 0.85);
+                $this->add($baseUrl . 'newsletter', 'weekly', $now, 0.85);
             }
         } else {
             $baseUrl = base_url() . '/';
             $this->add($baseUrl, 'always', $now, 1.0);
             $this->add($baseUrl . 'blog', 'hourly', $now, 0.9);
             $this->add($baseUrl . 'simuladores', 'weekly', $now, 0.9);
+            $this->add($baseUrl . 'simuladores/cambio', 'weekly', $now, 0.85);
+            $this->add($baseUrl . 'newsletter', 'weekly', $now, 0.85);
         }
     }
 
@@ -136,6 +140,45 @@ class SitemapModel extends BaseModel
         }
     }
 
+    //add web stories urls
+    private function addWebStoryUrls()
+    {
+        if (!$this->db->tableExists('web_stories')) {
+            return;
+        }
+        $now = date('Y-m-d\TH:i:sP');
+
+        // Hub URL — dá um ponto de entrada indexável para Google descobrir
+        // o conteúdo a partir da listagem (paralelo ao /blog).
+        if (!empty($this->activeLanguages)) {
+            foreach ($this->activeLanguages as $lang) {
+                $baseUrl = $this->generateBaseURLByLang($lang->id, $lang->short_form);
+                $this->add($baseUrl . 'web-stories', 'daily', $now, 0.7);
+            }
+        } else {
+            $this->add(base_url() . '/web-stories', 'daily', $now, 0.7);
+        }
+
+        $stories = $this->db->table('web_stories')
+            ->select('web_stories.id, web_stories.lang_id, web_stories.created_at, web_stories.updated_at, languages.short_form AS lang_short_form')
+            ->join('languages', 'languages.id = web_stories.lang_id')
+            ->where('languages.status', 1)
+            ->where('web_stories.is_active', 1)
+            ->orderBy('web_stories.id DESC')
+            ->get()
+            ->getResult();
+
+        foreach ($stories as $story) {
+            $baseURL = $this->generateBaseURLByLang($story->lang_id, $story->lang_short_form);
+            if (empty($baseURL)) {
+                continue;
+            }
+            $date = !empty($story->updated_at) ? $story->updated_at : $story->created_at;
+            $info = $this->getPostFreqLastMod($date);
+            $this->add($baseURL . 'web-stories/story/' . (int) $story->id, $info['freq'], $info['lastMod'], 0.6);
+        }
+    }
+
     //generate sitemap
     public function generateSitemap($index)
     {
@@ -143,6 +186,7 @@ class SitemapModel extends BaseModel
             $this->addStaticURLs();
             $this->addPageURLs();
             $this->addCategoryURLs();
+            $this->addWebStoryUrls();
         }
         $this->addPostUrls($index);
 

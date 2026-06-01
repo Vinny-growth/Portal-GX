@@ -143,6 +143,7 @@ class PostController extends BaseAdminController
                         $postUrl = $baseUrl . 'preview/' . $post->slug;
                     }
                     $this->postAdminModel->requestGoogleIndexing($post);
+                    $this->postAdminModel->requestIndexNowSubmission($post);
                     $msg .= '&nbsp;&nbsp;<a href="' . $postUrl . '" target="_blank" class="alert-post-link font-w-700">' . trans("view_post") . '&nbsp;&nbsp;<i class="fa fa-external-link"></i></a>';
                 }
                 setSuccessMessage($msg, false);
@@ -276,6 +277,7 @@ class PostController extends BaseAdminController
                         $postUrl = $baseUrl . 'preview/' . $post->slug;
                     }
                     $this->postAdminModel->requestGoogleIndexing($post);
+                    $this->postAdminModel->requestIndexNowSubmission($post);
                     $msg .= '&nbsp;&nbsp;<a href="' . $postUrl . '" target="_blank" class="alert-post-link font-w-700">' . trans("view_post") . '&nbsp;&nbsp;<i class="fa fa-external-link"></i></a>';
                 }
                 setSuccessMessage($msg, false);
@@ -476,18 +478,21 @@ class PostController extends BaseAdminController
             checkPermission('manage_all_posts');
             if ($this->postAdminModel->approvePost($post)) {
                 $this->postAdminModel->requestGoogleIndexing($post);
+                $this->postAdminModel->requestIndexNowSubmission($post);
                 $result = true;
             }
         } elseif ($option == 'publish') {
             checkPermission('add_post');
             if ($this->postAdminModel->publishPost($post)) {
                 $this->postAdminModel->requestGoogleIndexing($post);
+                $this->postAdminModel->requestIndexNowSubmission($post);
                 $result = true;
             }
         } elseif ($option == 'publish_draft') {
             checkPermission('add_post');
             if ($this->postAdminModel->publishDraft($post)) {
                 $this->postAdminModel->requestGoogleIndexing($post);
+                $this->postAdminModel->requestIndexNowSubmission($post);
                 $result = true;
             }
         }
@@ -929,10 +934,11 @@ class PostController extends BaseAdminController
             . 'Requisitos: formato paisagem, foco centralizado, deixar margens de segurança nas bordas, sem textos, sem logos, sem marcas d’água, alta qualidade.';
 
         // Select model/size/quality according to Web Stories settings (env)
-        $model = getenv('OPENAI_DEFAULT_MODEL') ?: 'gpt-image-1';
-        $quality = getenv('OPENAI_DEFAULT_QUALITY') ?: (($model === 'gpt-image-1') ? 'high' : 'hd');
+        $model = getenv('OPENAI_DEFAULT_MODEL') ?: 'gpt-image-1-mini';
+        $isGptImage = is_string($model) && strpos($model, 'gpt-image-1') === 0;
+        $quality = getenv('OPENAI_DEFAULT_QUALITY') ?: ($isGptImage ? 'high' : 'hd');
         // Prefer 3:2 landscape; fall back to closest if model doesn't support 3:2
-        if ($model === 'gpt-image-1') {
+        if ($isGptImage) {
             $size = '1536x1024'; // 3:2
         } elseif ($model === 'dall-e-3') {
             $size = '1792x1024'; // will crop later to 3:2 via our processing
@@ -970,6 +976,7 @@ class PostController extends BaseAdminController
 
         // Ensure 3:2 feel via variant sizes (UploadModel uses cropping for fixed sizes)
         $paths = [];
+        $paths['image_discover'] = $uploadModel->uploadPostImage($tmpPath, 'discover');
         $paths['image_big'] = $uploadModel->uploadPostImage($tmpPath, 'big');
         $paths['image_default'] = $uploadModel->uploadPostImage($tmpPath, 'default');
         $paths['image_slider'] = $uploadModel->uploadPostImage($tmpPath, 'slider');
@@ -1006,6 +1013,7 @@ class PostController extends BaseAdminController
         $slugBase = !empty($title) ? strSlug($title) : ('ai-cover-' . uniqid());
         $fileName = $uploadModel->createFileNameByExt($slugBase, 'webp');
         $dataImage = [
+            'image_discover' => $paths['image_discover'] ?? '',
             'image_big' => $paths['image_big'] ?? '',
             'image_default' => $paths['image_default'] ?? '',
             'image_slider' => $paths['image_slider'] ?? '',
@@ -1178,6 +1186,34 @@ class PostController extends BaseAdminController
         }
         if (!empty($message)) {
             $this->session->setFlashdata('msgTestApi', $message);
+        }
+        return redirect()->to(adminUrl('seo-tools'));
+    }
+
+    /**
+     * Test IndexNow API Post
+     */
+    public function testIndexNowApiPost()
+    {
+        checkPermission('seo_tools');
+        $message = '';
+        if (empty($this->generalSettings->indexnow_enabled) || $this->generalSettings->indexnow_enabled == 0) {
+            $message = ['status' => 0, 'message' => "Error: IndexNow is disabled!"];
+        } elseif (empty($this->generalSettings->indexnow_api_key)) {
+            $message = ['status' => 0, 'message' => "Error: IndexNow API key is not configured!"];
+        } else {
+            $keyFile = FCPATH . $this->generalSettings->indexnow_api_key . '.txt';
+            if (!file_exists($keyFile)) {
+                \App\Libraries\IndexNowClient::ensureKeyFile($this->generalSettings->indexnow_api_key);
+            }
+            $result = $this->postAdminModel->requestTestIndexNow();
+            $message = [
+                'status' => !empty($result) && !empty($result['success']) ? 1 : 0,
+                'message' => !empty($result) && !empty($result['message']) ? $result['message'] : ''
+            ];
+        }
+        if (!empty($message)) {
+            $this->session->setFlashdata('msgTestIndexNow', $message);
         }
         return redirect()->to(adminUrl('seo-tools'));
     }

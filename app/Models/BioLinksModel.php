@@ -55,6 +55,100 @@ class BioLinksModel extends BaseModel
                  ->update();
     }
 
+    public function logClick($id, $ipAddress = null, $userAgent = null, $referrer = null)
+    {
+        $this->db->table('bio_link_clicks')->insert([
+            'link_id'    => $id,
+            'ip_address' => $ipAddress,
+            'user_agent' => $userAgent ? mb_substr($userAgent, 0, 512) : null,
+            'referrer'   => $referrer ? mb_substr($referrer, 0, 512) : null,
+            'clicked_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    public function getClicksByDay($days = 30)
+    {
+        $since = date('Y-m-d', strtotime("-{$days} days"));
+
+        return $this->db->table('bio_link_clicks')
+            ->select("DATE(clicked_at) AS day, COUNT(*) AS clicks")
+            ->where('clicked_at >=', $since . ' 00:00:00')
+            ->groupBy('day')
+            ->orderBy('day', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getClicksByLink($days = 30)
+    {
+        $since = date('Y-m-d', strtotime("-{$days} days"));
+
+        return $this->db->table('bio_link_clicks AS c')
+            ->select('c.link_id, b.title, b.icon, b.button_color, COUNT(*) AS clicks')
+            ->join('bio_links AS b', 'b.id = c.link_id', 'left')
+            ->where('c.clicked_at >=', $since . ' 00:00:00')
+            ->groupBy('c.link_id')
+            ->orderBy('clicks', 'DESC')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getClicksByLinkPerDay($days = 30)
+    {
+        $since = date('Y-m-d', strtotime("-{$days} days"));
+
+        return $this->db->table('bio_link_clicks AS c')
+            ->select('c.link_id, b.title, DATE(c.clicked_at) AS day, COUNT(*) AS clicks')
+            ->join('bio_links AS b', 'b.id = c.link_id', 'left')
+            ->where('c.clicked_at >=', $since . ' 00:00:00')
+            ->groupBy('c.link_id, day')
+            ->orderBy('day', 'ASC')
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getRecentClicks($limit = 20)
+    {
+        return $this->db->table('bio_link_clicks AS c')
+            ->select('c.*, b.title, b.url')
+            ->join('bio_links AS b', 'b.id = c.link_id', 'left')
+            ->orderBy('c.clicked_at', 'DESC')
+            ->limit($limit)
+            ->get()
+            ->getResultArray();
+    }
+
+    public function getClicksAnalytics($days = 30)
+    {
+        $since = date('Y-m-d', strtotime("-{$days} days"));
+
+        $totalClicks = $this->db->table('bio_link_clicks')
+            ->where('clicked_at >=', $since . ' 00:00:00')
+            ->countAllResults();
+
+        $uniqueIPs = $this->db->table('bio_link_clicks')
+            ->select('COUNT(DISTINCT ip_address) AS cnt')
+            ->where('clicked_at >=', $since . ' 00:00:00')
+            ->get()
+            ->getRow()
+            ->cnt ?? 0;
+
+        $topReferrers = $this->db->table('bio_link_clicks')
+            ->select("COALESCE(NULLIF(referrer, ''), 'Direto') AS source, COUNT(*) AS clicks")
+            ->where('clicked_at >=', $since . ' 00:00:00')
+            ->groupBy('source')
+            ->orderBy('clicks', 'DESC')
+            ->limit(10)
+            ->get()
+            ->getResultArray();
+
+        return [
+            'total_clicks'  => (int) $totalClicks,
+            'unique_ips'    => (int) $uniqueIPs,
+            'top_referrers' => $topReferrers,
+        ];
+    }
+
     public function updateDisplayOrders($orders)
     {
         foreach ($orders as $id => $order) {

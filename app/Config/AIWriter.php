@@ -12,15 +12,16 @@ class AIWriter
 
     //AI Models
     public static $models = [
-        'gpt-3.5-turbo' => 'GPT-3.5 Turbo',
-        'gpt-4' => 'GPT-4',
+        'gpt-5.4-mini' => 'GPT-5.4 Mini',
+        'gpt-5' => 'GPT-5',
+        'gpt-4.1-mini' => 'GPT-4.1 Mini',
         'gpt-4o' => 'GPT-4o',
-        'gpt-4o-mini' => 'GPT-4o mini',
+        'gpt-4o-mini' => 'GPT-4o Mini',
     ];
 
     //AI Form Defaults
     public static $formDefaults = [
-        'model' => 'gpt-4o-mini',
+        'model' => 'gpt-5.4-mini',
         'temperature' => '0.7', // between 0 and 1
         'tone' => 'casual', //academic, casual, critical, formal, humorous, inspirational, persuasive, professional
         'length' => 'medium', //very_short, short, medium, long, very_long
@@ -120,7 +121,7 @@ class AIWriter
     public static function generateText($model, $temperature, $tone, $length, $topic, $langCode)
     {
         // Validate and set model
-        $model = (!empty(self::$models) && array_key_exists($model, self::$models)) ? $model : 'gpt-4o-mini';
+        $model = (!empty(self::$models) && array_key_exists($model, self::$models)) ? $model : 'gpt-5.4-mini';
 
         // Validate temperature
         $temperature = floatval($temperature);
@@ -130,13 +131,26 @@ class AIWriter
 
         // Build the AI prompt
         $prompt = self::generateAIPrompt($langCode, $length, $topic, $tone);
-        $data = [
-            'model' => $model,
-            'messages' => [
-                ['role' => 'user', 'content' => $prompt]
-            ],
-            'temperature' => $temperature,
-        ];
+        $useResponses = (strpos($model, 'gpt-5') !== false);
+        $apiEndpoint = $useResponses
+            ? 'https://api.openai.com/v1/responses'
+            : self::$apiUrl;
+
+        if ($useResponses) {
+            $data = [
+                'model' => $model,
+                'input' => $prompt,
+                'temperature' => $temperature,
+            ];
+        } else {
+            $data = [
+                'model' => $model,
+                'messages' => [
+                    ['role' => 'user', 'content' => $prompt]
+                ],
+                'temperature' => $temperature,
+            ];
+        }
 
         try {
             // Initialize AI Writer
@@ -150,7 +164,7 @@ class AIWriter
 
             // Initialize cURL
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, self::$apiUrl);
+            curl_setopt($ch, CURLOPT_URL, $apiEndpoint);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Authorization: Bearer ' . $aiWriter->apiKey,
@@ -201,12 +215,15 @@ class AIWriter
                 ]);
             }
 
-            // Return success response with content
-            if (isset($responseData['choices'][0]['message']['content'])) {
+            // Return success response with content (Responses API or Chat Completions)
+            $content = null;
+            if (isset($responseData['output_text'])) {
+                $content = $responseData['output_text'];
+            } elseif (isset($responseData['choices'][0]['message']['content'])) {
                 $content = $responseData['choices'][0]['message']['content'];
-                if (!empty($content)) {
-                    $content = nl2br($content);
-                }
+            }
+            if (!empty($content)) {
+                $content = nl2br($content);
                 return json_encode([
                     'status' => 'success',
                     'content' => $content

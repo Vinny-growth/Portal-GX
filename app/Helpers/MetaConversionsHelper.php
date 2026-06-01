@@ -47,30 +47,27 @@ class MetaConversionsHelper
     /**
      * Envia um evento para a Meta Conversions API
      */
-    public function sendEvent($eventName, $eventData = [], $userData = [])
+    public function sendEvent($eventName, $eventData = [], $userData = [], $clientEventId = null)
     {
         if (!$this->isEventEnabled($eventName)) {
             return false;
         }
-        
-        $url = "https://graph.facebook.com/v19.0/{$this->metaApiConfig['pixel_id']}/events";
-        
+
+        $url = "https://graph.facebook.com/v21.0/{$this->metaApiConfig['pixel_id']}/events";
+
         // Dados do usuário (importantes para matching)
         $defaultUserData = $this->getUserData();
         $userData = array_merge($defaultUserData, $userData);
-        
+
         // Dados do evento
-        $eventTime = time();
-        
-        // Validar se o timestamp está dentro do limite (7 dias)
-        $maxAge = 7 * 24 * 60 * 60; // 7 dias em segundos
-        if ($eventTime < (time() - $maxAge)) {
-            error_log("Meta Conversions API - Event time too old: " . date('Y-m-d H:i:s', $eventTime));
-            return false;
-        }
-        
-        $eventSourceUrl = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : base_url();
-        
+        $eventTime = !empty($eventData['_event_time']) ? (int) $eventData['_event_time'] : time();
+        unset($eventData['_event_time']);
+
+        // event_source_url: prioriza override explícito, depois HTTP_REFERER, depois base_url
+        $eventSourceUrl = $eventData['_event_source_url']
+            ?? ($_SERVER['HTTP_REFERER'] ?? base_url());
+        unset($eventData['_event_source_url']);
+
         $event = [
             'event_name' => $eventName,
             'event_time' => $eventTime,
@@ -79,9 +76,11 @@ class MetaConversionsHelper
             'custom_data' => $eventData,
             'action_source' => 'website'
         ];
-        
-        // Adicionar evento único ID para deduplicação
-        $event['event_id'] = md5($eventName . $eventTime . serialize($userData));
+
+        // Usar event_id do client-side para deduplicação, ou gerar um único estável
+        $event['event_id'] = !empty($clientEventId)
+            ? (string) $clientEventId
+            : 'srv_' . bin2hex(random_bytes(12));
         
         $data = [
             'data' => [$event],
@@ -102,27 +101,31 @@ class MetaConversionsHelper
     private function getUserData()
     {
         $userData = [];
-        
+
         // IP do cliente
         $clientIp = $this->getClientIp();
         if ($clientIp) {
             $userData['client_ip_address'] = $clientIp;
         }
-        
+
         // User Agent
         if (!empty($_SERVER['HTTP_USER_AGENT'])) {
             $userData['client_user_agent'] = $_SERVER['HTTP_USER_AGENT'];
         }
-        
-        // FBC (Facebook Click ID) e FBP (Facebook Browser ID) do cookie
+
+        // FBC (Facebook Click ID): cookie _fbc OU fallback construído do fbclid da URL
         if (!empty($_COOKIE['_fbc'])) {
             $userData['fbc'] = $_COOKIE['_fbc'];
+        } elseif (!empty($_GET['fbclid'])) {
+            // Formato oficial Meta: fb.1.<unixMillis>.<fbclid>
+            $userData['fbc'] = 'fb.1.' . (int) round(microtime(true) * 1000) . '.' . preg_replace('/[^A-Za-z0-9_-]/', '', (string) $_GET['fbclid']);
         }
-        
+
+        // FBP (Facebook Browser ID) do cookie
         if (!empty($_COOKIE['_fbp'])) {
             $userData['fbp'] = $_COOKIE['_fbp'];
         }
-        
+
         return $userData;
     }
     
@@ -154,39 +157,76 @@ class MetaConversionsHelper
      */
     private function sendApiRequest($url, $data)
     {
-        $ch = curl_init();
-        
-        curl_setopt_array($ch, [
-            CURLOPT_URL => $url,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode($data),
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_TIMEOUT => 30
-        ]);
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        
-        curl_close($ch);
-        
-        if ($error) {
-            error_log("Meta Conversions API - cURL Error: " . $error);
-            return false;
+        $payload = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $maxAttempts = 3; // 1 tentativa inicial + 2 retries
+        $lastError = null;
+        $lastHttpCode = 0;
+        $lastResponse = null;
+
+        for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
+            $ch = curl_init();
+
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $url,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => [
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                ],
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_CONNECTTIMEOUT => 5,
+                CURLOPT_TIMEOUT => 15,
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            curl_close($ch);
+
+            $lastResponse = $response;
+            $lastHttpCode = $httpCode;
+            $lastError = $error;
+
+            // Sucesso
+            if ($response !== false && $httpCode >= 200 && $httpCode < 300) {
+                $decoded = json_decode($response, true);
+                if (function_exists('log_message')) {
+                    $trace = is_array($decoded) ? ($decoded['fbtrace_id'] ?? '-') : '-';
+                    $events = is_array($decoded) ? ($decoded['events_received'] ?? '?') : '?';
+                    log_message('info', 'Meta CAPI ok: events_received={events} fbtrace_id={trace}', [
+                        'events' => $events,
+                        'trace'  => $trace,
+                    ]);
+                }
+                return $decoded ?: true;
+            }
+
+            // 4xx (exceto 429): erro de payload/credencial → não adianta tentar de novo
+            if ($response !== false && $httpCode >= 400 && $httpCode < 500 && $httpCode !== 429) {
+                break;
+            }
+
+            // Backoff antes da próxima tentativa (200ms, 600ms)
+            if ($attempt < $maxAttempts) {
+                usleep(200000 * $attempt * $attempt);
+            }
         }
-        
-        $decodedResponse = json_decode($response, true);
-        
-        if ($httpCode !== 200) {
-            error_log("Meta Conversions API - HTTP Error {$httpCode}: " . $response);
-            return false;
+
+        // Falha definitiva
+        $logMsg = sprintf(
+            'Meta CAPI fail: http=%d err=%s response=%s',
+            $lastHttpCode,
+            $lastError ?: '-',
+            is_string($lastResponse) ? substr($lastResponse, 0, 800) : '-'
+        );
+        if (function_exists('log_message')) {
+            log_message('error', $logMsg);
+        } else {
+            error_log($logMsg);
         }
-        
-        return $decodedResponse;
+        return false;
     }
     
     /**
@@ -203,54 +243,99 @@ class MetaConversionsHelper
         return $this->sendEvent('PageView', $eventData);
     }
     
-    public function trackLead($email = null, $phone = null, $firstName = null, $lastName = null, $customData = [])
+    public function trackLead($email = null, $phone = null, $firstName = null, $lastName = null, $customData = [], $clientEventId = null)
+    {
+        return $this->sendEvent(
+            'Lead',
+            $customData,
+            $this->buildUserDataPayload($email, $phone, $firstName, $lastName),
+            $clientEventId
+        );
+    }
+
+    public function trackCompleteRegistration($email = null, $customData = [], $clientEventId = null, $phone = null, $firstName = null, $lastName = null)
+    {
+        return $this->sendEvent(
+            'CompleteRegistration',
+            $customData,
+            $this->buildUserDataPayload($email, $phone, $firstName, $lastName),
+            $clientEventId
+        );
+    }
+
+    public function trackContact($email = null, $customData = [], $clientEventId = null, $phone = null, $firstName = null, $lastName = null)
+    {
+        return $this->sendEvent(
+            'Contact',
+            $customData,
+            $this->buildUserDataPayload($email, $phone, $firstName, $lastName),
+            $clientEventId
+        );
+    }
+
+    /**
+     * Constrói o user_data hasheado conforme exigências do Meta CAPI.
+     * - email/firstName/lastName: lowercase + trim + sha256
+     * - phone: apenas dígitos, com código de país, sha256
+     */
+    private function buildUserDataPayload($email = null, $phone = null, $firstName = null, $lastName = null)
     {
         $userData = [];
-        
-        if ($email) {
-            $userData['em'] = hash('sha256', strtolower(trim($email)));
+
+        if ($email !== null && $email !== '') {
+            $userData['em'] = hash('sha256', strtolower(trim((string) $email)));
         }
-        
-        if ($phone) {
-            // Remover caracteres não numéricos e adicionar código do país se necessário
-            $cleanPhone = preg_replace('/[^0-9]/', '', $phone);
-            // Se não tiver código do país, assumir Brasil (+55)
-            if (strlen($cleanPhone) === 11 && substr($cleanPhone, 0, 1) !== '5') {
-                $cleanPhone = '55' . $cleanPhone;
+
+        if ($phone !== null && $phone !== '') {
+            $normalized = $this->normalizePhone((string) $phone);
+            if ($normalized !== '') {
+                $userData['ph'] = hash('sha256', $normalized);
             }
-            $userData['ph'] = hash('sha256', $cleanPhone);
         }
-        
-        if ($firstName) {
-            $userData['fn'] = hash('sha256', strtolower(trim($firstName)));
+
+        if ($firstName !== null && $firstName !== '') {
+            $userData['fn'] = hash('sha256', strtolower(trim((string) $firstName)));
         }
-        
-        if ($lastName) {
-            $userData['ln'] = hash('sha256', strtolower(trim($lastName)));
+
+        if ($lastName !== null && $lastName !== '') {
+            $userData['ln'] = hash('sha256', strtolower(trim((string) $lastName)));
         }
-        
-        return $this->sendEvent('Lead', $customData, $userData);
+
+        return $userData;
     }
-    
-    public function trackCompleteRegistration($email = null, $customData = [])
+
+    /**
+     * Normaliza telefones para o formato exigido pelo Meta CAPI:
+     * apenas dígitos, com código do país (E.164 sem o "+").
+     *
+     * Comportamento:
+     *  - Detecta sinal "+" original (independente de espaços/parênteses) → assume já internacional
+     *  - 10 ou 11 dígitos sem "+" → assume Brasil (prefixa 55)
+     *  - 12+ dígitos sem "+" → assume já internacional (mantém)
+     *  - Strings com menos de 10 dígitos → inválido (string vazia)
+     */
+    private function normalizePhone(string $phone): string
     {
-        $userData = [];
-        
-        if ($email) {
-            $userData['em'] = hash('sha256', strtolower(trim($email)));
+        $trimmed = trim($phone);
+        $hasPlus = strpos($trimmed, '+') === 0;
+        $digits = preg_replace('/\D+/', '', $trimmed);
+
+        if ($digits === '' || $digits === null) {
+            return '';
         }
-        
-        return $this->sendEvent('CompleteRegistration', $customData, $userData);
-    }
-    
-    public function trackContact($email = null, $customData = [])
-    {
-        $userData = [];
-        
-        if ($email) {
-            $userData['em'] = hash('sha256', strtolower(trim($email)));
+
+        $len = strlen($digits);
+
+        if ($len < 10 || $len > 15) {
+            return '';
         }
-        
-        return $this->sendEvent('Contact', $customData, $userData);
+
+        // Já internacional (com "+" explícito ou 12+ dígitos)
+        if ($hasPlus || $len >= 12) {
+            return $digits;
+        }
+
+        // 10 ou 11 dígitos sem "+" → Brasil
+        return '55' . $digits;
     }
 }

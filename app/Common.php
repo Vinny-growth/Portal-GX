@@ -1858,6 +1858,9 @@ if (!function_exists('getPostImagePath')) {
             $path = '';
             $sizeKey = '';
             switch ($imageSize) {
+                case 'discover':
+                    $sizeKey = 'img_dsc';
+                    break;
                 case 'big':
                     $sizeKey = 'img_bg';
                     break;
@@ -2031,9 +2034,16 @@ if (!function_exists('setPostMetaTags')) {
         $data['keywords'] = $post->keywords;
         $data['ogTitle'] = $post->title;
         $data['ogType'] = 'article';
-        $data['ogImage'] = getPostImage($post, 'big');
-        $data['ogWidth'] = '750';
-        $data['ogHeight'] = '422';
+        $discoverImg = getPostImage($post, 'discover');
+        if (!empty($discoverImg)) {
+            $data['ogImage'] = $discoverImg;
+            $data['ogWidth'] = '1200';
+            $data['ogHeight'] = '675';
+        } else {
+            $data['ogImage'] = getPostImage($post, 'big');
+            $data['ogWidth'] = '870';
+            $data['ogHeight'] = '580';
+        }
         $data['ogCreator'] = $post->author_username;
         $data['ogAuthor'] = $post->author_username;
         $data['ogPublishedTime'] = $post->created_at;
