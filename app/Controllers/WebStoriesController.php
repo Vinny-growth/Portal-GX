@@ -407,20 +407,37 @@ class WebStoriesController extends BaseController
 
         try {
             $result = $this->openAIHelper->generateWebStoryImage($prompt, $style);
-            
+
             if ($result && $result['success']) {
                 $imageData = $result['data'][0];
-                
+                // gpt-image retorna b64_json; DALL-E (descontinuado) retornava url.
+                $imageUrl = $imageData['url'] ?? null;
+                $b64 = $imageData['b64_json'] ?? null;
+
+                if (empty($imageUrl) && !empty($b64)) {
+                    $uploadPath = FCPATH . 'uploads/web_stories/ai_generated/';
+                    if (!is_dir($uploadPath)) { @mkdir($uploadPath, 0755, true); }
+                    $filename = 'ws_ai_' . uniqid('', true) . '.png';
+                    $raw = base64_decode($b64);
+                    if ($raw !== false && file_put_contents($uploadPath . $filename, $raw)) {
+                        $imageUrl = base_url('uploads/web_stories/ai_generated/' . $filename);
+                    }
+                }
+
+                if (empty($imageUrl)) {
+                    return $this->response->setJSON(['success' => false, 'message' => 'Resposta inválida da IA']);
+                }
+
                 return $this->response->setJSON([
                     'success' => true,
-                    'image_url' => $imageData['url'],
+                    'image_url' => $imageUrl,
                     'prompt' => $prompt,
                     'created' => $result['created']
                 ]);
             } else {
                 return $this->response->setJSON(['success' => false, 'message' => 'Failed to generate image']);
             }
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             log_message('error', 'OpenAI image generation error: ' . $e->getMessage());
             return $this->response->setJSON(['success' => false, 'message' => 'Error generating image: ' . $e->getMessage()]);
         }

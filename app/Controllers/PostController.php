@@ -954,20 +954,28 @@ class PostController extends BaseAdminController
         }
 
         $imageData = $result['data'][0];
+        // gpt-image-1 / gpt-image-1-mini retornam SEMPRE base64 (b64_json) e nunca url.
+        // Apenas os modelos DALL-E (descontinuados) retornavam url. Tratar os dois casos.
         $imageUrl = $imageData['url'] ?? null;
-        if (empty($imageUrl)) {
+        $b64 = $imageData['b64_json'] ?? null;
+        if (empty($imageUrl) && empty($b64)) {
             return $this->response->setJSON(['success' => false, 'message' => 'Resposta inválida da IA']);
         }
 
-        // Download to tmp
+        // Download / decode to tmp
         $tmpDir = FCPATH . 'uploads/tmp/';
         if (!is_dir($tmpDir)) { @mkdir($tmpDir, 0755, true); }
         $tmpName = 'ai_cover_' . uniqid('', true) . '.png';
         $tmpPath = $tmpDir . $tmpName;
 
-        $downloaded = $this->downloadImage($imageUrl, $tmpPath);
-        if (!$downloaded || !file_exists($tmpPath)) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Não foi possível baixar a imagem gerada']);
+        $saved = false;
+        if (!empty($imageUrl)) {
+            $saved = $this->downloadImage($imageUrl, $tmpPath);
+        } elseif (!empty($b64)) {
+            $saved = (bool) file_put_contents($tmpPath, base64_decode($b64));
+        }
+        if (!$saved || !file_exists($tmpPath)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Não foi possível obter a imagem gerada']);
         }
 
         // Produce post image variants and convert to WebP

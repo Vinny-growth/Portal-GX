@@ -1158,6 +1158,44 @@ class ContentAIService
         return strtr($template, $vars);
     }
 
+    /**
+     * (Re)gera a imagem de capa de um post ja existente, reaproveitando o mesmo
+     * pipeline de prompt + geracao usado na criacao automatica. Util para
+     * recuperar posts que ficaram sem capa por falha transitoria de imagem.
+     *
+     * @return int|null  image_id gerado, ou null em caso de falha
+     */
+    public function regenerateCoverForPost(int $postId): ?int
+    {
+        $db = \Config\Database::connect(null, false);
+        $post = $db->table('posts')->select('id, title, summary, category_id, user_id')->where('id', $postId)->get()->getRow();
+        if (empty($post)) {
+            return null;
+        }
+
+        $settings = $this->settingsModel->getSettings();
+        $categoryName = '';
+        if (!empty($post->category_id)) {
+            $cat = $db->table('categories')->select('name')->where('id', (int) $post->category_id)->get()->getRow();
+            $categoryName = $cat->name ?? '';
+        }
+
+        $prompt = $this->buildImagePrompt(
+            (string) $post->title,
+            (string) ($post->summary ?? ''),
+            (string) $post->title,
+            $categoryName,
+            (int) ($post->category_id ?? 0),
+            $settings
+        );
+
+        $imageId = $this->generateCoverImage($prompt, (string) $post->title, (int) ($post->user_id ?: 1));
+        if (!empty($imageId)) {
+            $db->table('posts')->where('id', $postId)->update(['image_id' => $imageId]);
+        }
+        return $imageId;
+    }
+
     protected function getCategoryGuidelines(int $categoryId, $settings): string
     {
         $json = $settings->category_guidelines_json ?? '';

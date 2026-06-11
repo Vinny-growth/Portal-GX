@@ -43,7 +43,7 @@ class OpenAIImageHelper
      * @param int $n Number of images to generate (1-10 for dall-e-2, only 1 for newer models)
      * @return array|false
      */
-    public function generateImage($prompt, $model = 'gpt-image-1-mini', $size = '1024x1024', $quality = 'standard', $n = 1)
+    public function generateImage($prompt, $model = 'gpt-image-1-mini', $size = '1024x1024', $quality = 'standard', $n = 1, $allowFallback = true)
     {
         if (empty($this->apiKey)) {
             log_message('error', 'OpenAI API key not configured');
@@ -118,12 +118,12 @@ class OpenAIImageHelper
                 ];
             } else {
                 log_message('error', 'Invalid response from OpenAI API: ' . json_encode($response));
-                if ($this->isGptImageModel($model)) {
+                if ($this->isGptImageModel($model) && $allowFallback) {
                     return $this->generateImageWithFallback($prompt, $size);
                 }
                 return false;
             }
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             log_message('error', 'OpenAI API error: ' . $e->getMessage());
             return false;
         }
@@ -199,7 +199,7 @@ class OpenAIImageHelper
     {
         $ch = curl_init();
 
-        $timeout = intval(getenv('OPENAI_IMAGE_TIMEOUT') ?: 60);
+        $timeout = intval(getenv('OPENAI_IMAGE_TIMEOUT') ?: 120);
         if ($timeout < 20) { $timeout = 20; }
         curl_setopt_array($ch, [
             CURLOPT_URL => $this->apiUrl,
@@ -229,13 +229,9 @@ class OpenAIImageHelper
         if ($httpCode !== 200) {
             log_message('error', 'OpenAI API returned HTTP ' . $httpCode . ': ' . $response);
             log_message('error', 'Request data was: ' . json_encode($data));
-            
-            // Check if it's a gpt-image verification error and try fallback to dall-e-3
-            if ($httpCode === 403 && strpos($response, 'gpt-image-1') !== false && strpos($response, 'verified') !== false) {
-                log_message('info', 'gpt-image-* requires verification, falling back to dall-e-3');
-                return $this->generateImageWithFallback($data['prompt'], $data['size']);
-            }
-            
+
+            // Erro retornado para o chamador; a recuperacao (retry gpt-image medium)
+            // acontece em generateImage() para evitar fallback recursivo aqui.
             return false;
         }
 
@@ -317,7 +313,7 @@ class OpenAIImageHelper
         try {
             $response = $this->generateImage('test', 'gpt-image-1-mini', '1024x1024', 'low');
             return $response !== false;
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return false;
         }
     }
@@ -360,7 +356,13 @@ class OpenAIImageHelper
     }
 
     /**
-     * Generate image with fallback to DALL-E 3
+     * Retry de recuperacao quando uma requisicao gpt-image falha (ex.: timeout).
+     *
+     * NOTA: a OpenAI descontinuou os modelos DALL-E (dall-e-2 / dall-e-3) — eles
+     * retornam "The model does not exist". Resta apenas a familia gpt-image.
+     * Em vez de um fallback morto para dall-e-3, re-tentamos gpt-image-1-mini em
+     * qualidade 'medium', que gera mais rapido e com payload menor (reduz o risco
+     * de novo timeout).
      *
      * @param string $prompt
      * @param string $size
@@ -368,31 +370,14 @@ class OpenAIImageHelper
      */
     private function generateImageWithFallback($prompt, $size)
     {
-        // Convert gpt-image-1 size to dall-e-3 compatible size
-        $fallbackSize = $this->convertSizeForFallback($size);
-        
-        log_message('info', 'Attempting fallback to dall-e-3 with size: ' . $fallbackSize);
-        
-        return $this->generateImage($prompt, 'dall-e-3', $fallbackSize, 'hd');
+        $retrySize = in_array($size, ['1024x1024', '1536x1024', '1024x1536']) ? $size : '1536x1024';
+
+        log_message('info', 'Retrying image generation with gpt-image-1-mini (medium quality), size: ' . $retrySize);
+
+        // allowFallback=false evita recursao infinita.
+        return $this->generateImage($prompt, 'gpt-image-1-mini', $retrySize, 'medium', 1, false);
     }
-    
-    /**
-     * Convert gpt-image-* sizes to dall-e-3 compatible sizes
-     *
-     * @param string $size
-     * @return string
-     */
-    private function convertSizeForFallback($size)
-    {
-        $sizeMapping = [
-            '1024x1536' => '1024x1792', // Portrait
-            '1536x1024' => '1792x1024', // Landscape
-            '1024x1024' => '1024x1024'  // Square
-        ];
-        
-        return $sizeMapping[$size] ?? '1024x1792';
-    }
-    
+
     /**
      * Set API key
      *
