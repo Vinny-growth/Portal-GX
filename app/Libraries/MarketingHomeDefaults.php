@@ -237,10 +237,17 @@ class MarketingHomeDefaults
                 'description' => 'Teste cenários para investimento, compra planejada e comparação com financiamento antes de falar com o especialista.',
                 'cta' => 'Simular consórcio',
             ],
+            'simulador-seguro-resgatavel' => [
+                'label' => 'VIDA',
+                'eyebrow' => 'Proteção e patrimônio',
+                'title' => 'Simulador de Seguro de Vida Resgatável',
+                'description' => 'Veja a projeção de um seguro de vida resgatável quitado em 10 anos: o ponto em que a reserva acumulada ultrapassa tudo que você pagou.',
+                'cta' => 'Projetar reserva',
+            ],
         ];
 
         $items = [];
-        $alwaysAvailable = ['simulador-de-risco-cambial', 'fx-loan'];
+        $alwaysAvailable = ['simulador-de-risco-cambial', 'fx-loan', 'simulador-seguro-resgatavel'];
         foreach ($definitions as $slug => $item) {
             if (in_array($slug, $alwaysAvailable, true)) {
                 $item['slug'] = $slug;

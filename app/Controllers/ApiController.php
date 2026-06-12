@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Libraries\LeadPhoneFormatter;
+use App\Libraries\QuotationEngine;
+use App\Libraries\QuotationGate;
 use App\Models\SimLeadModel;
 use CodeIgniter\API\ResponseTrait;
 
@@ -180,6 +182,137 @@ class ApiController extends BaseController
                 'message' => 'Erro interno do servidor: ' . $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Prévia da cotação — payload SEGURO (sem R$). Não grava nada.
+     * Alimenta o gráfico de break-even com a curva indexada (base 100).
+     */
+    public function quotationPreview()
+    {
+        if (($resp = $this->applyCors()) !== null) {
+            return $resp;
+        }
+        try {
+            $input   = QuotationGate::parseInput($this->request->getPost());
+            $preview = (new QuotationEngine())->preview($input);
+
+            return $this->response->setJSON([
+                'status'  => 'success',
+                'result'  => 1,
+                'preview' => $preview,
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 'result' => 0, 'message' => $e->getMessage(),
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'API quotationPreview: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'status' => 'error', 'result' => 0, 'message' => 'Erro ao calcular a prévia.',
+            ]);
+        }
+    }
+
+    /**
+     * Desbloqueio — grava o lead e SÓ ENTÃO devolve o dossiê em R$.
+     * Reusa SimLeadModel::addSimLead (dedup + deferAfterResponse -> CRM + Meta).
+     */
+    public function quotationUnlock()
+    {
+        if (($resp = $this->applyCors()) !== null) {
+            return $resp;
+        }
+
+        $post  = $this->request->getPost();
+        $name  = trim((string) ($post['name'] ?? ''));
+        $email = trim((string) ($post['email'] ?? ''));
+        $phone = trim((string) ($post['phone'] ?? ''));
+
+        if ($name === '' || $email === '' || $phone === '') {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 'result' => 0,
+                'message' => 'Os campos nome, email e telefone são obrigatórios',
+            ]);
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 'result' => 0, 'message' => 'O email informado é inválido',
+            ]);
+        }
+
+        // Mesma normalização de telefone do saveSimulatorLead.
+        $phoneCountry = strtoupper(trim((string) ($post['phone_country'] ?? '')));
+        if ($phoneCountry !== '') {
+            if (!in_array($phoneCountry, LeadPhoneFormatter::getCountryCodes(), true)) {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'status' => 'error', 'result' => 0, 'message' => 'País do telefone inválido',
+                ]);
+            }
+            $normalized = LeadPhoneFormatter::toInternational($phoneCountry, $phone);
+            if ($normalized === null) {
+                return $this->response->setStatusCode(400)->setJSON([
+                    'status' => 'error', 'result' => 0, 'message' => 'Telefone inválido para o país selecionado',
+                ]);
+            }
+            $phone = $normalized;
+        }
+
+        try {
+            $input   = QuotationGate::parseInput($post);
+            $dossier = (new QuotationEngine())->quote($input);
+
+            $leadData = QuotationGate::buildLeadData($input, $dossier, [
+                'name'          => $name,
+                'email'         => $email,
+                'phone'         => $phone,
+                'phone_country' => $phoneCountry ?: null,
+            ], $post);
+
+            $ok = (new SimLeadModel())->addSimLead($leadData);
+            if (!$ok) {
+                return $this->response->setStatusCode(500)->setJSON([
+                    'status' => 'error', 'result' => 0, 'message' => 'Não foi possível registrar sua solicitação agora.',
+                ]);
+            }
+
+            return $this->response->setJSON([
+                'status' => 'success',
+                'result' => 1,
+                'dossie' => QuotationGate::publicDossier($dossier),
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 'result' => 0, 'message' => $e->getMessage(),
+            ]);
+        } catch (\Throwable $e) {
+            log_message('error', 'API quotationUnlock: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'status' => 'error', 'result' => 0, 'message' => 'Erro ao gerar o relatório.',
+            ]);
+        }
+    }
+
+    /** CORS + preflight compartilhado (espelha o bloco do saveSimulatorLead). */
+    private function applyCors()
+    {
+        $origin = $this->request->getHeaderLine('Origin');
+        $allowed = $this->getAllowedOrigins();
+        if ($origin !== '' && !in_array($origin, $allowed, true)) {
+            return $this->response->setStatusCode(403)->setJSON([
+                'status' => 'error', 'result' => 0, 'message' => 'Origem não permitida',
+            ]);
+        }
+        if ($origin !== '') {
+            $this->response->setHeader('Access-Control-Allow-Origin', $origin);
+            $this->response->setHeader('Vary', 'Origin');
+        }
+        $this->response->setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        $this->response->setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With');
+        if ($this->request->getMethod() === 'options') {
+            return $this->response->setStatusCode(200);
+        }
+        return null;
     }
 
     private function getAllowedOrigins(): array

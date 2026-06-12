@@ -70,6 +70,17 @@ class CrmLeadClient
             'external_id' => $data['external_id'] ?? null,
         ];
 
+        // Dossiê estruturado da simulação (quando houver) — o corretor recebe
+        // capital, prêmio, reserva projetada etc. sem reabrir a planilha.
+        if (!empty($data['sim_data'])) {
+            $simDecoded = is_array($data['sim_data'])
+                ? $data['sim_data']
+                : json_decode((string) $data['sim_data'], true);
+            if (is_array($simDecoded)) {
+                $payload['dados_simulacao'] = $simDecoded;
+            }
+        }
+
         $status = $data['status'] ?? $this->getEnv('CRM_LEAD_STATUS');
         if ($status !== '') {
             $payload['status'] = $status;

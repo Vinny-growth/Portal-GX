@@ -39,9 +39,12 @@ $routes->get('connect-with-google', 'AuthController::connectWithGoogle');
 $routes->get('connect-with-vk', 'AuthController::connectWithVK');
 $routes->get('gnews/feed', 'HomeController::googleNewsFeeds');
 $routes->get('simulador-aurum', 'HomeController::simuladorAurum');
+$routes->get('simulador-seguro-resgatavel', 'HomeController::simuladorSeguroResgatavel');
 $routes->get('playbook/importacao-blindada', 'HomeController::playbookImportacaoBlindada');
 $routes->get('playbook/exportacao-premium', 'HomeController::playbookExportacaoPremium');
 $routes->post('api/save-simulator-lead', 'ApiController::saveSimulatorLead');
+$routes->match(['post', 'options'], 'api/quotation/preview', 'ApiController::quotationPreview');
+$routes->match(['post', 'options'], 'api/quotation/unlock', 'ApiController::quotationUnlock');
 
 // Bio Links Routes
 $routes->get('bio', 'BioLinksController::index');
@@ -140,6 +143,16 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->post('content-ai/trends/update', 'ContentAIController::updateTrendFlagsPost');
     $routes->post('content-ai/trends/add', 'ContentAIController::addSelectedTrendsToCalendarPost');
     $routes->post('content-ai/x-pulse/run', 'ContentAIController::runXPulseNowPost');
+    //SEO analysis (keyword ranking tracker)
+    $routes->get('seo-analysis', 'SeoAnalysisController::index');
+    $routes->get('seo-analysis/keywords', 'SeoAnalysisController::keywords');
+    $routes->get('seo-analysis/keyword/(:num)', 'SeoAnalysisController::keywordDetail/$1');
+    $routes->post('seo-analysis/keyword/add', 'SeoAnalysisController::addKeywordPost');
+    $routes->post('seo-analysis/keyword/update', 'SeoAnalysisController::updateKeywordPost');
+    $routes->post('seo-analysis/keyword/toggle', 'SeoAnalysisController::toggleKeywordPost');
+    $routes->post('seo-analysis/keyword/delete', 'SeoAnalysisController::deleteKeywordPost');
+    $routes->post('seo-analysis/keywords/sync', 'SeoAnalysisController::syncKeywordsPost');
+    $routes->post('seo-analysis/fetch-now', 'SeoAnalysisController::fetchNowPost');
     //rss feeds
     $routes->get('feeds', 'RssController::feeds');
     $routes->get('import-feed', 'RssController::importFeed');
@@ -577,6 +590,7 @@ if (!empty($languages)) {
             $routes->get($key . 'simuladores-cambio', 'HomeController::simulatorsFxLegacyRedirect');
             $routes->get($key . 'simulador-de-risco-cambial', 'HomeController::simulatorsFxLegacyRedirect');
             $routes->get($key . 'fx-loan', 'HomeController::simulatorsFxLegacyRedirect');
+            $routes->get($key . 'simulador-seguro-resgatavel', 'HomeController::simuladorSeguroResgatavel');
         }
         $routes->get($key . $customRoutes->register, 'AuthController::register');
         $routes->get($key . $customRoutes->forgot_password, 'AuthController::forgotPassword');

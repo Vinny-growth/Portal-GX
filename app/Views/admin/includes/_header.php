@@ -190,6 +190,15 @@
                             <a href="<?= adminUrl('content-ai'); ?>"><i class="fa fa-magic"></i><span>Central de Conteudos IA</span></a>
                         </li>
                     <?php endif;
+                    if (hasPermission('seo_analysis')): ?>
+                        <li class="treeview<?php isAdminNavActive(['seo-analysis','seo-analysis/keywords','seo-analysis/keyword']); ?>">
+                            <a href="#"><i class="fa fa-search" aria-hidden="true"></i><span>An&aacute;lise de SEO</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li class="nav-seo-analysis"><a href="<?= adminUrl('seo-analysis'); ?>"><i class="fa fa-tachometer"></i> Vis&atilde;o geral</a></li>
+                                <li class="nav-seo-analysis-keywords"><a href="<?= adminUrl('seo-analysis/keywords'); ?>"><i class="fa fa-key"></i> Palavras-chave</a></li>
+                            </ul>
+                        </li>
+                    <?php endif;
                     if (hasPermission('rss_feeds')): ?>
                         <li class="nav-feeds"><a href="<?= adminUrl('feeds'); ?>"><i class="fa fa-rss" aria-hidden="true"></i><span><?= trans("rss_feeds"); ?></span></a></li>
                     <?php endif;

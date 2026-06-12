@@ -73,7 +73,9 @@ class Filters extends BaseFilters
             // 'honeypot',
             'csrf' => [
                 'except' => [
-                    'api/save-simulator-lead'
+                    'api/save-simulator-lead',
+                    'api/quotation/preview',
+                    'api/quotation/unlock'
                 ]
             ],
             // 'invalidchars',
@@ -111,7 +113,9 @@ class Filters extends BaseFilters
     public array $filters = [
         'csrf' => [
             'except' => [
-                'api/save-simulator-lead'
+                'api/save-simulator-lead',
+                'api/quotation/preview',
+                'api/quotation/unlock'
             ]
         ]
     ];

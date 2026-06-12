@@ -1076,6 +1076,50 @@ class HomeController extends BaseController
     }
 
     /**
+     * Simulador de Seguro de Vida Resgatável (Whole Life WL10/WL20).
+     * Gate server-side: a página chama api/quotation/preview (sem R$) e só
+     * revela os valores após api/quotation/unlock (grava o lead).
+     */
+    public function simuladorSeguroResgatavel()
+    {
+        $canonicalUrl = langBaseUrl('simulador-seguro-resgatavel');
+        $title = 'Simulador de Seguro de Vida Resgatável';
+        $description = 'Simule um seguro de vida resgatável (Whole Life) quitado em 10 anos, com correção anual e formação de reserva. Veja o ponto de break-even em que a reserva ultrapassa o que você pagou.';
+
+        $contactChannels = $this->getMarketingContactChannels();
+        $defaultWhatsAppMessage = 'Olá! Fiz a simulação do Seguro de Vida Resgatável na GX Capital e quero estruturar meu plano.';
+        $whatsAppBaseUrl = '';
+        if (!empty($contactChannels['whatsapp_digits'])) {
+            $whatsAppBaseUrl = 'https://wa.me/' . $contactChannels['whatsapp_digits'];
+        }
+
+        $data = [
+            'title' => $title,
+            'description' => $description,
+            'keywords' => trim(($this->settings->keywords ?? '') . ', seguro de vida resgatavel, whole life, simulador de seguro, reserva resgatavel, vida inteira, planejamento sucessorio', ' ,'),
+            'bodyClass' => 'gx-marketing-home gx-srs-page',
+            'pageHeadView' => 'simulators/_seguro_resgatavel_head',
+            'canonicalUrl' => $canonicalUrl,
+            'socialImage' => getLogo(),
+            'ogDescription' => $description,
+            'blogUrl' => langBaseUrl('blog'),
+            'simulatorsHubUrl' => langBaseUrl('simuladores'),
+            'wealthUrl' => base_url('wealth'),
+            'contactUrl' => getPageLinkByDefaultName('contact', $this->activeLang->id),
+            'termsUrl' => getPageLinkByDefaultName('terms_conditions', $this->activeLang->id),
+            'contactChannels' => $contactChannels,
+            'whatsAppUrl' => $this->buildWhatsAppUrl($contactChannels['whatsapp_digits'] ?? '', $defaultWhatsAppMessage),
+            'whatsAppBaseUrl' => $whatsAppBaseUrl,
+            'whatsAppDefaultMessage' => $defaultWhatsAppMessage,
+            'userSession' => getUserSession(),
+        ];
+
+        echo view('marketing/_home_head', $data);
+        echo view('simulators/seguro_resgatavel', $data);
+        echo view('marketing/_home_footer', $data);
+    }
+
+    /**
      * Category
      */
     private function category($category, $isParent = true)

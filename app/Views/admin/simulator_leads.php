@@ -126,6 +126,86 @@
         return escapeHtml(value);
     }
 
+    function brlFmt(v) {
+        var n = Number(v);
+        if (!isFinite(n)) return 'n/a';
+        return 'R$ ' + n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    var SRS_COB_LABELS = {
+        vida: 'Vida Inteira (WL)', dg_plus: 'Doenças Graves Plus', dg_basico: 'Doenças Graves Básico',
+        invalidez: 'Invalidez', renda_hospitalar: 'Renda Hospitalar', morte_acidental: 'Morte Acidental'
+    };
+
+    function srsItem(label, value) {
+        return '<div class="lead-json-item"><strong>' + escapeHtml(label) + '</strong><div>' + value + '</div></div>';
+    }
+
+    function renderSeguroDossier(d) {
+        var inp = d.input || {}, pr = d.premio || {}, ds = d.destaques || {};
+        var capVida = 0;
+        (inp.coberturas || []).forEach(function (c) { if (c.tipo === 'vida') capVida = c.capital; });
+        var sexo = inp.sexo === 'F' ? 'Feminino' : 'Masculino';
+
+        var html = '<div class="lead-json-grid">';
+        html += srsItem('Perfil', escapeHtml(sexo) + ', ' + escapeHtml(inp.idade) + ' anos · ' + escapeHtml(inp.estrategia) + ' (quita em ' + escapeHtml(ds.quitacao_ano) + ' anos)');
+        html += srsItem('Capital de vida', brlFmt(capVida));
+        html += srsItem('Prêmio mensal (WL, c/ IOF)', '<strong>' + brlFmt(pr.mensal_bruto) + '</strong>');
+        html += srsItem('Prêmio mensal total (c/ proteções)', brlFmt(pr.total_mensal_com_riders));
+        html += srsItem('Reserva projetada aos 65', '<strong>' + brlFmt(ds.reserva_aos_65) + '</strong>');
+        html += srsItem('Reserva final (100 anos)', brlFmt(ds.reserva_final));
+        html += srsItem('Break-even', ds.breakeven_idade ? ('idade ' + ds.breakeven_idade + ' (ano ' + ds.breakeven_ano + ')') : 'n/a');
+        html += srsItem('Múltiplo final', (ds.multiplo_final != null ? ds.multiplo_final + 'x' : 'n/a'));
+        html += '</div>';
+
+        var pf = d.perfil || {};
+        if (pf.renda_mensal || pf.patrimonio_total || pf.dividas || pf.dependentes || pf.filhos || pf.objetivo_label) {
+            html += '<h5 style="margin-top:12px">Perfil do cliente (diagnóstico)</h5>';
+            html += '<div class="lead-json-grid">';
+            if (pf.objetivo_label) { html += srsItem('Objetivo', escapeHtml(pf.objetivo_label)); }
+            html += srsItem('Renda mensal', brlFmt(pf.renda_mensal));
+            if (pf.estado) { html += srsItem('Estado / ITCMD', escapeHtml(pf.estado) + (pf.itcmd_rate != null ? ' · ' + (Math.round(pf.itcmd_rate * 1000) / 10).toString().replace('.', ',') + '%' : '')); }
+            html += srsItem('Patrimônio imobiliário', brlFmt(pf.patrimonio_imobiliario));
+            html += srsItem('Patrimônio financeiro', brlFmt(pf.patrimonio_financeiro));
+            html += srsItem('Custo de sucessão estimado', brlFmt(pf.custo_sucessao_estimado));
+            html += srsItem('Dívidas', brlFmt(pf.dividas));
+            html += srsItem('Dependentes', escapeHtml(pf.dependentes != null ? pf.dependentes : '—'));
+            html += srsItem('Filhos', escapeHtml(pf.filhos != null ? pf.filhos : '—'));
+            html += '</div>';
+        }
+
+        var bd = pr.breakdown || [];
+        if (bd.length) {
+            html += '<h5 style="margin-top:12px">Coberturas</h5>';
+            html += '<table class="table table-condensed"><thead><tr><th>Cobertura</th><th>Capital</th><th>Taxa (‰)</th><th>Mensal</th></tr></thead><tbody>';
+            bd.forEach(function (c) {
+                html += '<tr><td>' + escapeHtml(SRS_COB_LABELS[c.tipo] || c.tipo) + '</td><td>' + brlFmt(c.capital) + '</td><td>' + escapeHtml(c.taxa) + '</td><td>' + brlFmt(c.mensal) + '</td></tr>';
+            });
+            html += '</tbody></table>';
+        }
+
+        var proj = d.projecao || [];
+        if (proj.length) {
+            var marcos = [proj[0]];
+            var be = proj.find(function (p) { return p.idade === ds.breakeven_idade; });
+            if (be) marcos.push(be);
+            var p65 = proj.find(function (p) { return p.idade === 65; });
+            if (p65) marcos.push(p65);
+            marcos.push(proj[proj.length - 1]);
+            var seen = {}, uniq = [];
+            marcos.forEach(function (p) { if (p && !seen[p.idade]) { seen[p.idade] = 1; uniq.push(p); } });
+            html += '<h5 style="margin-top:12px">Marcos da projeção</h5>';
+            html += '<table class="table table-condensed"><thead><tr><th>Idade</th><th>Capital corrigido</th><th>Aporte acumulado</th><th>Reserva</th></tr></thead><tbody>';
+            uniq.forEach(function (p) {
+                html += '<tr><td>' + escapeHtml(p.idade) + '</td><td>' + brlFmt(p.capital_vigente) + '</td><td>' + brlFmt(p.pago_acum) + '</td><td>' + brlFmt(p.reserva) + '</td></tr>';
+            });
+            html += '</tbody></table>';
+        }
+
+        html += '<p class="lead-json-muted" style="margin-top:8px">Valores projetados (IPCA 5,5% a.a.), não garantidos · fonte dos dados: ' + escapeHtml((d.params && d.params.rates_source) || '—') + '</p>';
+        return html;
+    }
+
     function showLeadDetails(leadId) {
         var leads = <?= json_encode($leads); ?>;
         var lead = leads.find(function(item) {
@@ -151,7 +231,11 @@
 
                 content += '<section class="lead-detail-section">';
                 content += '<h4>Dados da Simulação</h4>';
-                content += renderJsonValue(data);
+                if (data && data.tipo === 'seguro_resgatavel') {
+                    content += renderSeguroDossier(data);
+                } else {
+                    content += renderJsonValue(data);
+                }
                 content += '</section>';
                 content += '</div>';
                 $('#leadDetailsContent').html(content);
