@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Briefing GX Nexus — Relatório de Planejamento Financeiro</title>
+
+<!--
+================================================================================
+  INSTRUÇÕES PARA O CLAUDE CODE  (leia este bloco antes de gerar qualquer código)
+================================================================================
+  TAREFA: criar um "Relatório de Planejamento Financeiro" (documento de entrega
+  para o cliente) com a MESMA linguagem visual do nosso Simulador de Seguro de
+  Vida Resgatável — identidade "GX Nexus" (brutalismo financeiro: azul-marinho
+  profundo + champagne/dourado, cantos retos 0px, sombras hard-offset, títulos
+  UPPERCASE, números em fonte monoespaçada).
+
+  REGRAS:
+  1. Use EXATAMENTE os tokens de cor/tipografia/espaçamento definidos em
+     <style> abaixo (:root). Eles são idênticos ao arquivo do projeto
+     `colors_and_type.css`. Se for construir DENTRO do repositório GX, prefira
+     dar `<link rel="stylesheet" href="/colors_and_type.css">` e reusar as
+     classes; fora do repo, copie os tokens inline (como neste arquivo).
+  2. NÃO invente cores novas, NÃO arredonde cantos (radius = 0), NÃO use sombras
+     com blur — só as sombras hard-offset dos tokens.
+  3. Números/valores monetários SEMPRE em JetBrains Mono (tabular-nums).
+  4. Replique a anatomia do relatório (capa → seções numeradas → caixa de
+     recomendação → KPIs → tabelas mono → CTA → rodapé) e o isolamento de
+     impressão A4 (@media print).
+  5. O exemplo no fim deste arquivo é uma REFERÊNCIA FUNCIONAL — adapte o
+     conteúdo de planejamento financeiro, mas mantenha o padrão visual.
+
+  Critério de aceite: ao lado do relatório real do simulador, o novo relatório
+  precisa parecer "do mesmo produto" — mesma paleta, mesmas formas, mesma
+  tipografia, mesmo ritmo de espaçamento.
+================================================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   1) TOKENS — GX Capital "Nexus" (cópia fiel de colors_and_type.css)
+   ========================================================================== */
+:root{
+  /* Fontes */
+  --font-sans:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,monospace;
+  --font-display:'Inter',system-ui,sans-serif; /* mesmo family, peso 900 */
+
+  /* Escala tipográfica (px — previsível para headers brutalistas) */
+  --fs-xs:10px; --fs-sm:12px; --fs-base:14px; --fs-md:16px; --fs-lg:20px;
+  --fs-xl:24px; --fs-2xl:32px; --fs-3xl:48px; --fs-4xl:64px; --fs-5xl:96px;
+
+  /* Pesos */
+  --fw-regular:400; --fw-medium:500; --fw-semibold:600;
+  --fw-bold:700; --fw-extrabold:800; --fw-black:900;
+
+  /* Letter-spacing */
+  --ls-tighter:-0.04em; --ls-tight:-0.02em; --ls-normal:0;
+  --ls-wide:0.025em; --ls-wider:0.05em; --ls-widest:0.1em;
+
+  /* Line-heights */
+  --lh-none:1; --lh-tight:1.1; --lh-snug:1.25; --lh-normal:1.5; --lh-relaxed:1.625;
+
+  /* Cores da marca — PRIMÁRIA (azul-marinho) */
+  --gx-primary:#0c3163;        /* navy base */
+  --gx-primary-dark:#000d23;   /* navy quase-preto */
+  --gx-primary-light:#1f5694;  /* hover */
+
+  /* SECUNDÁRIA (champagne / dourado) — usar SÓ como acento */
+  --gx-secondary-light:#dbc7a2; /* champagne suave */
+  --gx-secondary-dark:#87704a;  /* dourado antigo */
+  --gx-gold:#c9a96a;            /* dourado do logo */
+
+  /* Neutros */
+  --gx-bg:#ffffff; --gx-bg-muted:#f5f3ee; --gx-fg:#000d23; --gx-fg-muted:#5a6a80;
+  --gx-border:#d3d9e0; --gx-border-strong:#0c3163;
+
+  /* Semânticos */
+  --gx-success:#16a34a; --gx-warning:#d97706; --gx-danger:#dc2626; --gx-info:#0c3163;
+
+  /* Pares de foreground */
+  --fg-on-primary:#dbc7a2; --fg-on-secondary:#0c3163; --fg-on-dark:#ffffff; --fg-on-light:#000d23;
+
+  /* Aliases semânticos */
+  --fg1:var(--gx-fg); --fg2:var(--gx-fg-muted); --fg3:#94a3b8;
+  --bg1:var(--gx-bg); --bg2:var(--gx-bg-muted); --bg3:#ebe6dc;
+
+  /* Gradientes */
+  --gradient-hero:linear-gradient(180deg,var(--gx-primary) 0%,var(--gx-primary-dark) 100%);
+  --gradient-primary:linear-gradient(135deg,var(--gx-primary),var(--gx-primary-dark));
+
+  /* Sombras HARD-OFFSET (assinatura brutalista — sem blur) */
+  --shadow-gx:4px 4px 0 0 rgba(12,49,99,.2);
+  --shadow-card:2px 2px 0 0 rgba(211,217,224,.5);
+  --shadow-card-hover:6px 6px 0 0 rgba(12,49,99,.3);
+  --shadow-elevated:8px 8px 0 0 rgba(12,49,99,.2);
+
+  /* Raios — TUDO RETO */
+  --radius:0;
+
+  /* Espaçamento (base 4px) */
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:20px;
+  --space-6:24px; --space-7:28px; --space-8:32px; --space-10:40px; --space-12:48px;
+  --space-16:64px; --space-20:80px;
+
+  /* Motion / bordas */
+  --transition-smooth:all .2s cubic-bezier(.16,1,.3,1);
+  --transition-fast:all .15s ease-out;
+  --border-width-heavy:4px;
+}
+
+/* ==========================================================================
+   2) CHROME DO BRIEFING (a própria página já demonstra o estilo)
+   ========================================================================== */
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:var(--font-sans);color:var(--fg1);background:var(--bg2);line-height:var(--lh-normal);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 var(--space-6)}
+a{color:var(--gx-primary)}
+code{font-family:var(--font-mono);font-size:.92em;background:var(--bg3);padding:1px 5px}
+
+/* topo */
+.doc-top{background:var(--gx-primary-dark);color:#fff;border-bottom:2px solid var(--gx-secondary-dark)}
+.doc-top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.doc-top .brand{font-family:var(--font-display);font-weight:var(--fw-black);text-transform:uppercase;letter-spacing:var(--ls-tight);font-size:var(--fs-md)}
+.doc-top .brand em{font-style:normal;color:var(--gx-gold)}
+.doc-top .tag{font-size:var(--fs-xs);letter-spacing:var(--ls-widest);text-transform:uppercase;color:var(--gx-secondary-light)}
+
+/* hero do briefing */
+.doc-hero{position:relative;overflow:hidden;background:var(--gradient-hero);color:#fff;padding:var(--space-16) 0}
+.doc-hero .mark{position:absolute;top:50%;right:-1%;transform:translateY(-50%);font-family:var(--font-display);font-weight:var(--fw-black);font-size:220px;line-height:1;color:#fff;opacity:.05;letter-spacing:var(--ls-tighter);pointer-events:none}
+.eyebrow{display:inline-flex;align-items:center;gap:var(--space-3);font-size:var(--fs-sm);font-weight:var(--fw-bold);letter-spacing:var(--ls-widest);text-transform:uppercase;color:var(--gx-secondary-light);margin-bottom:var(--space-5)}
+.eyebrow::before{content:"";width:36px;height:2px;background:var(--gx-gold)}
+.doc-hero h1{font-family:var(--font-display);font-weight:var(--fw-black);font-size:clamp(34px,5.4vw,68px);line-height:.94;letter-spacing:var(--ls-tighter);text-transform:uppercase;margin:0 0 var(--space-5);max-width:18ch}
+.doc-hero h1 em{font-style:normal;color:var(--gx-gold)}
+.doc-hero p{font-size:var(--fs-md);max-width:60ch;color:rgba(255,255,255,.82);margin:0}
+
+/* seções do briefing */
+.block{padding:var(--space-12) 0;border-bottom:1px solid var(--gx-border)}
+.block h2{font-family:var(--font-sans);font-weight:var(--fw-black);font-size:var(--fs-2xl);letter-spacing:var(--ls-tight);text-transform:uppercase;margin:0 0 var(--space-2);display:flex;align-items:center;gap:var(--space-3)}
+.block h2 .n{font-family:var(--font-mono);font-size:var(--fs-lg);color:var(--gx-gold);font-weight:var(--fw-bold)}
+.block > .wrap > .lead{color:var(--fg2);font-size:var(--fs-md);max-width:70ch;margin:0 0 var(--space-8)}
+.block h3{font-size:var(--fs-sm);font-weight:var(--fw-black);letter-spacing:var(--ls-widest);text-transform:uppercase;color:var(--gx-secondary-dark);margin:var(--space-8) 0 var(--space-4);display:flex;align-items:center;gap:var(--space-3)}
+.block h3::before{content:"";width:28px;height:2px;background:var(--gx-primary)}
+
+/* swatches de cor */
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--space-4)}
+.sw{border:1px solid var(--gx-border);background:var(--bg1)}
+.sw .chip{height:72px}
+.sw .meta{padding:var(--space-3)}
+.sw .name{font-size:var(--fs-xs);font-weight:var(--fw-bold);letter-spacing:var(--ls-wider);text-transform:uppercase;color:var(--fg1)}
+.sw .hex{font-family:var(--font-mono);font-size:var(--fs-xs);color:var(--fg2);margin-top:2px}
+.sw .use{font-size:var(--fs-xs);color:var(--fg3);margin-top:var(--space-1);line-height:var(--lh-snug)}
+
+/* listas de destaques */
+.highlights{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+@media(max-width:760px){.highlights{grid-template-columns:1fr}}
+.hl{border:1px solid var(--gx-border);background:var(--bg1);border-left:var(--border-width-heavy) solid var(--gx-gold);padding:var(--space-5)}
+.hl h4{margin:0 0 var(--space-2);font-size:var(--fs-base);font-weight:var(--fw-bold);letter-spacing:var(--ls-tight)}
+.hl p{margin:0;font-size:var(--fs-sm);color:var(--fg2);line-height:var(--lh-normal)}
+.hl code{font-size:var(--fs-xs)}
+
+/* tabela de tokens */
+.tok{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+.tok th{text-align:left;font-size:var(--fs-xs);font-weight:var(--fw-bold);letter-spacing:var(--ls-wide);text-transform:uppercase;color:var(--fg2);background:var(--bg2);padding:var(--space-2) var(--space-3);border:1px solid var(--gx-border)}
+.tok td{padding:var(--space-2) var(--space-3);border:1px solid var(--gx-border);vertical-align:top}
+.tok td.k{font-family:var(--font-mono);color:var(--gx-primary);white-space:nowrap}
+
+/* do / dont */
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)}
+@media(max-width:760px){.rules{grid-template-columns:1fr}}
+.rules ul{list-style:none;margin:0;padding:0}
+.rules li{position:relative;padding-left:var(--space-6);margin-bottom:var(--space-3);font-size:var(--fs-sm);color:var(--fg1);line-height:var(--lh-snug)}
+.rules .do li::before{content:"✓";position:absolute;left:0;top:-1px;color:var(--gx-success);font-weight:var(--fw-black)}
+.rules .dont li::before{content:"✕";position:absolute;left:0;top:-1px;color:var(--gx-danger);font-weight:var(--fw-black)}
+.rules .col-title{font-size:var(--fs-xs);font-weight:var(--fw-black);letter-spacing:var(--ls-widest);text-transform:uppercase;margin-bottom:var(--space-4)}
+.rules .do .col-title{color:var(--gx-success)}
+.rules .dont .col-title{color:var(--gx-danger)}
+
+.callout{background:var(--gx-primary);color:#fff;padding:var(--space-6);border-bottom:var(--border-width-heavy) solid var(--gx-gold);margin-top:var(--space-6)}
+.callout strong{color:var(--gx-gold)}
+
+/* ==========================================================================
+   3) ESTILOS DO RELATÓRIO DE EXEMPLO (.rep-*) — espelham .gx-srs-rp-* do simulador
+   ========================================================================== */
+.example-stage{background:var(--bg2);padding:var(--space-12) 0 var(--space-20)}
+.rep{max-width:920px;margin:0 auto;background:#fff;border:1px solid var(--gx-border);box-shadow:var(--shadow-elevated)}
+
+.rep-cover{position:relative;overflow:hidden;color:#fff;min-height:340px;display:flex;align-items:flex-end;
+  background:linear-gradient(100deg,var(--gx-primary-dark) 0%,rgba(0,13,35,.94) 38%,rgba(12,49,99,.55) 68%,rgba(31,86,148,.25) 100%),var(--gradient-hero)}
+.rep-cover-inner{position:relative;z-index:1;padding:var(--space-10) var(--space-8);max-width:74%}
+@media(max-width:640px){.rep-cover-inner{max-width:100%}.rep-cover{min-height:300px}}
+.rep-cover-logo{font-family:var(--font-display);font-weight:var(--fw-black);text-transform:uppercase;letter-spacing:var(--ls-tight);font-size:var(--fs-lg);margin-bottom:var(--space-6)}
+.rep-cover-logo em{font-style:normal;color:var(--gx-gold)}
+.rep-cover-kicker{font-size:var(--fs-sm);font-weight:var(--fw-bold);letter-spacing:var(--ls-widest);text-transform:uppercase;color:var(--gx-secondary-light);margin-bottom:var(--space-3)}
+.rep-cover-title{font-family:var(--font-display);font-weight:var(--fw-black);font-size:clamp(28px,4.2vw,46px);line-height:.98;letter-spacing:var(--ls-tighter);text-transform:uppercase;margin:0 0 var(--space-5)}
+.rep-cover-meta{font-size:var(--fs-xs);letter-spacing:var(--ls-wide);text-transform:uppercase;color:rgba(255,255,255,.65);display:flex;flex-direction:column;gap:2px;border-left:2px solid var(--gx-gold);padding-left:var(--space-4)}
+.rep-cover-meta strong{color:#fff;font-size:var(--fs-md);font-weight:var(--fw-bold);text-transform:none;letter-spacing:0}
+.rep-cover-meta span{font-family:var(--font-mono)}
+
+.rep-section{padding:var(--space-7) var(--space-8);border-bottom:1px solid var(--gx-border)}
+.rep-label{display:flex;align-items:center;gap:var(--space-3);font-size:var(--fs-sm);font-weight:var(--fw-black);letter-spacing:var(--ls-widest);text-transform:uppercase;color:var(--gx-secondary-dark);margin-bottom:var(--space-5)}
+.rep-label::before{content:"";width:28px;height:2px;background:var(--gx-primary)}
+
+.rep-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4) var(--space-6)}
+@media(max-width:640px){.rep-grid{grid-template-columns:1fr 1fr}}
+.rep-item .k{font-size:var(--fs-xs);font-weight:var(--fw-bold);letter-spacing:var(--ls-wider);text-transform:uppercase;color:var(--fg2)}
+.rep-item .v{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:var(--fw-bold);font-size:var(--fs-md);color:var(--fg1);margin-top:2px}
+.rep-item .v.txt{font-family:var(--font-sans)}
+
+.rep-reco{display:flex;align-items:baseline;gap:var(--space-6);flex-wrap:wrap;background:var(--gx-primary);color:#fff;padding:var(--space-6);border-bottom:var(--border-width-heavy) solid var(--gx-gold)}
+.rep-reco-num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:var(--fw-black);font-size:var(--fs-3xl);line-height:1;color:var(--gx-gold);white-space:nowrap}
+.rep-reco-txt{flex:1 1 320px;margin:0;font-size:var(--fs-sm);line-height:var(--lh-relaxed);color:rgba(255,255,255,.92)}
+
+.rep-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-4);margin-bottom:var(--space-6)}
+@media(max-width:640px){.rep-kpis{grid-template-columns:1fr 1fr}}
+.rep-kpi{border:1px solid var(--gx-border);padding:var(--space-4)}
+.rep-kpi.navy{background:var(--gx-primary);border-bottom:var(--border-width-heavy) solid var(--gx-gold);color:#fff}
+.rep-kpi.gold{background:var(--gx-secondary-dark);border-bottom:var(--border-width-heavy) solid var(--gx-primary);color:#fff}
+.rep-kpi .k{font-size:9px;font-weight:var(--fw-bold);letter-spacing:var(--ls-widest);text-transform:uppercase;color:var(--fg2)}
+.rep-kpi.navy .k,.rep-kpi.gold .k{color:rgba(255,255,255,.8)}
+.rep-kpi .v{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-weight:var(--fw-black);font-size:var(--fs-lg);color:var(--gx-primary);margin-top:var(--space-1)}
+.rep-kpi.navy .v,.rep-kpi.gold .v{color:#fff}
+
+.rep-table{width:100%;border-collapse:collapse;font-size:var(--fs-sm);margin-top:var(--space-2)}
+.rep-table th{text-align:left;font-size:var(--fs-xs);font-weight:var(--fw-bold);letter-spacing:var(--ls-wide);text-transform:uppercase;color:var(--fg2);background:var(--bg2);padding:var(--space-2) var(--space-3);border:1px solid var(--gx-border)}
+.rep-table td{padding:var(--space-2) var(--space-3);border:1px solid var(--gx-border)}
+.rep-table td.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right}
+.rep-table tr.hi td{background:rgba(201,169,106,.12);font-weight:var(--fw-bold)}
+.rep-caption{font-size:var(--fs-xs);line-height:var(--lh-normal);color:var(--fg2);margin:var(--space-3) 0 0}
+.rep-caption strong{color:var(--gx-secondary-dark);font-family:var(--font-mono)}
+
+.rep-cta{padding:var(--space-8);background:var(--gx-secondary-dark);color:#fff}
+.rep-cta h3{font-family:var(--font-sans);font-weight:var(--fw-black);font-size:var(--fs-lg);text-transform:uppercase;letter-spacing:var(--ls-tight);margin:0 0 var(--space-4)}
+.rep-bullets{list-style:none;margin:0 0 var(--space-6);padding:0;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+@media(max-width:640px){.rep-bullets{grid-template-columns:1fr}}
+.rep-bullets li{position:relative;padding-left:var(--space-5);font-size:var(--fs-sm);line-height:var(--lh-snug);color:rgba(255,255,255,.92)}
+.rep-bullets li::before{content:"";position:absolute;left:0;top:6px;width:8px;height:8px;background:var(--gx-gold)}
+.rep-btn{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 var(--space-8);background:var(--gx-primary);color:var(--fg-on-primary);font-weight:var(--fw-bold);font-size:var(--fs-sm);letter-spacing:var(--ls-wider);text-transform:uppercase;text-decoration:none;border:0}
+.rep-foot{padding:var(--space-5) var(--space-8);font-size:var(--fs-xs);line-height:var(--lh-normal);color:var(--fg3)}
+
+/* impressão A4 — isola o relatório */
+@media print{
+  body{background:#fff!important}
+  body>*{display:none!important}
+  .example-stage{display:block!important;padding:0}
+  .example-stage>.wrap{padding:0}
+  .rep{max-width:none;border:0;box-shadow:none}
+  .rep-cover,.rep-reco,.rep-cta,.rep-kpi.navy,.rep-kpi.gold{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rep-section,.rep-cta{break-inside:avoid;page-break-inside:avoid}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================ TOPO ============================ -->
+<header class="doc-top">
+  <div class="wrap">
+    <div class="brand">GX<em>·</em>CAPITAL</div>
+    <div class="tag">Briefing de Design · v1</div>
+  </div>
+</header>
+
+<!-- ============================ HERO ============================ -->
+<section class="doc-hero">
+  <div class="mark">GX</div>
+  <div class="wrap">
+    <div class="eyebrow">Instruções para o Claude Code</div>
+    <h1>Relatório de Planejamento <em>Financeiro</em></h1>
+    <p>Como construir um documento de entrega ao cliente com a mesma identidade visual
+       do nosso Simulador de Seguro de Vida — o sistema <strong>GX Nexus</strong>:
+       brutalismo financeiro, azul-marinho profundo + champagne/dourado, cantos retos,
+       sombras sólidas e números em fonte monoespaçada.</p>
+  </div>
+</section>
+
+<!-- ===================== 0 · COMO USAR ===================== -->
+<section class="block">
+  <div class="wrap">
+    <h2><span class="n">00</span> Como usar este documento</h2>
+    <p class="lead">Este arquivo é, ao mesmo tempo, a <strong>especificação visual</strong> e um
+       <strong>exemplo funcional</strong>. A própria página já está pintada no padrão GX Nexus —
+       use-a como termômetro de "está parecido?".</p>
+    <div class="highlights">
+      <div class="hl"><h4>1. Leia os tokens</h4><p>As variáveis em <code>:root</code> são idênticas ao
+         <code>colors_and_type.css</code> do projeto. Elas são a fonte da verdade de cor, tipografia e espaçamento.</p></div>
+      <div class="hl"><h4>2. Siga a anatomia</h4><p>Replique a ordem capa → seções numeradas → caixa de
+         recomendação → KPIs → tabelas → CTA → rodapé, descrita na seção 03.</p></div>
+      <div class="hl"><h4>3. Copie o exemplo</h4><p>O bloco renderizado no fim (<code>.rep</code>) é um
+         relatório pronto. Reaproveite a marcação e troque só o conteúdo.</p></div>
+      <div class="hl"><h4>4. Compare lado a lado</h4><p>O resultado precisa parecer "do mesmo produto" que o
+         relatório do simulador de seguro. Mesma paleta, formas e ritmo.</p></div>
+    </div>
+    <div class="callout">Se estiver construindo <strong>dentro do repositório GX</strong>, não copie o CSS:
+       use <code>&lt;link rel="stylesheet" href="/colors_and_type.css"&gt;</code> e as classes
+       <code>.gx-srs-rp-*</code> já existentes em <code>app/Views/simulators/_seguro_resgatavel_head.php</code>.
+       Fora do repo, mantenha os tokens inline como neste arquivo.</div>
+  </div>
+</section>
+
+<!-- ===================== 1 · DESTAQUES DA APARÊNCIA ===================== -->
+<section class="block">
+  <div class="wrap">
+    <h2><span class="n">01</span> Destaques da aparência</h2>
+    <p class="lead">As assinaturas que tornam o visual reconhecível. Se faltar qualquer uma delas, o
+       relatório "sai do personagem".</p>
+
+    <div class="highlights">
+      <div class="hl"><h4>Paleta navy + dourado</h4><p>Azul-marinho (<code>#0c3163</code> / <code>#000d23</code>)
+         domina as superfícies escuras. Dourado (<code>#c9a96a</code>) é <strong>só acento</strong>: filetes,
+         números de destaque, bordas inferiores. Nunca dourado em grandes áreas.</p></div>
+      <div class="hl"><h4>Cantos 100% retos</h4><p><code>border-radius: 0</code> em tudo — cards, botões,
+         inputs, tags. É o coração do "brutalismo financeiro".</p></div>
+      <div class="hl"><h4>Sombras hard-offset</h4><p>Sombra sólida deslocada, <strong>sem blur</strong>:
+         <code>8px 8px 0 0 rgba(12,49,99,.2)</code>. Nada de sombra difusa de Material Design.</p></div>
+      <div class="hl"><h4>Tipografia em 2 fontes</h4><p><strong>Inter</strong> para texto (pesos 700–900 nos
+         títulos) e <strong>JetBrains Mono</strong> para todo número/valor (<code>tabular-nums</code>).</p></div>
+      <div class="hl"><h4>Títulos UPPERCASE apertados</h4><p>Headlines em caixa alta com
+         <code>letter-spacing:-0.04em</code> (negativo) e <code>line-height</code> ~0.95. Densos e monolíticos.</p></div>
+      <div class="hl"><h4>Labels com tracking largo</h4><p>Eyebrows/labels em UPPERCASE 10–12px com
+         <code>letter-spacing:0.1em</code> e um <strong>filete</strong> (—) dourado/navy antes do texto.</p></div>
+      <div class="hl"><h4>Seções numeradas</h4><p>Cada bloco abre com <code>01 ·</code>, <code>02 ·</code>…
+         em label dourado, criando um índice visual de leitura.</p></div>
+      <div class="hl"><h4>Caixa de recomendação</h4><p>Fundo navy, número-herói grande em mono dourado e
+         <strong>borda inferior dourada de 4px</strong>. É o ponto focal do documento.</p></div>
+      <div class="hl"><h4>KPIs em tiles</h4><p>Cartões com borda fina; variantes navy/gold ganham
+         <code>border-bottom:4px</code> de cor contrastante e valor em mono peso 900.</p></div>
+      <div class="hl"><h4>Tabelas financeiras</h4><p>Cabeçalho UPPERCASE, números em mono alinhados à
+         <strong>direita</strong>, linha de destaque com leve tint dourado (<code>rgba(201,169,106,.12)</code>).</p></div>
+      <div class="hl"><h4>Capa com gradiente</h4><p>Gradiente navy escurecendo da esquerda, logo no topo,
+         título display gigante e bloco "Preparado para" com borda-esquerda dourada.</p></div>
+      <div class="hl"><h4>Muito espaço negativo</h4><p>Espaçamento base 4px, mas usado com generosidade
+         (<code>--space-8</code>/<code>--space-12</code>). Respiro = sofisticação.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 2 · TOKENS ===================== -->
+<section class="block">
+  <div class="wrap">
+    <h2><span class="n">02</span> Tokens (use exatamente estes)</h2>
+
+    <h3>Cores</h3>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#0c3163"></div><div class="meta"><div class="name">Primary</div><div class="hex">#0c3163</div><div class="use">Navy base · superfícies, botões</div></div></div>
+      <div class="sw"><div class="chip" style="background:#000d23"></div><div class="meta"><div class="name">Primary Dark</div><div class="hex">#000d23</div><div class="use">Topo, capa, texto near-black</div></div></div>
+      <div class="sw"><div class="chip" style="background:#c9a96a"></div><div class="meta"><div class="name">Gold</div><div class="hex">#c9a96a</div><div class="use">Acento · filetes, números-herói</div></div></div>
+      <div class="sw"><div class="chip" style="background:#dbc7a2"></div><div class="meta"><div class="name">Champagne</div><div class="hex">#dbc7a2</div><div class="use">Texto sobre navy, eyebrows</div></div></div>
+      <div class="sw"><div class="chip" style="background:#87704a"></div><div class="meta"><div class="name">Gold Dark</div><div class="hex">#87704a</div><div class="use">CTA, labels de seção</div></div></div>
+      <div class="sw"><div class="chip" style="background:#f5f3ee"></div><div class="meta"><div class="name">BG Muted</div><div class="hex">#f5f3ee</div><div class="use">Fundo de página (champagne-tint)</div></div></div>
+      <div class="sw"><div class="chip" style="background:#d3d9e0"></div><div class="meta"><div class="name">Border</div><div class="hex">#d3d9e0</div><div class="use">Bordas de cards e tabelas</div></div></div>
+      <div class="sw"><div class="chip" style="background:#5a6a80"></div><div class="meta"><div class="name">FG Muted</div><div class="hex">#5a6a80</div><div class="use">Texto secundário</div></div></div>
+    </div>
+
+    <h3>Tipografia &amp; espaçamento</h3>
+    <table class="tok">
+      <thead><tr><th>Token</th><th>Valor</th><th>Onde usar</th></tr></thead>
+      <tbody>
+        <tr><td class="k">--font-sans</td><td>Inter</td><td>Texto, títulos, labels</td></tr>
+        <tr><td class="k">--font-mono</td><td>JetBrains Mono</td><td>Todo número, valor R$, KPI, tabela</td></tr>
+        <tr><td class="k">--fw-black</td><td>900</td><td>Headlines e valores de KPI</td></tr>
+        <tr><td class="k">--fw-bold</td><td>700</td><td>Labels, eyebrows, botões</td></tr>
+        <tr><td class="k">--ls-tighter</td><td>-0.04em</td><td>Headlines UPPERCASE</td></tr>
+        <tr><td class="k">--ls-widest</td><td>0.1em</td><td>Eyebrows / labels UPPERCASE</td></tr>
+        <tr><td class="k">--fs-3xl</td><td>48px</td><td>Número-herói da recomendação</td></tr>
+        <tr><td class="k">--radius</td><td>0</td><td>Cantos de TUDO</td></tr>
+        <tr><td class="k">--shadow-elevated</td><td>8px 8px 0 0 rgba(12,49,99,.2)</td><td>Card do relatório</td></tr>
+        <tr><td class="k">--border-width-heavy</td><td>4px</td><td>Borda inferior dourada de destaque</td></tr>
+        <tr><td class="k">--space-8 / --space-12</td><td>32px / 48px</td><td>Padding de seções do relatório</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 3 · ANATOMIA ===================== -->
+<section class="block">
+  <div class="wrap">
+    <h2><span class="n">03</span> Anatomia do relatório</h2>
+    <p class="lead">A ordem e a função de cada bloco. É o mesmo esqueleto do relatório do simulador de seguro
+       (<code>.gx-srs-rp-*</code>), adaptado para planejamento financeiro.</p>
+    <table class="tok">
+      <thead><tr><th>Bloco</th><th>Função</th><th>Assinatura visual</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Capa</td><td>Logo, kicker, título, "Preparado para [cliente] · data"</td><td>Gradiente navy + imagem à direita; meta com borda-esquerda dourada</td></tr>
+        <tr><td class="k">01 · Diagnóstico</td><td>Foto financeira do cliente (renda, patrimônio, perfil)</td><td>Grid 3 colunas de pares rótulo/valor; valores em mono</td></tr>
+        <tr><td class="k">02 · Recomendação</td><td>O número central do plano (patrimônio-alvo, aporte)</td><td>Caixa navy + número-herói dourado + borda inferior 4px</td></tr>
+        <tr><td class="k">03 · Seu plano</td><td>KPIs do plano + tabela de alocação</td><td>4 tiles de KPI (1 navy de destaque) + tabela mono</td></tr>
+        <tr><td class="k">04 · Projeção</td><td>Evolução patrimonial ao longo do tempo</td><td>Tabela por marco/idade; linha-meta destacada com tint dourado</td></tr>
+        <tr><td class="k">05 · Próximos passos</td><td>Chamada para ação / agendamento</td><td>Bloco dourado-escuro + bullets quadrados + botão navy</td></tr>
+        <tr><td class="k">Rodapé</td><td>Disclaimer e identificação</td><td>Texto 10px, cor terciária</td></tr>
+        <tr><td class="k">@media print</td><td>Exportar como PDF/A4</td><td>Isola o card, força cores, evita quebra dentro de seção</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== 4 · REGRAS ===================== -->
+<section class="block">
+  <div class="wrap">
+    <h2><span class="n">04</span> Regras &amp; critérios de aceite</h2>
+    <div class="rules">
+      <div class="do">
+        <div class="col-title">Faça</div>
+        <ul>
+          <li>Usar os tokens do <code>:root</code> / <code>colors_and_type.css</code>.</li>
+          <li>Todo número em <code>--font-mono</code> com <code>tabular-nums</code>.</li>
+          <li>Títulos em UPPERCASE com tracking negativo.</li>
+          <li>Filete dourado/navy antes de eyebrows e labels.</li>
+          <li>Dourado apenas como acento pontual.</li>
+          <li>Incluir o <code>@media print</code> para PDF A4.</li>
+          <li>Manter cantos retos e sombras hard-offset.</li>
+        </ul>
+      </div>
+      <div class="dont">
+        <div class="col-title">Evite</div>
+        <ul>
+          <li>Inventar cores fora da paleta.</li>
+          <li><code>border-radius</code> &gt; 0 em qualquer elemento.</li>
+          <li>Sombras com blur / estilo Material.</li>
+          <li>Gradientes coloridos chamativos (só navy→navy).</li>
+          <li>Fontes diferentes de Inter / JetBrains Mono.</li>
+          <li>Números em fonte sans.</li>
+          <li>Grandes áreas preenchidas de dourado.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><strong>Aceite:</strong> imprima (Ctrl/Cmd+P) e veja se o relatório vira um PDF A4 limpo,
+       com a capa colorida e as seções sem corte. Coloque lado a lado com o relatório do simulador de seguro:
+       deve parecer o <strong>mesmo produto</strong>.</div>
+  </div>
+</section>
+
+<!-- ===================== 5 · EXEMPLO FUNCIONAL ===================== -->
+<section class="block" style="border-bottom:0;padding-bottom:0">
+  <div class="wrap">
+    <h2><span class="n">05</span> Exemplo funcional (copie e adapte)</h2>
+    <p class="lead">Relatório de planejamento financeiro renderizado abaixo com dados fictícios. A marcação
+       usa classes <code>.rep-*</code> que espelham as <code>.gx-srs-rp-*</code> do projeto. Tudo é HTML/CSS
+       puro — sem dependências além das Google Fonts.</p>
+  </div>
+
+  <div class="example-stage">
+    <div class="wrap">
+      <article class="rep">
+
+        <!-- CAPA -->
+        <header class="rep-cover">
+          <div class="rep-cover-inner">
+            <div class="rep-cover-logo">GX<em>·</em>CAPITAL</div>
+            <div class="rep-cover-kicker">Planejamento Financeiro &amp; Patrimonial</div>
+            <h2 class="rep-cover-title">Relatório de<br>Plano Financeiro</h2>
+            <div class="rep-cover-meta">Preparado para <strong>Mariana Albuquerque</strong><span>11 JUN 2026 · CONFIDENCIAL</span></div>
+          </div>
+        </header>
+
+        <!-- 01 · DIAGNÓSTICO -->
+        <section class="rep-section">
+          <div class="rep-label">01 · Seu diagnóstico</div>
+          <div class="rep-grid">
+            <div class="rep-item"><div class="k">Idade</div><div class="v">38 anos</div></div>
+            <div class="rep-item"><div class="k">Renda mensal</div><div class="v">R$ 32.000</div></div>
+            <div class="rep-item"><div class="k">Despesas mensais</div><div class="v">R$ 19.500</div></div>
+            <div class="rep-item"><div class="k">Patrimônio atual</div><div class="v">R$ 740.000</div></div>
+            <div class="rep-item"><div class="k">Capacidade de aporte</div><div class="v">R$ 9.000</div></div>
+            <div class="rep-item"><div class="k">Perfil de risco</div><div class="v txt">Moderado</div></div>
+            <div class="rep-item"><div class="k">Objetivo central</div><div class="v txt">Independência aos 60</div></div>
+            <div class="rep-item"><div class="k">Horizonte</div><div class="v">22 anos</div></div>
+            <div class="rep-item"><div class="k">Reserva de emergência</div><div class="v">R$ 110.000</div></div>
+          </div>
+        </section>
+
+        <!-- 02 · RECOMENDAÇÃO -->
+        <section class="rep-section">
+          <div class="rep-label">02 · Patrimônio-alvo</div>
+          <div class="rep-reco">
+            <div class="rep-reco-num">R$ 4,8 mi</div>
+            <p class="rep-reco-txt">Patrimônio necessário para sustentar uma renda passiva de
+               <strong>R$ 20.000/mês</strong> a partir dos 60 anos, mantendo o padrão de vida e
+               preservando o principal — dimensionado a uma taxa real de 4% a.a.</p>
+          </div>
+        </section>
+
+        <!-- 03 · PLANO -->
+        <section class="rep-section">
+          <div class="rep-label">03 · Seu plano GX</div>
+          <div class="rep-kpis">
+            <div class="rep-kpi navy"><div class="k">Aporte mensal</div><div class="v">R$ 9.000</div></div>
+            <div class="rep-kpi"><div class="k">Retorno-alvo (real)</div><div class="v">4,0% a.a.</div></div>
+            <div class="rep-kpi"><div class="k">Independência em</div><div class="v">2048</div></div>
+            <div class="rep-kpi"><div class="k">Patrimônio projetado</div><div class="v">R$ 5,1 mi</div></div>
+          </div>
+          <table class="rep-table">
+            <thead><tr><th>Classe de ativo</th><th>Alocação</th><th>Valor-alvo</th></tr></thead>
+            <tbody>
+              <tr><td>Renda fixa pós/inflação</td><td class="num">40%</td><td class="num">R$ 1.920.000</td></tr>
+              <tr><td>Ações Brasil / FIIs</td><td class="num">25%</td><td class="num">R$ 1.200.000</td></tr>
+              <tr><td>Exterior (ações/REITs)</td><td class="num">25%</td><td class="num">R$ 1.200.000</td></tr>
+              <tr><td>Alternativos / liquidez</td><td class="num">10%</td><td class="num">R$ 480.000</td></tr>
+              <tr class="hi"><td>Total</td><td class="num">100%</td><td class="num">R$ 4.800.000</td></tr>
+            </tbody>
+          </table>
+          <p class="rep-caption">Alocação estratégica de referência. O rebalanceamento sugerido é
+             <strong>semestral</strong>, respeitando o perfil <b>moderado</b>.</p>
+        </section>
+
+        <!-- 04 · PROJEÇÃO -->
+        <section class="rep-section">
+          <div class="rep-label">04 · Projeção patrimonial</div>
+          <table class="rep-table">
+            <thead><tr><th>Marco</th><th>Idade</th><th>Aportado</th><th>Patrimônio</th></tr></thead>
+            <tbody>
+              <tr><td>Hoje</td><td class="num">38</td><td class="num">—</td><td class="num">R$ 740.000</td></tr>
+              <tr><td>+5 anos</td><td class="num">43</td><td class="num">R$ 540.000</td><td class="num">R$ 1.520.000</td></tr>
+              <tr><td>+10 anos</td><td class="num">48</td><td class="num">R$ 1.080.000</td><td class="num">R$ 2.560.000</td></tr>
+              <tr><td>+15 anos</td><td class="num">53</td><td class="num">R$ 1.620.000</td><td class="num">R$ 3.780.000</td></tr>
+              <tr class="hi"><td>Meta</td><td class="num">60</td><td class="num">R$ 2.376.000</td><td class="num">R$ 5.100.000</td></tr>
+            </tbody>
+          </table>
+          <p class="rep-caption">Projeção determinística a <strong>4% a.a. real</strong>. Cenários de
+             mercado podem alterar o resultado — revise o plano anualmente.</p>
+        </section>
+
+        <!-- 05 · CTA -->
+        <section class="rep-cta">
+          <h3>Próximos passos</h3>
+          <ul class="rep-bullets">
+            <li>Implementar a alocação estratégica recomendada</li>
+            <li>Automatizar o aporte mensal de R$ 9.000</li>
+            <li>Estruturar a blindagem patrimonial e sucessória</li>
+            <li>Revisão de acompanhamento trimestral com a GX</li>
+          </ul>
+          <a class="rep-btn" href="#">Agendar reunião</a>
+        </section>
+
+        <!-- RODAPÉ -->
+        <footer class="rep-foot">
+          GX Capital · Documento gerado para fins de planejamento e não constitui oferta, garantia de
+          rentabilidade ou recomendação personalizada de investimento. Projeções são estimativas baseadas
+          nas premissas informadas. Confidencial — uso exclusivo do destinatário.
+        </footer>
+
+      </article>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
