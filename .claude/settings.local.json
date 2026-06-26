@@ -126,7 +126,12 @@
       "Bash(git fetch *)",
       "Bash(git rev-list *)",
       "Bash(xargs -0 -I{} du -h \"{}\")",
-      "Bash(docker stop *)"
+      "Bash(docker stop *)",
+      "Bash(gh auth *)",
+      "Read(//root/**)",
+      "Bash(unset TOKEN)",
+      "Bash(awk 'NR>=1300 && /<\\\\/style>/{print NR\": \"$0; exit}' app/Views/admin/dashboard/index_analytics.php)",
+      "Bash(sed -n '/\\\\.dashboard-list-row {/,/}/p' app/Views/admin/dashboard/index_analytics.php)"
     ],
     "deny": []
   },
