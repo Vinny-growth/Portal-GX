@@ -788,6 +788,27 @@ class DashboardModel extends BaseModel
 
         $dailyLeads = $this->fillDateSeries($days, $dailyLeads, ['leads' => 0]);
 
+        // --- Leads por origem (de onde vêm os leads dos simuladores) ---
+        $leadsBySourceRows = $this->db->query("
+            SELECT
+                COALESCE(NULLIF(TRIM(origem), ''), 'Direto / não informado') AS origem,
+                COUNT(*) AS total
+            FROM sim_leads
+            WHERE created_at >= ?
+            GROUP BY origem
+            ORDER BY total DESC, origem ASC
+            LIMIT 12
+        ", [$startDatetime])->getResultArray();
+
+        $leadsBySource = [];
+        foreach ($leadsBySourceRows as $row) {
+            $leadsBySource[] = [
+                'origem' => $row['origem'],
+                'count' => (int) $row['total'],
+                'percentage' => $totalLeads > 0 ? round(((int) $row['total'] / $totalLeads) * 100, 1) : 0,
+            ];
+        }
+
         // --- Contact form (contacts) ---
         $totalContacts = (int) $this->db->table('contacts')
             ->where('created_at >=', $startDatetime)
@@ -807,7 +828,7 @@ class DashboardModel extends BaseModel
 
         // --- Recent leads (last 5) ---
         $recentLeads = $this->db->query("
-            SELECT id, name, email, status, created_at
+            SELECT id, name, email, status, origem, created_at
             FROM sim_leads
             WHERE created_at >= ?
             ORDER BY id DESC
@@ -840,6 +861,7 @@ class DashboardModel extends BaseModel
             'converted_leads' => $convertedLeads,
             'conversion_rate' => $totalLeads > 0 ? round(($convertedLeads / $totalLeads) * 100, 2) : 0,
             'funnel' => $funnel,
+            'leads_by_source' => $leadsBySource,
             'daily_leads' => $dailyLeads,
             'daily_contacts' => $dailyContacts,
             'recent_leads' => $recentLeads,

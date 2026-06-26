@@ -97,6 +97,7 @@ $exportLinks = [
     ['label' => 'Posts mais lidos (CSV)', 'url' => adminUrl('dashboard/export-data?type=top_posts&format=csv&days=' . $days)],
     ['label' => 'Categorias (CSV)', 'url' => adminUrl('dashboard/export-data?type=categories&format=csv&days=' . $days)],
     ['label' => 'Conversões (CSV)', 'url' => adminUrl('dashboard/export-data?type=conversions&format=csv&days=' . $days)],
+    ['label' => 'Leads por origem (CSV)', 'url' => adminUrl('dashboard/export-data?type=lead_sources&format=csv&days=' . $days)],
 ];
 if (!empty($ga4Connection['is_ready'])) {
     $exportLinks[] = ['label' => 'GA4 Canais (CSV)', 'url' => adminUrl('dashboard/export-data?type=ga4_channels&format=csv&days=' . $days)];
@@ -707,7 +708,8 @@ if (!empty($ga4Connection['is_ready'])) {
                     <?php break;
 
                 case 'conversions': ?>
-                    <?php $conversions = $conversions ?? ['total_leads' => 0, 'total_contacts' => 0, 'total_conversions' => 0, 'converted_leads' => 0, 'conversion_rate' => 0, 'funnel' => [], 'daily_leads' => [], 'daily_contacts' => [], 'recent_leads' => []]; ?>
+                    <?php $conversions = $conversions ?? ['total_leads' => 0, 'total_contacts' => 0, 'total_conversions' => 0, 'converted_leads' => 0, 'conversion_rate' => 0, 'funnel' => [], 'leads_by_source' => [], 'daily_leads' => [], 'daily_contacts' => [], 'recent_leads' => []]; ?>
+                    <?php $conversions['leads_by_source'] = $conversions['leads_by_source'] ?? []; ?>
                     <div class="box dashboard-widget" id="conversions-widget">
                         <div class="box-header with-border">
                             <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
@@ -800,7 +802,7 @@ if (!empty($ga4Connection['is_ready'])) {
                                             <div class="dashboard-list-row">
                                                 <div>
                                                     <strong><?= esc(characterLimiter($lead->name ?? '', 25, '...')); ?></strong>
-                                                    <small><?= esc(date('d/m H:i', strtotime($lead->created_at))); ?></small>
+                                                    <small><?= esc(date('d/m H:i', strtotime($lead->created_at))); ?><?php if (!empty($lead->origem)): ?> · <?= esc(characterLimiter($lead->origem, 34, '...')); ?><?php endif; ?></small>
                                                 </div>
                                                 <span class="dashboard-badge <?= $statusBadgeClass[$lead->status] ?? 'dashboard-badge-blue'; ?>">
                                                     <?= esc($statusLabel[$lead->status] ?? $lead->status); ?>
@@ -810,6 +812,31 @@ if (!empty($ga4Connection['is_ready'])) {
                                     <?php else: ?>
                                         <div class="dashboard-empty dashboard-empty-inline">
                                             <p>Nenhum lead recente.</p>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-top:20px">
+                                <div class="col-sm-12">
+                                    <h5 style="margin-bottom:12px"><i class="fa fa-compass"></i> Leads por origem <small class="text-muted">— de onde vêm os leads dos simuladores</small></h5>
+                                    <?php if (!empty($conversions['leads_by_source'])): ?>
+                                        <?php $maxSource = max(1, max(array_column($conversions['leads_by_source'], 'count'))); ?>
+                                        <div class="lead-source-list">
+                                            <?php foreach ($conversions['leads_by_source'] as $source): ?>
+                                                <div class="lead-source-row">
+                                                    <div class="lead-source-head">
+                                                        <span class="lead-source-name" title="<?= esc($source['origem']); ?>"><?= esc($source['origem']); ?></span>
+                                                        <span class="lead-source-count"><strong><?= number_format((int) $source['count']); ?></strong> <small><?= number_format((float) $source['percentage'], 1, ',', '.'); ?>%</small></span>
+                                                    </div>
+                                                    <div class="lead-source-track">
+                                                        <div class="lead-source-bar" style="width:<?= round(((int) $source['count'] / $maxSource) * 100); ?>%"></div>
+                                                    </div>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="dashboard-empty dashboard-empty-inline">
+                                            <p>Nenhum lead com origem registrada no período. Novos leads dos simuladores passam a aparecer aqui automaticamente.</p>
                                         </div>
                                     <?php endif; ?>
                                 </div>
@@ -1611,5 +1638,51 @@ document.addEventListener('DOMContentLoaded', function () {
     .dashboard-meta-chips {
         justify-content: flex-start;
     }
+}
+
+.lead-source-list {
+    display: grid;
+    gap: 12px;
+}
+.lead-source-row {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+.lead-source-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+.lead-source-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.lead-source-count {
+    flex: none;
+    font-size: 13px;
+    color: #334155;
+}
+.lead-source-count small {
+    color: #94a3b8;
+    margin-left: 4px;
+}
+.lead-source-track {
+    background: #eef2f7;
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+}
+.lead-source-bar {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #d4a11d, #b8860b);
 }
 </style>

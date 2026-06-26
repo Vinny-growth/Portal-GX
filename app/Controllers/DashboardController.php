@@ -751,6 +751,9 @@ class DashboardController extends BaseAdminController
                     ];
                 }
                 return [$exportRows, 'conversoes'];
+            case 'lead_sources':
+                $sourceData = $this->dashboardModel->getConversionMetrics($days);
+                return [$sourceData['leads_by_source'] ?? [], 'leads_por_origem'];
             case 'ga4_channels':
                 $ga4Payload = $this->getGoogleAnalyticsDashboardPayload($days);
                 if (empty($ga4Payload['snapshot']['success'])) {

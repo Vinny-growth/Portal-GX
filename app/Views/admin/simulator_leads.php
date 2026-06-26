@@ -23,6 +23,7 @@
                             <th><?= trans('name'); ?></th>
                             <th><?= trans('email'); ?></th>
                             <th><?= "Telefone"; ?></th>
+                            <th><?= "Origem"; ?></th>
                             <th><?= "Status"; ?></th>
                             <th><?= trans('date'); ?></th>
                             <th class="max-width-120"><?= trans('options'); ?></th>
@@ -38,6 +39,18 @@
                                     <td><?= esc($item->email); ?></td>
                                     <td><?= esc($item->phone); ?></td>
                                     <td>
+                                        <?php if (!empty($item->origem)): ?>
+                                            <span class="lead-origin-label" title="<?= esc($item->origem); ?>"><?= esc(characterLimiter($item->origem, 38, '...')); ?></span>
+                                            <?php if (!empty($item->utm_source) || !empty($item->utm_medium) || !empty($item->utm_campaign)): ?>
+                                                <small class="lead-origin-utm">
+                                                    <?= esc(implode(' / ', array_filter([$item->utm_source ?? null, $item->utm_medium ?? null, $item->utm_campaign ?? null]))); ?>
+                                                </small>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <span class="lead-json-muted">—</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
                                         <select class="form-control lead-status-select" data-lead-id="<?= $item->id; ?>" onchange="updateLeadStatus(this)">
                                             <option value="new" <?= $item->status == 'new' ? 'selected' : ''; ?>>Novo</option>
                                             <option value="contacted" <?= $item->status == 'contacted' ? 'selected' : ''; ?>>Contatado</option>
@@ -49,7 +62,7 @@
                                     </td>
                                     <td><?= formatDate($item->created_at); ?></td>
                                     <td>
-                                        <?php if (!empty($item->sim_data)): ?>
+                                        <?php if (!empty($item->sim_data) || !empty($item->origem) || !empty($item->observations)): ?>
                                             <button class="btn btn-sm btn-info" onclick="showLeadDetails(<?= $item->id; ?>)"><i class="fa fa-info-circle"></i> Detalhes</button>
                                         <?php endif; ?>
                                         <a href="javascript:void(0)" onclick="deleteItem('Admin/deleteSimulatorLeadPost','<?= $item->id; ?>','<?= clrDQuotes(trans("confirm_delete")); ?>');" class="btn btn-sm btn-danger"><i class="fa fa-trash-o"></i> <?= trans('delete'); ?></a>
@@ -206,46 +219,81 @@
         return html;
     }
 
+    function originItem(label, value) {
+        if (value === null || value === undefined || value === '') {
+            return '';
+        }
+        return '<div class="lead-json-item"><strong>' + escapeHtml(label) + '</strong><div>' + escapeHtml(value) + '</div></div>';
+    }
+
+    function renderOriginSection(lead) {
+        var rows = '';
+        rows += originItem('Origem', lead.origem);
+        rows += originItem('UTM Source', lead.utm_source);
+        rows += originItem('UTM Medium', lead.utm_medium);
+        rows += originItem('UTM Campaign', lead.utm_campaign);
+        rows += originItem('UTM Term', lead.utm_term);
+        rows += originItem('UTM Content', lead.utm_content);
+        rows += originItem('Página de entrada', lead.landing_page);
+        rows += originItem('Referência (referrer)', lead.referrer);
+
+        if (rows === '') {
+            rows = '<div class="lead-json-item"><span class="lead-json-muted">Sem dados de origem registrados para este lead.</span></div>';
+        }
+
+        return '<section class="lead-detail-section">' +
+            '<h4>Origem &amp; Rastreamento</h4>' +
+            '<div class="lead-json-grid">' + rows + '</div>' +
+            '</section>';
+    }
+
     function showLeadDetails(leadId) {
         var leads = <?= json_encode($leads); ?>;
         var lead = leads.find(function(item) {
             return item.id == leadId;
         });
-        
-        if (lead && lead.sim_data) {
+
+        if (!lead) {
+            $('#leadDetailsContent').html('<div class="alert alert-warning">Lead não encontrado.</div>');
+            $('#leadDetailsModal').modal('show');
+            return;
+        }
+
+        var content = '<div class="lead-detail-stack">';
+
+        content += '<section class="lead-detail-section">';
+        content += '<h4>Informações do Contato</h4>';
+        content += '<div class="lead-json-grid">';
+        content += '<div class="lead-json-item"><strong>Nome</strong><div>' + escapeHtml(lead.name || '') + '</div></div>';
+        content += '<div class="lead-json-item"><strong>Email</strong><div>' + escapeHtml(lead.email || '') + '</div></div>';
+        content += '<div class="lead-json-item"><strong>Telefone</strong><div>' + escapeHtml(lead.phone || '') + '</div></div>';
+        content += '<div class="lead-json-item"><strong>Status</strong><div>' + escapeHtml(lead.status || '') + '</div></div>';
+        if (lead.observations) {
+            content += '<div class="lead-json-item"><strong>Observações</strong><div>' + escapeHtml(lead.observations) + '</div></div>';
+        }
+        content += '</div>';
+        content += '</section>';
+
+        content += renderOriginSection(lead);
+
+        if (lead.sim_data) {
+            content += '<section class="lead-detail-section">';
+            content += '<h4>Dados da Simulação</h4>';
             try {
                 var data = JSON.parse(lead.sim_data);
-                var content = '<div class="lead-detail-stack">';
-                content += '<section class="lead-detail-section">';
-                content += '<h4>Informações do Contato</h4>';
-                content += '<div class="lead-json-grid">';
-                content += '<div class="lead-json-item"><strong>Nome</strong><div>' + escapeHtml(lead.name || '') + '</div></div>';
-                content += '<div class="lead-json-item"><strong>Email</strong><div>' + escapeHtml(lead.email || '') + '</div></div>';
-                content += '<div class="lead-json-item"><strong>Telefone</strong><div>' + escapeHtml(lead.phone || '') + '</div></div>';
-                content += '<div class="lead-json-item"><strong>Status</strong><div>' + escapeHtml(lead.status || '') + '</div></div>';
-                if (lead.observations) {
-                    content += '<div class="lead-json-item"><strong>Observações</strong><div>' + escapeHtml(lead.observations) + '</div></div>';
-                }
-                content += '</div>';
-                content += '</section>';
-
-                content += '<section class="lead-detail-section">';
-                content += '<h4>Dados da Simulação</h4>';
                 if (data && data.tipo === 'seguro_resgatavel') {
                     content += renderSeguroDossier(data);
                 } else {
                     content += renderJsonValue(data);
                 }
-                content += '</section>';
-                content += '</div>';
-                $('#leadDetailsContent').html(content);
             } catch (e) {
-                $('#leadDetailsContent').html('<div class="alert alert-danger">Erro ao processar dados da simulação: ' + e.message + '</div>');
+                content += '<div class="alert alert-danger">Erro ao processar dados da simulação: ' + escapeHtml(e.message) + '</div>';
             }
-        } else {
-            $('#leadDetailsContent').html('<div class="alert alert-warning">Nenhum dado de simulação disponível para este lead.</div>');
+            content += '</section>';
         }
-        
+
+        content += '</div>';
+        $('#leadDetailsContent').html(content);
         $('#leadDetailsModal').modal('show');
     }
     
@@ -393,5 +441,19 @@
     }
     .lead-json-muted {
         color: #9ca3af;
+    }
+    .lead-origin-label {
+        display: block;
+        font-weight: 600;
+        font-size: 12px;
+        line-height: 1.3;
+    }
+    .lead-origin-utm {
+        display: block;
+        color: #6b7280;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        margin-top: 2px;
     }
 </style>

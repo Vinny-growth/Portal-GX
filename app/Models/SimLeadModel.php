@@ -17,6 +17,12 @@ class SimLeadModel extends BaseModel
     {
         $email = $data['email'] ?? '';
         $phone = $data['phone'] ?? '';
+
+        // Resolve os dados de origem do lead (origem + utm + landing_page + referrer)
+        // para que fiquem GRAVADOS na tabela e visíveis no painel/dashboard, e não
+        // apenas repassados ao CRM/Meta. Espelha a lógica do CrmLeadClient.
+        $tracking = $this->resolveTracking($data);
+
         $dedupMinutes = (int) (getenv('LEAD_DEDUP_MINUTES') ?: 60);
         if ($dedupMinutes < 1) {
             $dedupMinutes = 60;
@@ -60,6 +66,14 @@ class SimLeadModel extends BaseModel
                 $updateData['observations'] = $data['observations'];
             }
 
+            // Atribuição first-touch: preserva a origem da PRIMEIRA navegação.
+            // Só preenche os campos de tracking se ainda estiverem vazios no lead.
+            foreach ($tracking as $field => $value) {
+                if (!empty($value) && empty($existing->{$field})) {
+                    $updateData[$field] = $value;
+                }
+            }
+
             if (!empty($updateData)) {
                 $updated = (bool) $this->builderSimLeads->where('id', $existing->id)->update($updateData);
                 $this->sendLeadToCrm(array_merge($data, ['external_id' => $existing->id]));
@@ -76,10 +90,18 @@ class SimLeadModel extends BaseModel
             'phone' => $data['phone'],
             'sim_data' => isset($data['sim_data']) ? $data['sim_data'] : NULL,
             'observations' => isset($data['observations']) ? $data['observations'] : NULL,
+            'origem' => $tracking['origem'],
+            'utm_source' => $tracking['utm_source'],
+            'utm_medium' => $tracking['utm_medium'],
+            'utm_campaign' => $tracking['utm_campaign'],
+            'utm_term' => $tracking['utm_term'],
+            'utm_content' => $tracking['utm_content'],
+            'landing_page' => $tracking['landing_page'],
+            'referrer' => $tracking['referrer'],
             'status' => 'new',
             'created_at' => date('Y-m-d H:i:s')
         ];
-        
+
         $result = $this->builderSimLeads->insert($insertData);
 
         // Agendar envio para Meta API e CRM APÓS a resposta HTTP (non-blocking)
@@ -159,6 +181,107 @@ class SimLeadModel extends BaseModel
                 $this->deleteSimLead($id);
             }
         }
+    }
+
+    /**
+     * Normaliza os dados de origem do lead a partir do payload do simulador,
+     * com fallback para os cabeçalhos da requisição (referer / URI / query utm).
+     * Quando nenhuma origem explícita é informada, deriva uma a partir do
+     * caminho da landing page / referrer — para que TODO lead tenha origem.
+     *
+     * @return array{origem:?string,utm_source:?string,utm_medium:?string,utm_campaign:?string,utm_term:?string,utm_content:?string,landing_page:?string,referrer:?string}
+     */
+    private function resolveTracking(array $data): array
+    {
+        $clean = static function ($value): ?string {
+            if ($value === null) {
+                return null;
+            }
+            $value = trim((string) $value);
+            return $value === '' ? null : $value;
+        };
+
+        $referrer    = $clean($data['referrer'] ?? null) ?? $this->getServerValue('HTTP_REFERER');
+        $landingPage = $clean($data['landing_page'] ?? null) ?? $this->getRequestUri();
+        $utmSource   = $clean($data['utm_source'] ?? null) ?? $this->getQueryValue('utm_source');
+        $utmMedium   = $clean($data['utm_medium'] ?? null) ?? $this->getQueryValue('utm_medium');
+        $utmCampaign = $clean($data['utm_campaign'] ?? null) ?? $this->getQueryValue('utm_campaign');
+        $utmTerm     = $clean($data['utm_term'] ?? null) ?? $this->getQueryValue('utm_term');
+        $utmContent  = $clean($data['utm_content'] ?? null) ?? $this->getQueryValue('utm_content');
+
+        // UTMs presentes na querystring do referrer (ex.: clique de anúncio).
+        if (!empty($referrer)) {
+            $query = (string) parse_url($referrer, PHP_URL_QUERY);
+            if ($query !== '') {
+                parse_str($query, $referrerQuery);
+                $utmSource   = $utmSource   ?: ($clean($referrerQuery['utm_source'] ?? null));
+                $utmMedium   = $utmMedium   ?: ($clean($referrerQuery['utm_medium'] ?? null));
+                $utmCampaign = $utmCampaign ?: ($clean($referrerQuery['utm_campaign'] ?? null));
+                $utmTerm     = $utmTerm     ?: ($clean($referrerQuery['utm_term'] ?? null));
+                $utmContent  = $utmContent  ?: ($clean($referrerQuery['utm_content'] ?? null));
+            }
+        }
+
+        $origem = $clean($data['origem'] ?? null)
+            ?? $clean($data['origin'] ?? null)
+            ?? $clean($data['lead_origin'] ?? null);
+
+        // Rede de segurança: simuladores que mandam só "observations" no padrão
+        // "Dados da Simulação <X> GX" passam a ter uma origem legível.
+        if ($origem === null) {
+            $obs = $clean($data['observations'] ?? null);
+            if ($obs !== null && preg_match('/^Dados da Simula[çc][ãa]o (?:de )?(.+?) GX/u', $obs, $mm)) {
+                $origem = 'Simulador de ' . trim($mm[1]);
+            }
+        }
+
+        // Último fallback: deriva do caminho da landing page / referrer.
+        if ($origem === null && !empty($landingPage)) {
+            $path = (string) parse_url($landingPage, PHP_URL_PATH);
+            $origem = 'Site GX Capital - ' . ($path !== '' ? $path : '/');
+        }
+        if ($origem === null && !empty($referrer)) {
+            $path = (string) parse_url($referrer, PHP_URL_PATH);
+            $origem = 'Site GX Capital - ' . ($path !== '' ? $path : '/');
+        }
+
+        return [
+            'origem'       => $origem !== null ? mb_substr($origem, 0, 255) : null,
+            'utm_source'   => $utmSource,
+            'utm_medium'   => $utmMedium,
+            'utm_campaign' => $utmCampaign,
+            'utm_term'     => $utmTerm,
+            'utm_content'  => $utmContent,
+            'landing_page' => $landingPage,
+            'referrer'     => $referrer,
+        ];
+    }
+
+    private function getServerValue(string $key): ?string
+    {
+        if (!is_object($this->request) || !method_exists($this->request, 'getServer')) {
+            return null;
+        }
+        $value = $this->request->getServer($key);
+        return ($value === null || $value === '') ? null : trim((string) $value);
+    }
+
+    private function getRequestUri(): ?string
+    {
+        if (!is_object($this->request) || !method_exists($this->request, 'getUri')) {
+            return null;
+        }
+        $uri = (string) $this->request->getUri();
+        return $uri === '' ? null : $uri;
+    }
+
+    private function getQueryValue(string $key): ?string
+    {
+        if (!is_object($this->request) || !method_exists($this->request, 'getGet')) {
+            return null;
+        }
+        $value = $this->request->getGet($key);
+        return ($value === null || $value === '') ? null : trim((string) $value);
     }
 
     private function sendLeadToCrm(array $data): bool
