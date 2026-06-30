@@ -4,4 +4,22 @@ Disallow: /uploads/tmp/
 Disallow: /tmp/
 Allow: /
 
+# Crawlers de IA / motores generativos — explicitamente permitidos (GEO)
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Claude-Web
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: Bytespider
+Disallow: /admin/
+Disallow: /uploads/tmp/
+Disallow: /tmp/
+Allow: /
+
 Sitemap: https://gx.capital/sitemap.xml

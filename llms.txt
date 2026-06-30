@@ -1,0 +1,30 @@
+# GX Capital
+
+> Boutique financeira digital brasileira, sediada em Porto Alegre/RS. Estrutura e assessora operações de câmbio e trade finance, crédito empresarial, consórcios, seguros e wealth management para empresas e famílias.
+
+Conteúdo informativo — não constitui recomendação de investimento nem oferta de crédito. Consórcio é compra planejada (não é investimento). Operações de crédito estão sujeitas a análise e ao Custo Efetivo Total (CET). Rentabilidade passada não garante resultados futuros.
+
+## Contato
+- Telefone / WhatsApp: +55 51 2042-1991
+- E-mail: contato@gx.capital
+- Site: https://gx.capital
+
+## Verticais
+- [Câmbio e Trade Finance](https://gx.capital/cambio-6): hedge cambial, NDF, ACC, ACE, FINIMP, operações 4131 e fechamento de câmbio para importadores e exportadores.
+- [Crédito Empresarial](https://gx.capital/credito-empresarial): crédito estruturado, capital de giro, antecipação de recebíveis, garantias e linhas BNDES.
+- Consórcios: compra planejada de bens e cartas de crédito.
+- Seguros: seguro de vida resgatável e proteção patrimonial.
+- Wealth Management: gestão de patrimônio e acesso ao mercado de capitais.
+
+## Simuladores
+- [Central de simuladores](https://gx.capital/simuladores)
+- [Risco cambial / FX (câmbio)](https://gx.capital/simuladores/cambio)
+- [Aurum — custo de capital](https://gx.capital/aurum-simulador-de-custo-de-capital)
+- [Mercado de capitais](https://gx.capital/simulador-mercado-de-capitais)
+- [Custo de antecipação de recebíveis](https://gx.capital/simulador-de-custo-de-antecipacao)
+- [Consórcio](https://gx.capital/simulador-consorcio)
+- [Seguro de vida resgatável](https://gx.capital/simulador-seguro-resgatavel)
+- [Linhas de crédito BNDES](https://gx.capital/linhas-credito-bndes)
+
+## Mais
+- [Sitemap](https://gx.capital/sitemap.xml)

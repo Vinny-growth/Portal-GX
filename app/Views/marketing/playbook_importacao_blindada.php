@@ -21,7 +21,6 @@ $homeUrl = $homeUrl ?? langBaseUrl();
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title><?= escMeta($title); ?> — <?= escMeta($baseSettings->site_title); ?></title>
 <meta name="description" content="<?= escMeta($description); ?>">
-<meta name="keywords" content="<?= escMeta($keywords); ?>">
 <meta name="author" content="<?= escMeta($baseSettings->application_name); ?>">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
 <meta name="theme-color" content="#0c3163">
