@@ -849,7 +849,7 @@ class HomeController extends BaseController
      * simulador servidas pelo CMS via page(). Retorna [] para páginas que não são
      * simuladores. Usa título/descrição reais da página (sem inventar conteúdo).
      */
-    private function buildSimulatorPageSchema($page): array
+    private function buildSimulatorPageSchema($page, array $faqItems = []): array
     {
         $slug = (string) ($page->slug ?? '');
         $fallbackDescriptions = [
@@ -874,14 +874,18 @@ class HomeController extends BaseController
             $description = $fallbackDescriptions[$slug];
         }
 
-        return jsonldGraph([
+        $nodes = [
             jsonldSoftwareApplication($url, $name, $description),
             jsonldBreadcrumb([
                 ['name' => 'Início', 'url' => langBaseUrl()],
                 ['name' => 'Simuladores', 'url' => langBaseUrl('simuladores')],
                 ['name' => $name, 'url' => $url],
             ]),
-        ]);
+        ];
+        if (!empty($faqItems)) {
+            $nodes[] = jsonldFaqPage($faqItems, $url . '#faq');
+        }
+        return jsonldGraph($nodes);
     }
 
     private function resolveCategoryUrl($slug, $fallback)
@@ -1050,9 +1054,15 @@ class HomeController extends BaseController
             $data['description'] = $page->description;
             $data['keywords'] = $page->keywords;
             $data['page'] = $page;
-            $simulatorSchema = $this->buildSimulatorPageSchema($page);
+            $seoFaq = new \Config\SeoFaq();
+            $simulatorFaq = $seoFaq->forSlug((string) ($page->slug ?? ''));
+            $simulatorSchema = $this->buildSimulatorPageSchema($page, $simulatorFaq);
             if (!empty($simulatorSchema)) {
                 $data['marketingSchema'] = $simulatorSchema;
+            }
+            if (!empty($simulatorFaq)) {
+                $data['faqItems'] = $simulatorFaq;
+                $data['faqTitle'] = $seoFaq->titleForSlug((string) ($page->slug ?? ''));
             }
             if ($page->page_default_name == 'gallery') {
                 $this->gallery($page, $data);
