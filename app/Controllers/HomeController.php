@@ -844,6 +844,46 @@ class HomeController extends BaseController
         ];
     }
 
+    /**
+     * Schema JSON-LD (SoftwareApplication + BreadcrumbList) para as páginas de
+     * simulador servidas pelo CMS via page(). Retorna [] para páginas que não são
+     * simuladores. Usa título/descrição reais da página (sem inventar conteúdo).
+     */
+    private function buildSimulatorPageSchema($page): array
+    {
+        $slug = (string) ($page->slug ?? '');
+        $fallbackDescriptions = [
+            'aurum-simulador-de-custo-de-capital' => 'Simulador de custo de capital (WACC) para empresas avaliarem o custo médio ponderado de suas fontes de financiamento.',
+            'simulador-mercado-de-capitais'       => 'Simulador de operações de mercado de capitais para estruturação de dívida e captação empresarial.',
+            'simulador-de-custo-de-antecipacao'   => 'Simulador do custo de antecipação de recebíveis: estima deságio, taxa e custo efetivo da operação.',
+            'linhas-credito-bndes'                => 'Simulador de linhas de crédito BNDES para empresas compararem condições e enquadramento.',
+        ];
+        if (!isset($fallbackDescriptions[$slug])) {
+            return [];
+        }
+
+        helper('jsonld');
+
+        $url  = langBaseUrl($slug);
+        $name = trim((string) ($page->title ?? '')) ?: 'Simulador GX Capital';
+
+        $description = trim(strip_tags((string) ($page->description ?? '')));
+        if ($description !== '') {
+            $description = characterLimiter(preg_replace('/\s+/', ' ', $description), 300, '');
+        } else {
+            $description = $fallbackDescriptions[$slug];
+        }
+
+        return jsonldGraph([
+            jsonldSoftwareApplication($url, $name, $description),
+            jsonldBreadcrumb([
+                ['name' => 'Início', 'url' => langBaseUrl()],
+                ['name' => 'Simuladores', 'url' => langBaseUrl('simuladores')],
+                ['name' => $name, 'url' => $url],
+            ]),
+        ]);
+    }
+
     private function resolveCategoryUrl($slug, $fallback)
     {
         $categoryModel = new CategoryModel();
@@ -1010,6 +1050,10 @@ class HomeController extends BaseController
             $data['description'] = $page->description;
             $data['keywords'] = $page->keywords;
             $data['page'] = $page;
+            $simulatorSchema = $this->buildSimulatorPageSchema($page);
+            if (!empty($simulatorSchema)) {
+                $data['marketingSchema'] = $simulatorSchema;
+            }
             if ($page->page_default_name == 'gallery') {
                 $this->gallery($page, $data);
             } elseif ($page->page_default_name == 'contact') {
