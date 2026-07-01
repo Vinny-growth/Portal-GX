@@ -52,10 +52,18 @@ if (document.cookie.indexOf('gx_cookie_consent=accepted') !== -1) {
 <meta name="twitter:title" content="<?= escMeta($post->title); ?>"/>
 <meta name="twitter:description" content="<?= escMeta($description); ?>"/>
 <meta name="twitter:image" content="<?= escMeta($ogImage); ?>"/>
-<?php else: ?>
-<meta property="og:image" content="<?= getLogo(); ?>"/>
-<meta property="og:image:width" content="<?= getLogoSize('width'); ?>"/>
-<meta property="og:image:height" content="<?= getLogoSize('height'); ?>"/>
+<?php else:
+    $nonPostOgImage = getLogo();
+    $nonPostOgW = (int) getLogoSize('width');
+    $nonPostOgH = (int) getLogoSize('height');
+    if (!empty($categoryOgImage)) {
+        $nonPostOgImage = $categoryOgImage;
+        $nonPostOgW = 1536;
+        $nonPostOgH = 1024;
+    } ?>
+<meta property="og:image" content="<?= escMeta($nonPostOgImage); ?>"/>
+<meta property="og:image:width" content="<?= $nonPostOgW; ?>"/>
+<meta property="og:image:height" content="<?= $nonPostOgH; ?>"/>
 <meta property="og:type" content="website"/>
 <meta property="og:title" content="<?= escMeta($title); ?> - <?= escMeta($baseSettings->site_title); ?>"/>
 <meta property="og:description" content="<?= escMeta($description); ?>"/>
@@ -65,6 +73,7 @@ if (document.cookie.indexOf('gx_cookie_consent=accepted') !== -1) {
 <meta name="twitter:site" content="@<?= escMeta($baseSettings->application_name); ?>"/>
 <meta name="twitter:title" content="<?= escMeta($title); ?> - <?= escMeta($baseSettings->site_title); ?>"/>
 <meta name="twitter:description" content="<?= escMeta($description); ?>"/>
+<meta name="twitter:image" content="<?= escMeta($nonPostOgImage); ?>"/>
 <?php endif;
 if ($generalSettings->pwa_status == 1): ?>
 <meta name="mobile-web-app-capable" content="yes">

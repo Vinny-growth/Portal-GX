@@ -1189,6 +1189,13 @@ class HomeController extends BaseController
             $data['keywords'] = $category->keywords;
             $data['category'] = $category;
 
+            // og:image própria por categoria (Fase 5): usa a imagem gerada se existir,
+            // senão o header cai no logo. Ver command seo:gen-category-og.
+            $catOgRel = 'uploads/marketing/og/og_cat_' . (int) $category->id . '.webp';
+            if (is_file(FCPATH . $catOgRel)) {
+                $data['categoryOgImage'] = base_url($catOgRel);
+            }
+
             // FAQ das páginas-pilar (Fase 2 GEO): acordeão visível + schema FAQPage
             // alimentados pela MESMA fonte (Config\SeoFaq). Só emite quando há itens.
             $seoFaq = new \Config\SeoFaq();
