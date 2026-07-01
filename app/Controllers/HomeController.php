@@ -1179,6 +1179,19 @@ class HomeController extends BaseController
             $data['keywords'] = $category->keywords;
             $data['category'] = $category;
 
+            // FAQ das páginas-pilar (Fase 2 GEO): acordeão visível + schema FAQPage
+            // alimentados pela MESMA fonte (Config\SeoFaq). Só emite quando há itens.
+            $seoFaq = new \Config\SeoFaq();
+            $faqItems = $seoFaq->forCategoryId((int) $category->id);
+            if (!empty($faqItems)) {
+                helper('jsonld');
+                $data['faqItems'] = $faqItems;
+                $data['faqTitle'] = $seoFaq->titleForCategoryId((int) $category->id);
+                $data['marketingSchema'] = jsonldGraph([
+                    jsonldFaqPage($faqItems, generateCategoryURL($category) . '#faq'),
+                ]);
+            }
+
             $categoryTree = getCategoryTree($category->id, $this->categories);
             $numRows = $this->postModel->getPostCountByCategory($category->id, $categoryTree);
             $data['pager'] = paginate($this->postsPerPage, $numRows);

@@ -43,5 +43,12 @@
                 <?= loadView('partials/_sidebar'); ?>
             </div>
         </div>
+        <?php if (!empty($faqItems)): ?>
+        <div class="row">
+            <div class="col-12">
+                <?= view('common/_faq_section', ['faqItems' => $faqItems, 'faqTitle' => ($faqTitle ?? 'Perguntas frequentes'), 'faqEyebrow' => 'FAQ']) ?>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 </section>
