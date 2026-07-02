@@ -75,6 +75,14 @@ class SitemapModel extends BaseModel
     //add public CMS page urls
     private function addPageURLs()
     {
+        // Slugs que respondem 301 (rotas de redirect legadas) NÃO devem entrar no
+        // sitemap, mesmo existindo como CMS page — Google penaliza "redirect no sitemap".
+        // Fonte única: HomeController::LEGACY_SIMULATOR_REDIRECTS (Fase 6) + slugs FX legados.
+        $redirectSlugs = array_merge(
+            array_keys(\App\Controllers\HomeController::LEGACY_SIMULATOR_REDIRECTS),
+            ['simuladores-cambio', 'simulador-de-risco-cambial', 'fx-loan']
+        );
+
         $pages = $this->db->table('pages')
             ->select('pages.slug, pages.lang_id, pages.created_at, languages.short_form AS lang_short_form')
             ->join('languages', 'languages.id = pages.lang_id')
@@ -84,6 +92,7 @@ class SitemapModel extends BaseModel
             ->where('pages.page_type', 'page')
             ->where('pages.slug IS NOT NULL')
             ->where('pages.slug !=', '')
+            ->whereNotIn('pages.slug', $redirectSlugs)
             ->orderBy('pages.id DESC')
             ->get()
             ->getResult();
