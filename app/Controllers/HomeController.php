@@ -299,6 +299,33 @@ class HomeController extends BaseController
     }
 
     /**
+     * Slugs de simulador legados/quebrados -> 301 para o slug canônico (Fase 6 GEO/SEO).
+     * Registrado como rotas GET em Config\Routes (NÃO via addRedirect): o addRedirect
+     * grava no verbo `*`, mas getRoutes() coloca as rotas do verbo GET antes das `*`,
+     * então o catch-all `(:any)` -> HomeController::any casaria primeiro e devolveria 404.
+     */
+    public const LEGACY_SIMULATOR_REDIRECTS = [
+        'simulador-risco-cambial-fx-loan-4131' => 'simuladores/cambio',
+        'simulador-risco-cambial'              => 'simuladores/cambio',
+        'simulador-fx-loan-4131'               => 'simuladores/cambio',
+        'fx-loan-4131'                         => 'simuladores/cambio',
+        'simulador-aurum-custo-de-capital'     => 'aurum-simulador-de-custo-de-capital',
+        'simulador-custo-de-capital'           => 'aurum-simulador-de-custo-de-capital',
+        'simulador-credito-empresarial'        => 'aurum-simulador-de-custo-de-capital',
+        'simulador-antecipacao-fidc'           => 'simulador-de-custo-de-antecipacao',
+        'simulador-bndes'                      => 'linhas-credito-bndes',
+    ];
+
+    public function legacyRedirect()
+    {
+        $segments = explode('/', trim(uri_string(), '/'));
+        $slug     = end($segments);
+        $target   = self::LEGACY_SIMULATOR_REDIRECTS[$slug] ?? 'simuladores';
+
+        return redirect()->to(langBaseUrl($target), 301);
+    }
+
+    /**
      * Playbook (ebook interativo) — Importação Blindada · 2026
      * Landing dedicada para tráfego pago capturando leads de importadores/exportadores.
      */

@@ -18,6 +18,13 @@ $routes->get('simuladores/cambio', 'HomeController::simulatorsFxHub');
 $routes->get('simuladores-cambio', 'HomeController::simulatorsFxLegacyRedirect');
 $routes->get('simulador-de-risco-cambial', 'HomeController::simulatorsFxLegacyRedirect');
 $routes->get('fx-loan', 'HomeController::simulatorsFxLegacyRedirect');
+// Slugs de simulador legados/quebrados -> 301 para o slug canônico (Fase 6 GEO/SEO).
+// Precisam ser rotas GET (não addRedirect): getRoutes() casa o verbo GET antes do
+// wildcard `*`, então o catch-all `(:any)` -> HomeController::any interceptaria o
+// addRedirect e devolveria 404. Mapa: HomeController::LEGACY_SIMULATOR_REDIRECTS.
+foreach (array_keys(\App\Controllers\HomeController::LEGACY_SIMULATOR_REDIRECTS) as $legacySlug) {
+    $routes->get($legacySlug, 'HomeController::legacyRedirect');
+}
 $routes->get('cron/update-feeds', 'CronController::checkFeedPosts');
 $routes->get('cron/update-sitemap', 'CronController::updateSitemap');
 $routes->get('unsubscribe', 'AuthController::unsubscribe');
