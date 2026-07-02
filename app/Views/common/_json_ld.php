@@ -16,6 +16,7 @@ $personSchema = [
     "@type" => "Person",
     "@id" => base_url() . '/#person-vinicius-teixeira',
     "name" => "Vinicius Teixeira",
+    "url" => base_url('profile/vinicius-teixeira'),
     "jobTitle" => "CEO & Founder",
     "worksFor" => ["@id" => base_url() . '/#organization'],
     "knowsAbout" => [

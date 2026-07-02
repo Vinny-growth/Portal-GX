@@ -45,9 +45,70 @@ class ProfileController extends BaseController
         $data['followers'] = $this->profileModel->getFollowers($data['user']->id);
         $data['headerNoMargin'] = true;
 
+        // E-E-A-T (YMYL): ProfilePage + Person(autor) + Breadcrumb em JSON-LD.
+        // Compartilhado via view() -> renderizado por common/_json_ld no footer.
+        $data['marketingSchema'] = $this->buildAuthorProfileSchema($data['user']);
+
         echo loadView('partials/_header', $data);
         echo loadView('profile/profile', $data);
         echo loadView('partials/_footer');
+    }
+
+    /**
+     * JSON-LD da página de autor (Fase 3 GEO/SEO). O @id do Person usa o slug,
+     * então para vinicius-teixeira reconcilia com o Person site-wide de
+     * common/_json_ld.php (mesmo @id = mesmo nó, mesclado pelos buscadores/LLMs).
+     */
+    private function buildAuthorProfileSchema($user): array
+    {
+        helper('jsonld');
+
+        $authorUrl = base_url('profile/' . $user->slug);
+        $personId  = base_url() . '/#person-' . $user->slug;
+
+        $person = [
+            '@type'            => 'Person',
+            '@id'              => $personId,
+            'name'             => $user->username,
+            'url'              => $authorUrl,
+            'mainEntityOfPage' => $authorUrl,
+            'worksFor'         => ['@id' => base_url() . '/#organization'],
+        ];
+
+        if (!empty($user->about_me)) {
+            $bio = trim(preg_replace('/\s+/', ' ', strip_tags($user->about_me)));
+            if ($bio !== '') {
+                $person['description'] = mb_substr($bio, 0, 500);
+            }
+        }
+        if (!empty($user->avatar)) {
+            $person['image'] = base_url($user->avatar);
+        }
+
+        // Fundador (id 1): sinais de expertise iguais aos do schema site-wide,
+        // repetidos aqui para o grafo da página de autor ser autossuficiente.
+        if ((int) $user->id === 1) {
+            $person['jobTitle']   = 'CEO & Founder';
+            $person['knowsAbout'] = [
+                'Câmbio estruturado', 'Hedge cambial', 'Crédito corporativo',
+                'Trade finance', 'Wealth advisory', 'Mercado de capitais',
+            ];
+        }
+
+        $profilePage = [
+            '@type'      => 'ProfilePage',
+            '@id'        => $authorUrl . '#profilepage',
+            'url'        => $authorUrl,
+            'name'       => $user->username,
+            'mainEntity' => ['@id' => $personId],
+        ];
+
+        $breadcrumb = jsonldBreadcrumb([
+            ['name' => 'Início',        'url' => base_url()],
+            ['name' => $user->username, 'url' => $authorUrl],
+        ]);
+
+        return jsonldGraph([$profilePage, $person, $breadcrumb]);
     }
 
     /**
