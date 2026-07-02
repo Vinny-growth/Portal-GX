@@ -32,6 +32,9 @@ if (document.cookie.indexOf('gx_cookie_consent=accepted') !== -1) {
 <?= csrf_meta(); ?>
 
 <?php if (isset($postType)): ?>
+<?php if (!empty($post->image_id) || !empty($post->image_url)): ?>
+<link rel="preload" as="image" href="<?= esc(getPostImage($post, 'default')); ?>" fetchpriority="high"/>
+<?php endif; ?>
 <meta property="og:type" content="<?= escMeta($ogType); ?>"/>
 <meta property="og:title" content="<?= escMeta($ogTitle); ?>"/>
 <meta property="og:description" content="<?= escMeta($description); ?>"/>

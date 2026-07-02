@@ -5,7 +5,7 @@
             <div class="show-on-page-load">
                 <div id="post-detail-slider" class="post-detail-slider">
                     <div class="post-detail-slider-item">
-                        <img src="<?= getPostImage($post, 'default'); ?>" class="img-fluid center-image" alt="<?= esc($coverAlt); ?>"  width="856" height="570"/>
+                        <img src="<?= getPostImage($post, 'default'); ?>" class="img-fluid center-image" alt="<?= esc($coverAlt); ?>" width="856" height="570" fetchpriority="high"/>
                         <?php if (!empty($post->image_description)): ?>
                             <figcaption class="img-description"><?= esc($post->image_description); ?></figcaption>
                         <?php endif; ?>
@@ -24,7 +24,7 @@
             </div>
         <?php else:
             if (!empty($post->image_id) || !empty($post->image_url)):?>
-                <img src="<?= getPostImage($post, 'default'); ?>" class="img-fluid center-image" alt="<?= esc($coverAlt); ?>" width="856" height="570"/>
+                <img src="<?= getPostImage($post, 'default'); ?>" class="img-fluid center-image" alt="<?= esc($coverAlt); ?>" width="856" height="570" fetchpriority="high"/>
                 <?php if (!empty($post->image_description)): ?>
                     <figcaption class="img-description"><?= esc($post->image_description); ?></figcaption>
                 <?php endif; ?>
