@@ -35,6 +35,7 @@ class Filters extends BaseFilters
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
         'auth'          => \App\Filters\Auth::class,
+        'hsts'          => \App\Filters\Hsts::class,
     ];
 
     /**
@@ -83,6 +84,7 @@ class Filters extends BaseFilters
         'after' => [
             // 'honeypot',
             // 'secureheaders',
+            'hsts', // Strict-Transport-Security (o add_header do nginx não emitia)
         ],
     ];
 
