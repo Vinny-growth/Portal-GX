@@ -22,6 +22,7 @@ class Globals extends BaseConfig
     public static $authCheck = false;
     public static $authUser = null;
     public static $darkMode = 0;
+    public static $brand = null;
 
     public static function setGlobals()
     {
@@ -70,6 +71,8 @@ class Globals extends BaseConfig
         }
         //set settings
         self::$settings = self::getSettings(self::$activeLang->id);
+        //set brand (white-label) — guarded: fica null se a tabela ainda não existir
+        self::$brand = self::getBrand();
         //authentication
         if (!empty($session->get('vr_ses_id')) && !empty($session->get('vr_ses_key'))) {
             $user = self::$db->table('users')->select('users.*, roles.role_name AS role_name_data, permissions, is_super_admin')
@@ -188,6 +191,17 @@ class Globals extends BaseConfig
     {
         return getOrSetStaticCache('settings_lang_' . $langId, function () use ($langId) {
             return self::$db->table('settings')->where('lang_id', $langId)->get()->getRow();
+        });
+    }
+
+    //get brand settings (white-label). Retorna null se a tabela não existir (installs pré-Fase 0).
+    private static function getBrand()
+    {
+        return getOrSetStaticCache('brand_settings', function () {
+            if (!self::$db->tableExists('brand_settings')) {
+                return null;
+            }
+            return self::$db->table('brand_settings')->where('id', 1)->get()->getRow();
         });
     }
 

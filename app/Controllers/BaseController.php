@@ -139,7 +139,7 @@ abstract class BaseController extends Controller
         //view variables
         $view = \Config\Services::renderer();
         $view->setData(['assetsPath' => 'assets/' . getThemePath(), 'activeTheme' => $this->activeTheme, 'activeLang' => $this->activeLang, 'generalSettings' => $this->generalSettings, 'baseSettings' => $this->settings, 'activeLanguages' => $this->activeLanguages, 'rtl' => $this->rtl,
-            'darkMode' => $this->darkMode, 'activeFonts' => $this->activeFonts, 'baseMenuLinks' => $this->menuLinks, 'baseWidgets' => $this->widgets, 'baseCategories' => $this->categories, 'basePostsSelected' => $this->postsSelected, 'baseLatestCategoryPosts' => $this->latestCategoryPosts, 'adSpaces' => $this->adSpaces]);
+            'darkMode' => $this->darkMode, 'activeFonts' => $this->activeFonts, 'baseMenuLinks' => $this->menuLinks, 'baseWidgets' => $this->widgets, 'baseCategories' => $this->categories, 'basePostsSelected' => $this->postsSelected, 'baseLatestCategoryPosts' => $this->latestCategoryPosts, 'adSpaces' => $this->adSpaces, 'brand' => Globals::$brand, 'moduleMenuItems' => service('moduleRegistry')->menuItems()]);
     }
 
     //get fonts

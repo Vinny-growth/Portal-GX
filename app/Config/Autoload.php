@@ -41,6 +41,9 @@ class Autoload extends AutoloadConfig
      */
     public $psr4 = [
         APP_NAMESPACE => APPPATH,
+        // Módulos white-label (Fase 0). Cada módulo registra seu namespace para que o
+        // CI4 auto-descubra seu Config/Routes.php. A Fase 3 automatiza este registro.
+        'Modules\\Hello' => ROOTPATH . 'modules/Hello',
     ];
 
     /**
@@ -82,6 +85,7 @@ class Autoload extends AutoloadConfig
     public $files = [
         APPPATH . 'Helpers/deferred_helper.php',
         APPPATH . 'Helpers/meta_conversions_helper.php',
+        APPPATH . 'Helpers/brand_helper.php',
     ];
 
     /**
