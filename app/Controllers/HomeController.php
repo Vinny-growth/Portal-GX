@@ -1223,17 +1223,13 @@ class HomeController extends BaseController
                 $data['categoryOgImage'] = base_url($catOgRel);
             }
 
-            // FAQ das páginas-pilar (Fase 2 GEO): acordeão visível + schema FAQPage
-            // alimentados pela MESMA fonte (Config\SeoFaq). Só emite quando há itens.
+            // FAQ das páginas-pilar (Fase 2 GEO): acordeão visível alimentado pela
+            // MESMA fonte (Config\SeoFaq) usada no schema abaixo. Só quando há itens.
             $seoFaq = new \Config\SeoFaq();
             $faqItems = $seoFaq->forCategoryId((int) $category->id);
             if (!empty($faqItems)) {
-                helper('jsonld');
                 $data['faqItems'] = $faqItems;
                 $data['faqTitle'] = $seoFaq->titleForCategoryId((int) $category->id);
-                $data['marketingSchema'] = jsonldGraph([
-                    jsonldFaqPage($faqItems, generateCategoryURL($category) . '#faq'),
-                ]);
             }
 
             $categoryTree = getCategoryTree($category->id, $this->categories);
@@ -1244,10 +1240,72 @@ class HomeController extends BaseController
                 $data['posts'] = $this->postModel->getPostsByCategoryPaginated($category->id, $categoryTree, $this->postsPerPage, $data['pager']->offset);
             }
 
+            // Página-pilar como hub temático (Fase 7 GEO): CollectionPage + ItemList
+            // do cluster de artigos da página atual (+ FAQPage quando houver).
+            // Explicita a estrutura hub->cluster p/ buscadores/LLMs e consolida tópico.
+            $data['marketingSchema'] = $this->buildCategoryHubSchema($category, $data['posts'], $faqItems);
+
             echo loadView('partials/_header', $data);
             echo loadView('category', $data);
             echo loadView('partials/_footer');
         }
+    }
+
+    /**
+     * Schema de hub da página-pilar (Fase 7 GEO): CollectionPage declarando a
+     * categoria como hub temático, com ItemList do cluster de artigos da página
+     * atual, e FAQPage quando houver. Segue o padrão de buildSimulatorPageSchema.
+     */
+    private function buildCategoryHubSchema($category, array $posts, array $faqItems = []): array
+    {
+        helper('jsonld');
+
+        $url = generateCategoryURL($category);
+
+        $collectionPage = [
+            '@type'     => 'CollectionPage',
+            '@id'       => $url . '#collectionpage',
+            'url'       => $url,
+            'name'      => $category->name,
+            'isPartOf'  => ['@id' => base_url() . '/#website'],
+            'publisher' => ['@id' => base_url() . '/#organization'],
+            'about'     => ['@type' => 'Thing', 'name' => $category->name],
+        ];
+
+        if (!empty($category->description)) {
+            $desc = trim(preg_replace('/\s+/', ' ', strip_tags($category->description)));
+            if ($desc !== '') {
+                $collectionPage['description'] = characterLimiter($desc, 300, '');
+            }
+        }
+
+        $elements = [];
+        $position = 1;
+        foreach ($posts as $post) {
+            if (empty($post->title)) {
+                continue;
+            }
+            $elements[] = [
+                '@type'    => 'ListItem',
+                'position' => $position++,
+                'url'      => generatePostURL($post),
+                'name'     => trim(preg_replace('/\s+/', ' ', strip_tags($post->title))),
+            ];
+        }
+        if (!empty($elements)) {
+            $collectionPage['mainEntity'] = [
+                '@type'           => 'ItemList',
+                'numberOfItems'   => count($elements),
+                'itemListElement' => $elements,
+            ];
+        }
+
+        $nodes = [$collectionPage];
+        if (!empty($faqItems)) {
+            $nodes[] = jsonldFaqPage($faqItems, $url . '#faq');
+        }
+
+        return jsonldGraph($nodes);
     }
 
     /**

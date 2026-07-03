@@ -48,6 +48,34 @@ class SeoFaq extends BaseConfig
             ],
         ],
 
+        // 7 = Radar Econômico (economia)
+        7 => [
+            [
+                'q' => 'O que é a taxa Selic e como ela afeta o crédito da minha empresa?',
+                'a' => 'A Selic é a taxa básica de juros da economia brasileira, definida pelo Copom (Comitê de Política Monetária do Banco Central). Ela é a principal referência para o custo do crédito: quando sobe, tende a encarecer as linhas de capital de giro e de investimento; quando cai, o crédito costuma ficar mais barato. Acompanhar a trajetória da Selic ajuda a empresa a decidir o momento e o formato de uma captação, sempre observando o CET da operação.',
+            ],
+            [
+                'q' => 'O que é o Copom e por que suas decisões importam para as empresas?',
+                'a' => 'O Copom é o Comitê de Política Monetária do Banco Central, que se reúne periodicamente para definir a taxa Selic. Suas decisões e comunicados sinalizam a direção dos juros, o que influencia o custo do crédito, o câmbio e o planejamento de caixa. Empresas que acompanham o Copom conseguem antecipar cenários de custo de dívida e de exposição cambial com mais antecedência.',
+            ],
+            [
+                'q' => 'Como a inflação (IPCA) impacta as decisões financeiras da empresa?',
+                'a' => 'O IPCA é o índice oficial de inflação do Brasil, medido pelo IBGE. Ele afeta contratos indexados, o poder de compra e, indiretamente, a taxa de juros — já que a política monetária reage à inflação. Inflação mais alta tende a pressionar custos e o custo do crédito; entender o IPCA ajuda no reajuste de contratos e no planejamento financeiro da empresa.',
+            ],
+            [
+                'q' => 'Qual a relação entre câmbio, juros e inflação?',
+                'a' => 'São variáveis conectadas. Juros mais altos tendem a atrair capital e podem valorizar o real; um real mais fraco encarece importações e pressiona a inflação; e a inflação, por sua vez, influencia a decisão de juros. Para uma empresa com exposição em moeda estrangeira, acompanhar esse tripé é essencial para escolher o momento de proteger o câmbio ou de captar recursos.',
+            ],
+            [
+                'q' => 'Quais indicadores econômicos uma empresa deve acompanhar?',
+                'a' => 'Entre os principais estão a Selic e as decisões do Copom, o IPCA (inflação), o PIB (atividade econômica), a taxa de câmbio e o resultado fiscal. Juntos, eles ajudam a antecipar o custo do crédito, a exposição cambial e o ambiente de negócios. O conteúdo do Radar Econômico da GX Capital acompanha esses indicadores com foco em decisões corporativas de câmbio e crédito.',
+            ],
+            [
+                'q' => 'As análises do Radar Econômico são recomendação de investimento?',
+                'a' => 'Não. O Radar Econômico traz análises informativas sobre a conjuntura econômica para apoiar decisões de câmbio e crédito das empresas. Não constitui recomendação de investimento, previsão garantida nem oferta; cada operação deve passar por análise dedicada às condições da empresa.',
+            ],
+        ],
+
         // 8 = Crédito Empresarial
         8 => [
             [
@@ -140,6 +168,7 @@ class SeoFaq extends BaseConfig
     /** Título da seção de FAQ por categoria (usado no H2 visível). */
     public array $titleByCategoryId = [
         6 => 'Câmbio e hedge: perguntas frequentes',
+        7 => 'Radar econômico: perguntas frequentes',
         8 => 'Crédito empresarial: perguntas frequentes',
     ];
 
