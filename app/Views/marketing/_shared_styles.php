@@ -1,5 +1,9 @@
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* Design system GX (Nexus): Inter para tudo, JetBrains Mono só para números.
+   As serifas (Instrument/Fraunces) foram removidas — nenhum token as usava.
+   Inter é local (@font-face abaixo + preload no _home_head). O CSS do Google Fonts
+   (JetBrains Mono + pesos extras de Inter) é carregado de forma NÃO render-blocking
+   no _home_head (Fase 4 perf) — por isso o @import foi removido daqui. */
 
 @font-face {
     font-family: "Inter";
