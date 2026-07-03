@@ -11,6 +11,13 @@ $languages = Globals::$languages;
 $generalSettings = Globals::$generalSettings;
 $customRoutes = Globals::$customRoutes;
 
+// ── White-label: rotas de módulos habilitados ──────────────────────────────────
+// Carregadas AQUI (topo) para terem PRIORIDADE sobre o catch-all (:any) da CMS mais
+// abaixo. ModuleRegistry é defensivo (nunca lança), então isto é seguro em produção.
+foreach (service('moduleRegistry')->enabledRouteFiles() as $__moduleRoutesFile) {
+    require $__moduleRoutesFile;
+}
+
 $routes->get('/', 'HomeController::index');
 $routes->get('blog', 'HomeController::blog');
 $routes->get('simuladores', 'HomeController::simulatorsHub');

@@ -29,4 +29,16 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+
+    /**
+     * Registro de módulos white-label (Fase 0). Uso: service('moduleRegistry').
+     */
+    public static function moduleRegistry($getShared = true)
+    {
+        if ($getShared) {
+            return static::getSharedInstance('moduleRegistry');
+        }
+
+        return new \App\Libraries\ModuleRegistry();
+    }
 }
