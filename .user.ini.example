@@ -1,0 +1,11 @@
+; EXEMPLO de .user.ini — copie para `.user.ini` por INSTALL e ajuste o caminho.
+;
+; open_basedir restringe o acesso do PHP ao filesystem. O valor é um caminho
+; ABSOLUTO e NÃO aceita variáveis/relativos — por isso é por install.
+; Substitua __DOCROOT__ pelo caminho absoluto da raiz do projeto neste servidor
+; (ex.: /var/www/suamarca ou /www/wwwroot/suamarca.com).
+;
+; Alternativa recomendada: em vez deste arquivo, definir open_basedir no pool
+; do PHP-FPM do site. Se o servidor não usar open_basedir, este arquivo pode
+; ser omitido.
+open_basedir=__DOCROOT__/:/tmp/
