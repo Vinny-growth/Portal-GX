@@ -91,6 +91,9 @@ abstract class BaseController extends Controller
         //general settings
         $this->generalSettings = Globals::$generalSettings;
 
+        //i18n white-label: locale da camada de marketing/módulos = idioma do install
+        service('language')->setLocale(brandLocale());
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             setActiveLangPostRequest();
         }

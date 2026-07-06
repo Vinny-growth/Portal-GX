@@ -44,6 +44,19 @@ if (!function_exists('brandPressMentions')) {
     }
 }
 
+if (!function_exists('brandLocale')) {
+    /**
+     * Locale curto do install (subtag primária de brand('locale')).
+     * Ex.: 'pt-BR' -> 'pt', 'es-MX' -> 'es'. Default 'pt' (GX).
+     * Usado para resolver os arquivos de idioma da camada de marketing via lang().
+     */
+    function brandLocale(): string
+    {
+        $primary = explode('-', (string) brand('locale', 'pt-BR'))[0];
+        return $primary !== '' ? strtolower($primary) : 'pt';
+    }
+}
+
 if (!function_exists('brandCssVars')) {
     /**
      * Bloco <style> com CSS custom properties da marca, para injetar no <head>.
