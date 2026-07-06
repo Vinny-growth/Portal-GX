@@ -326,6 +326,36 @@ class HomeController extends BaseController
     }
 
     /**
+     * Conteúdo duplicado detectado no site audit (Ubersuggest) -> 301 do duplicado
+     * para o canônico, consolidando sinais de ranking. Dois casos:
+     *  - 6 pares de POSTS gêmeos: ao colidir o slug, o CMS anexou o ID do post; o ID
+     *    menor é o original (mais antigo/mais pageviews), o sufixo -<id> é o clone.
+     *  - 1 canibalização de "spread bancário": consolida no artigo mais completo
+     *    (id 177, 3x conteúdo, rankeia os head terms) o mais fraco (id 78).
+     * Os slugs de origem também recebem visibility=0 (saem do sitemap/listagens, para
+     * não deixar URL que 301 no sitemap — ver Fase 3). Mesmo padrão de rota GET da
+     * Fase 6 (ver LEGACY_SIMULATOR_REDIRECTS) porque addRedirect é anulado pelo catch-all.
+     */
+    public const DUPLICATE_CONTENT_REDIRECTS = [
+        'china-turbina-compras-de-petroleo-do-ira-e-russia-o-que-isso-muda-para-o-brasil-20'              => 'china-turbina-compras-de-petroleo-do-ira-e-russia-o-que-isso-muda-para-o-brasil',
+        'dolar-forte-real-fraco-termos-de-troca-explicam-2026-guia-pratico-252'                           => 'dolar-forte-real-fraco-termos-de-troca-explicam-2026-guia-pratico',
+        'gx-explica-trade-finance-cartas-de-credito-accace-e-sblc-para-impulsionar-comercio-exterior-67'  => 'gx-explica-trade-finance-cartas-de-credito-accace-e-sblc-para-impulsionar-comercio-exterior',
+        'gx-insights-guia-definitivo-do-consorcio-empresarial-86'                                         => 'gx-insights-guia-definitivo-do-consorcio-empresarial',
+        'itau-preve-desaceleracao-do-credito-o-que-isso-significa-para-sua-empresa-38'                    => 'itau-preve-desaceleracao-do-credito-o-que-isso-significa-para-sua-empresa',
+        'selic-a-1475-analise-da-gx-capital-sobre-a-ata-do-copom-e-o-cenario-economico-atual-29'          => 'selic-a-1475-analise-da-gx-capital-sobre-a-ata-do-copom-e-o-cenario-economico-atual',
+        'spread-bancario-como-e-formado-e-5-estrategias-para-pagar-menos-no-credito-empresarial'          => 'o-que-e-spread-bancario-e-por-que-o-credito-e-tao-caro-no-brasil',
+    ];
+
+    public function duplicateRedirect()
+    {
+        $segments = explode('/', trim(uri_string(), '/'));
+        $slug     = end($segments);
+        $target   = self::DUPLICATE_CONTENT_REDIRECTS[$slug] ?? '';
+
+        return redirect()->to(langBaseUrl($target), 301);
+    }
+
+    /**
      * Playbook (ebook interativo) — Importação Blindada · 2026
      * Landing dedicada para tráfego pago capturando leads de importadores/exportadores.
      */

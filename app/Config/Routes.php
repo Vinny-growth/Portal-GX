@@ -32,6 +32,11 @@ $routes->get('fx-loan', 'HomeController::simulatorsFxLegacyRedirect');
 foreach (array_keys(\App\Controllers\HomeController::LEGACY_SIMULATOR_REDIRECTS) as $legacySlug) {
     $routes->get($legacySlug, 'HomeController::legacyRedirect');
 }
+// Conteúdo duplicado (site audit Ubersuggest) -> 301 para o canônico. Mesma razão de
+// ser rota GET. Mapa: HomeController::DUPLICATE_CONTENT_REDIRECTS.
+foreach (array_keys(\App\Controllers\HomeController::DUPLICATE_CONTENT_REDIRECTS) as $dupSlug) {
+    $routes->get($dupSlug, 'HomeController::duplicateRedirect');
+}
 $routes->get('cron/update-feeds', 'CronController::checkFeedPosts');
 $routes->get('cron/update-sitemap', 'CronController::updateSitemap');
 $routes->get('unsubscribe', 'AuthController::unsubscribe');
