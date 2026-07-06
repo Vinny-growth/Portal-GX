@@ -19,4 +19,18 @@ return [
     'falar_especialista' => 'Falar com especialista',
     'simular_agora'      => 'Simular agora',
     'ver_simuladores'    => 'Ver simuladores',
+
+    // Formulário "Fale com um especialista" (_specialist_form.php)
+    'form_heading'       => 'Fale com um especialista',
+    'form_description'   => 'Conte o contexto da operação e retornamos com a frente mais aderente.',
+    'form_button'        => 'Enviar mensagem',
+    'form_placeholder'   => 'Descreva brevemente sua necessidade, objetivo ou estrutura atual.',
+    'form_origin_prefix' => 'Formulário especialista - ',
+    'form_nome'          => 'Nome',
+    'form_email'         => 'E-mail',
+    'form_contexto'      => 'Contexto',
+    'form_terms_pre'     => 'Li e concordo com os',
+    'form_terms_link'    => 'termos e condições',
+    'form_captcha_hint'  => 'A verificação de segurança será carregada quando você interagir com o formulário.',
+    'form_note_mobile'   => 'Formulário otimizado para preenchimento rápido no celular.',
 ];

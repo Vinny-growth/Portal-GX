@@ -1,10 +1,10 @@
 <?php
 $formId = $formId ?? 'gx-specialist-form';
-$heading = $heading ?? 'Fale com um especialista';
-$description = $description ?? 'Conte o contexto da operação e retornamos com a frente mais aderente.';
-$buttonLabel = $buttonLabel ?? 'Enviar mensagem';
-$messagePlaceholder = $messagePlaceholder ?? 'Descreva brevemente sua necessidade, objetivo ou estrutura atual.';
-$leadOrigin = $leadOrigin ?? ('Formulário especialista - ' . ((string) parse_url(current_url(), PHP_URL_PATH) ?: '/'));
+$heading = $heading ?? lang('Marketing.form_heading');
+$description = $description ?? lang('Marketing.form_description');
+$buttonLabel = $buttonLabel ?? lang('Marketing.form_button');
+$messagePlaceholder = $messagePlaceholder ?? lang('Marketing.form_placeholder');
+$leadOrigin = $leadOrigin ?? (lang('Marketing.form_origin_prefix') . ((string) parse_url(current_url(), PHP_URL_PATH) ?: '/'));
 ?>
 <div class="gx-form-shell">
     <div class="gx-form-intro">
@@ -23,7 +23,7 @@ $leadOrigin = $leadOrigin ?? ('Formulário especialista - ' . ((string) parse_ur
         <input type="hidden" name="utm_term" value="">
         <input type="hidden" name="utm_content" value="">
         <div class="gx-form-field">
-            <label for="<?= esc($formId); ?>-name">Nome</label>
+            <label for="<?= esc($formId); ?>-name"><?= lang('Marketing.form_nome'); ?></label>
             <input
                 id="<?= esc($formId); ?>-name"
                 type="text"
@@ -37,7 +37,7 @@ $leadOrigin = $leadOrigin ?? ('Formulário especialista - ' . ((string) parse_ur
                 required>
         </div>
         <div class="gx-form-field">
-            <label for="<?= esc($formId); ?>-email">E-mail</label>
+            <label for="<?= esc($formId); ?>-email"><?= lang('Marketing.form_email'); ?></label>
             <input
                 id="<?= esc($formId); ?>-email"
                 type="email"
@@ -56,7 +56,7 @@ $leadOrigin = $leadOrigin ?? ('Formulário especialista - ' . ((string) parse_ur
             'phoneValue' => old('phone'),
         ]); ?>
         <div class="gx-form-field gx-form-field-full">
-            <label for="<?= esc($formId); ?>-message">Contexto</label>
+            <label for="<?= esc($formId); ?>-message"><?= lang('Marketing.form_contexto'); ?></label>
             <textarea
                 id="<?= esc($formId); ?>-message"
                 name="message"
@@ -71,9 +71,9 @@ $leadOrigin = $leadOrigin ?? ('Formulário especialista - ' . ((string) parse_ur
         <label class="gx-check">
             <input type="checkbox" required>
             <span>
-                Li e concordo com os
+                <?= lang('Marketing.form_terms_pre'); ?>
                 <a href="<?= getPageLinkByDefaultName('terms_conditions', $activeLang->id); ?>" target="_blank" rel="noopener">
-                    termos e condições
+                    <?= lang('Marketing.form_terms_link'); ?>
                 </a>.
             </span>
         </label>
@@ -85,13 +85,13 @@ $leadOrigin = $leadOrigin ?? ('Formulário especialista - ' . ((string) parse_ur
                     data-sitekey="<?= esc($generalSettings->recaptcha_site_key); ?>"
                     data-theme="<?= $darkMode ? 'dark' : 'light'; ?>"
                     data-lang="<?= esc($activeLang->short_form); ?>">
-                    <div class="gx-captcha-placeholder">A verificação de segurança será carregada quando você interagir com o formulário.</div>
+                    <div class="gx-captcha-placeholder"><?= lang('Marketing.form_captcha_hint'); ?></div>
                 </div>
             </div>
         <?php endif; ?>
         <div class="gx-form-actions">
             <button type="submit" class="gx-btn gx-btn-primary gx-form-submit"><?= esc($buttonLabel); ?></button>
-            <p class="gx-form-note">Formulário otimizado para preenchimento rápido no celular.</p>
+            <p class="gx-form-note"><?= lang('Marketing.form_note_mobile'); ?></p>
         </div>
     </form>
 </div>
