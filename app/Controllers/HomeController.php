@@ -717,7 +717,7 @@ class HomeController extends BaseController
 
         $pageName = trim((string)($homeConfig['hero']['title'] ?? ''));
         if ($pageName === '') {
-            $pageName = 'GX Capital';
+            $pageName = brand('display_name', 'GX Capital');
         }
 
         $webPageSchema = [
@@ -747,7 +747,7 @@ class HomeController extends BaseController
         $financialServiceSchema = [
             '@type' => 'FinancialService',
             '@id' => langBaseUrl() . '#financial-service',
-            'name' => 'GX Capital',
+            'name' => brand('display_name', 'GX Capital'),
             'url' => langBaseUrl(),
             'description' => $description,
             'provider' => ['@id' => base_url() . '/#organization'],

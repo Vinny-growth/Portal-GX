@@ -6,8 +6,8 @@
  */
 $contactChannels = $contactChannels ?? [];
 $whatsAppDigits = $contactChannels['whatsapp_digits'] ?? '';
-$whatsAppHref = !empty($whatsAppDigits) ? 'https://wa.me/' . $whatsAppDigits : 'https://wa.me/555120421991';
-$contactEmail = $contactChannels['email'] ?? 'contato@gx.capital';
+$whatsAppHref = !empty($whatsAppDigits) ? 'https://wa.me/' . $whatsAppDigits : 'https://wa.me/' . brand('whatsapp', '555120421991');
+$contactEmail = $contactChannels['email'] ?? brand('email', 'contato@gx.capital');
 $contactPhone = $contactChannels['phone'] ?? '+55 (51) 2042·1991';
 $specialistUrl = $specialistUrl ?? langBaseUrl('simuladores/cambio') . '#contato';
 $simuladorUrl = $simuladorUrl ?? langBaseUrl('simuladores/cambio');

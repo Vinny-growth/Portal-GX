@@ -10,14 +10,15 @@ if (!empty($socialArray)) {
     }
 }
 
-// PERSON JSON — Vinicius Teixeira (founder/CEO)
+// PERSON JSON — fundador (via brand config; defaults = GX)
+$founderId = base_url() . '/' . brand('founder_schema_id', '#person-vinicius-teixeira');
 $personSchema = [
     "@context" => "https://schema.org",
     "@type" => "Person",
-    "@id" => base_url() . '/#person-vinicius-teixeira',
-    "name" => "Vinicius Teixeira",
+    "@id" => $founderId,
+    "name" => brand('founder_name', 'Vinicius Teixeira'),
     "url" => base_url('profile/vinicius-teixeira'),
-    "jobTitle" => "CEO & Founder",
+    "jobTitle" => brand('founder_title', 'CEO & Founder'),
     "worksFor" => ["@id" => base_url() . '/#organization'],
     "knowsAbout" => [
         "Câmbio estruturado",
@@ -36,17 +37,17 @@ $organizationSchema = [
     "@context" => "https://schema.org",
     "@type" => "Organization",
     "@id" => base_url() . '/#organization',
-    "name" => "GX Capital",
-    "legalName" => "GX Capital",
+    "name" => brand('display_name', 'GX Capital'),
+    "legalName" => brand('legal_name', 'GX Capital'),
     "url" => base_url(),
-    "description" => "Câmbio estruturado, crédito, consultoria financeira e wealth advisory para empresas e famílias.",
+    "description" => brand('org_description', 'Câmbio estruturado, crédito, consultoria financeira e wealth advisory para empresas e famílias.'),
     "logo" => [
         "@type" => "ImageObject",
         "width" => 600,
         "height" => 60,
         "url" => getLogo()
     ],
-    "founder" => ["@id" => base_url() . '/#person-vinicius-teixeira'],
+    "founder" => ["@id" => $founderId],
     "knowsAbout" => [
         "Câmbio estruturado",
         "Hedge cambial",
@@ -60,7 +61,7 @@ $organizationSchema = [
     ],
     "areaServed" => [
         "@type" => "Country",
-        "name" => "Brazil",
+        "name" => brand('area_served', 'Brazil'),
         "sameAs" => "https://en.wikipedia.org/wiki/Brazil"
     ]
 ];
@@ -82,7 +83,7 @@ if (!empty($socialLinks)) {
 }
 
 // Press coverage — Article schemas (subjectOf)
-$pressMentions = $gxPressMentions ?? [
+$pressMentions = $gxPressMentions ?? (brandPressMentions() ?: [
     [
         'headline' => 'Crédito com garantia imobiliária ganha relevância na alocação de capital das empresas',
         'publisher' => 'Valor Econômico',
@@ -101,7 +102,7 @@ $pressMentions = $gxPressMentions ?? [
         'url' => 'https://oglobo.globo.com/patrocinado/pulse-brand/noticia/2026/03/19/em-um-cenario-de-comercio-exterior-aquecido-cambio-deixa-de-ser-rotina-operacional-e-ganha-peso-nas-decisoes-financeiras-das-empresas-1.ghtml',
         'datePublished' => '2026-03-19',
     ],
-];
+]);
 
 $articleSchemas = [];
 foreach ($pressMentions as $mention) {
