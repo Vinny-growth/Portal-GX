@@ -106,15 +106,15 @@ class HomeController extends BaseController
     public function simulatorsHub()
     {
         $canonicalUrl = langBaseUrl('simuladores');
-        $description = 'Central de simuladores da GX Capital para câmbio, trade finance, consórcio, crédito, mercado de capitais e recebíveis, organizada por frente e por ferramenta.';
+        $description = brandLang('Home.sim_hub_description');
         $topicFronts = $this->getSimulatorTopics();
         $simulators = $this->getSimulatorCatalog();
         $legacySimulators = $this->getFxLegacySimulatorCatalog();
         $contactChannels = $this->getMarketingContactChannels();
-        $whatsAppMessage = 'Olá! Vim pela Central de Simuladores da GX Capital e quero falar com um especialista para identificar a solução mais adequada para minha empresa.';
+        $whatsAppMessage = brandLang('Home.sim_hub_wa');
 
         $data = [
-            'title' => 'Central de simuladores GX Capital',
+            'title' => brandLang('Home.sim_hub_title'),
             'description' => characterLimiter(preg_replace('/\s+/', ' ', $description), 160, ''),
             'keywords' => trim($this->settings->keywords . ', central de simuladores, simuladores financeiros, simuladores de câmbio, simulador de consórcio, custo de capital', ' ,'),
             'pageHeadView' => 'marketing/_shared_styles',
@@ -135,9 +135,9 @@ class HomeController extends BaseController
             'whatsAppUrl' => $this->buildWhatsAppUrl($contactChannels['whatsapp_digits'] ?? '', $whatsAppMessage),
             'whatsAppMessage' => $whatsAppMessage,
             'hubStats' => [
-                ['value' => count($simulators), 'label' => 'ferramentas disponíveis'],
-                ['value' => count($topicFronts), 'label' => 'frentes organizadas'],
-                ['value' => count($legacySimulators), 'label' => 'estudos cambiais em destaque'],
+                ['value' => count($simulators), 'label' => lang('Home.sim_hub_stat_tools')],
+                ['value' => count($topicFronts), 'label' => lang('Home.sim_hub_stat_fronts')],
+                ['value' => count($legacySimulators), 'label' => lang('Home.sim_hub_stat_studies')],
             ],
             'marketingSchema' => [
                 '@context' => 'https://schema.org',
@@ -146,7 +146,7 @@ class HomeController extends BaseController
                         '@type' => 'CollectionPage',
                         '@id' => $canonicalUrl . '#webpage',
                         'url' => $canonicalUrl,
-                        'name' => 'Central de simuladores GX Capital',
+                        'name' => brandLang('Home.sim_hub_title'),
                         'description' => characterLimiter(preg_replace('/\s+/', ' ', $description), 160, ''),
                         'inLanguage' => $this->activeLang->language_code,
                         'isPartOf' => ['@id' => base_url() . '/#website'],
@@ -314,6 +314,14 @@ class HomeController extends BaseController
         'simulador-credito-empresarial'        => 'aurum-simulador-de-custo-de-capital',
         'simulador-antecipacao-fidc'           => 'simulador-de-custo-de-antecipacao',
         'simulador-bndes'                      => 'linhas-credito-bndes',
+        // Variantes quebradas do site audit (Ubersuggest, 2026-07): links internos
+        // gerados pela pipeline de IA apontando p/ slugs de simulador inexistentes.
+        'aurum-custo-de-capital'                    => 'aurum-simulador-de-custo-de-capital',
+        'simulador-custo-capital-aurum'             => 'aurum-simulador-de-custo-de-capital',
+        'aurum-simulador-de-custo-de-capital-aurum' => 'aurum-simulador-de-custo-de-capital',
+        'simulador-mercado-capitais'                => 'simulador-mercado-de-capitais',
+        'mercado-de-capitais'                       => 'simulador-mercado-de-capitais',
+        'simulador-fidc'                            => 'simulador-de-custo-de-antecipacao',
     ];
 
     public function legacyRedirect()
