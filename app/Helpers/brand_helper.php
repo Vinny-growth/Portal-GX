@@ -44,6 +44,25 @@ if (!function_exists('brandPressMentions')) {
     }
 }
 
+if (!function_exists('brandLang')) {
+    /**
+     * lang() + interpolação do nome da marca. A string de idioma usa o token
+     * literal {brand}; aqui ele é trocado por brand('display_name') via strtr —
+     * SEM passar pelo MessageFormatter do CI4 (não usamos $args), então caracteres
+     * como R$, %, chaves e apóstrofos ficam intactos (byte-safe).
+     *
+     * Uso: brandLang('Home.wa_home')  // '... da {brand} ...' -> '... da GX Capital ...'
+     */
+    function brandLang(string $key): string
+    {
+        $s = lang($key);
+        if (!is_string($s)) {
+            return (string) $s;
+        }
+        return strtr($s, ['{brand}' => (string) brand('display_name', 'GX Capital')]);
+    }
+}
+
 if (!function_exists('brandLocale')) {
     /**
      * Locale curto do install (subtag primária de brand('locale')).
