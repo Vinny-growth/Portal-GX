@@ -18,10 +18,10 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
   <!-- topbar -->
   <header class="gx-srs-topbar">
     <div class="gx-srs-wrap">
-      <a href="<?= esc(base_url()); ?>" class="gx-srs-brand" aria-label="GX Capital">
-        <img src="<?= getLogoFooter(); ?>" alt="GX Capital">
+      <a href="<?= esc(base_url()); ?>" class="gx-srs-brand" aria-label="<?= esc(brand('display_name')); ?>">
+        <img src="<?= getLogoFooter(); ?>" alt="<?= esc(brand('display_name')); ?>">
       </a>
-      <a href="<?= esc($simulatorsHubUrl); ?>" class="gx-srs-back">&larr; Todos os simuladores</a>
+      <a href="<?= esc($simulatorsHubUrl); ?>" class="gx-srs-back">&larr; <?= lang('Simuladores.srs_back'); ?></a>
     </div>
   </header>
 
@@ -29,14 +29,14 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
   <section class="gx-srs-hero<?= $heroImgUrl ? ' has-img' : ''; ?>"<?= $heroImgUrl ? ' style="background-image: linear-gradient(90deg, var(--gx-primary-dark) 0%, rgba(0,13,35,0.95) 40%, rgba(0,13,35,0.55) 70%, rgba(12,49,99,0.30) 100%), url(\'' . esc($heroImgUrl, 'attr') . '\');"' : ''; ?>>
     <div class="gx-srs-watermark" aria-hidden="true">GXC</div>
     <div class="gx-srs-wrap">
-      <div class="gx-srs-eyebrow">Seguro de Vida Resgatável · Whole Life</div>
-      <h1 class="gx-srs-headline">Você não paga seguro. Você <em>constrói patrimônio.</em></h1>
-      <p class="gx-srs-sub">Um plano quitado em 10 anos, corrigido todo ano, que forma uma reserva resgatável enquanto blinda sua família hoje. Veja o ponto em que a reserva ultrapassa tudo o que você pagou — e a proteção passa a sair de graça.</p>
+      <div class="gx-srs-eyebrow"><?= lang('Simuladores.srs_hero_eyebrow'); ?></div>
+      <h1 class="gx-srs-headline"><?= lang('Simuladores.srs_hero_headline'); ?></h1>
+      <p class="gx-srs-sub"><?= lang('Simuladores.srs_hero_sub'); ?></p>
       <div class="gx-srs-hero-signals">
-        <span class="gx-srs-chip">Pagamento finito</span>
-        <span class="gx-srs-chip">Correção anual (IPCA)</span>
-        <span class="gx-srs-chip">Reserva resgatável</span>
-        <span class="gx-srs-chip">Proteções em vida</span>
+        <span class="gx-srs-chip"><?= lang('Simuladores.srs_chip_pagamento'); ?></span>
+        <span class="gx-srs-chip"><?= lang('Simuladores.srs_chip_correcao'); ?></span>
+        <span class="gx-srs-chip"><?= lang('Simuladores.srs_reserva_resgatavel'); ?></span>
+        <span class="gx-srs-chip"><?= lang('Simuladores.srs_chip_protecoes'); ?></span>
       </div>
     </div>
   </section>
@@ -48,22 +48,22 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
 
         <!-- form -->
         <form class="gx-srs-card" id="gx-srs-form" novalidate>
-          <div class="gx-srs-card-title"><span>Diagnóstico · 2 minutos</span></div>
-          <p class="gx-srs-intro">Responda como num planejamento financeiro. A partir das suas respostas calculamos a proteção ideal e projetamos a reserva que você constrói.</p>
+          <div class="gx-srs-card-title"><span><?= lang('Simuladores.srs_form_title'); ?></span></div>
+          <p class="gx-srs-intro"><?= lang('Simuladores.srs_form_intro'); ?></p>
 
           <!-- 1. Sobre você -->
           <div class="gx-srs-section">
-            <div class="gx-srs-section-label">1 · Sobre você</div>
+            <div class="gx-srs-section-label"><?= lang('Simuladores.srs_sec1'); ?></div>
             <div class="gx-srs-grid2">
               <div class="gx-srs-field">
-                <label for="gx-srs-idade">Sua idade</label>
+                <label for="gx-srs-idade"><?= lang('Simuladores.srs_lbl_idade'); ?></label>
                 <input class="gx-srs-input" type="number" id="gx-srs-idade" name="idade" min="14" max="65" value="35" inputmode="numeric" required>
               </div>
               <div class="gx-srs-field">
-                <label>Sexo</label>
-                <div class="gx-srs-seg" role="group" aria-label="Sexo">
-                  <button type="button" data-seg="sexo" data-value="M" aria-pressed="true">Masculino</button>
-                  <button type="button" data-seg="sexo" data-value="F" aria-pressed="false">Feminino</button>
+                <label><?= lang('Simuladores.srs_lbl_sexo'); ?></label>
+                <div class="gx-srs-seg" role="group" aria-label="<?= lang('Simuladores.srs_lbl_sexo'); ?>">
+                  <button type="button" data-seg="sexo" data-value="M" aria-pressed="true"><?= lang('Simuladores.srs_masculino'); ?></button>
+                  <button type="button" data-seg="sexo" data-value="F" aria-pressed="false"><?= lang('Simuladores.srs_feminino'); ?></button>
                 </div>
                 <input type="hidden" name="sexo" id="gx-srs-sexo" value="M">
               </div>
@@ -72,26 +72,26 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
 
           <!-- 2. Família -->
           <div class="gx-srs-section">
-            <div class="gx-srs-section-label">2 · Quem depende de você</div>
+            <div class="gx-srs-section-label"><?= lang('Simuladores.srs_sec2'); ?></div>
             <div class="gx-srs-grid2">
               <div class="gx-srs-field">
-                <label for="gx-srs-dependentes">Pessoas que dependem da sua renda</label>
+                <label for="gx-srs-dependentes"><?= lang('Simuladores.srs_lbl_dependentes'); ?></label>
                 <select class="gx-srs-input" id="gx-srs-dependentes" name="dependentes">
-                  <option value="0">Ninguém — só eu</option>
-                  <option value="1">1 pessoa</option>
-                  <option value="2" selected>2 pessoas</option>
-                  <option value="3">3 pessoas</option>
-                  <option value="4">4 ou mais</option>
+                  <option value="0"><?= lang('Simuladores.srs_dep_0'); ?></option>
+                  <option value="1"><?= lang('Simuladores.srs_dep_1'); ?></option>
+                  <option value="2" selected><?= lang('Simuladores.srs_dep_2'); ?></option>
+                  <option value="3"><?= lang('Simuladores.srs_dep_3'); ?></option>
+                  <option value="4"><?= lang('Simuladores.srs_4mais'); ?></option>
                 </select>
               </div>
               <div class="gx-srs-field">
-                <label for="gx-srs-filhos">Filhos em formação</label>
+                <label for="gx-srs-filhos"><?= lang('Simuladores.srs_lbl_filhos'); ?></label>
                 <select class="gx-srs-input" id="gx-srs-filhos" name="filhos">
-                  <option value="0">Nenhum</option>
+                  <option value="0"><?= lang('Simuladores.srs_filho_nenhum'); ?></option>
                   <option value="1" selected>1</option>
                   <option value="2">2</option>
                   <option value="3">3</option>
-                  <option value="4">4 ou mais</option>
+                  <option value="4"><?= lang('Simuladores.srs_4mais'); ?></option>
                 </select>
               </div>
             </div>
@@ -99,59 +99,59 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
 
           <!-- 3. Vida financeira e patrimônio -->
           <div class="gx-srs-section">
-            <div class="gx-srs-section-label">3 · Renda e patrimônio</div>
+            <div class="gx-srs-section-label"><?= lang('Simuladores.srs_sec3'); ?></div>
             <div class="gx-srs-grid2">
               <div class="gx-srs-field">
-                <label for="gx-srs-renda">Renda mensal da família (R$)</label>
-                <input class="gx-srs-input gx-srs-money" type="text" id="gx-srs-renda" name="renda_mensal" inputmode="numeric" placeholder="Ex.: 30.000" value="30.000">
-                <div class="gx-srs-hint">Padrão de vida que sua renda sustenta.</div>
+                <label for="gx-srs-renda"><?= lang('Simuladores.srs_lbl_renda'); ?></label>
+                <input class="gx-srs-input gx-srs-money" type="text" id="gx-srs-renda" name="renda_mensal" inputmode="numeric" placeholder="<?= lang('Simuladores.srs_ph_renda'); ?>" value="30.000">
+                <div class="gx-srs-hint"><?= lang('Simuladores.srs_hint_renda'); ?></div>
               </div>
               <div class="gx-srs-field">
-                <label for="gx-srs-uf">Estado (define o ITCMD)</label>
+                <label for="gx-srs-uf"><?= lang('Simuladores.srs_lbl_uf'); ?></label>
                 <select class="gx-srs-input" id="gx-srs-uf" name="estado">
                   <?php foreach ($ufList as $u): ?>
                     <option value="<?= esc($u['uf'], 'attr'); ?>"<?= $u['uf'] === $ufPadrao ? ' selected' : ''; ?>><?= esc($u['nome']); ?> (<?= esc($u['uf']); ?>)</option>
                   <?php endforeach; ?>
                 </select>
-                <div class="gx-srs-hint">Alíquota usada na sucessão.</div>
+                <div class="gx-srs-hint"><?= lang('Simuladores.srs_hint_uf'); ?></div>
               </div>
             </div>
             <div class="gx-srs-grid2">
               <div class="gx-srs-field">
-                <label for="gx-srs-patr-imob">Patrimônio imobiliário (R$)</label>
-                <input class="gx-srs-input gx-srs-money" type="text" id="gx-srs-patr-imob" name="patrimonio_imobiliario" inputmode="numeric" placeholder="Ex.: 1.500.000" value="0">
-                <div class="gx-srs-hint">Imóveis: moradia, locação, terrenos.</div>
+                <label for="gx-srs-patr-imob"><?= lang('Simuladores.srs_lbl_patr_imob'); ?></label>
+                <input class="gx-srs-input gx-srs-money" type="text" id="gx-srs-patr-imob" name="patrimonio_imobiliario" inputmode="numeric" placeholder="<?= lang('Simuladores.srs_ph_patr_imob'); ?>" value="0">
+                <div class="gx-srs-hint"><?= lang('Simuladores.srs_hint_patr_imob'); ?></div>
               </div>
               <div class="gx-srs-field">
-                <label for="gx-srs-patr-fin">Patrimônio financeiro (R$)</label>
-                <input class="gx-srs-input gx-srs-money" type="text" id="gx-srs-patr-fin" name="patrimonio_financeiro" inputmode="numeric" placeholder="Ex.: 500.000" value="0">
-                <div class="gx-srs-hint">Investimentos, empresas, aplicações.</div>
+                <label for="gx-srs-patr-fin"><?= lang('Simuladores.srs_lbl_patr_fin'); ?></label>
+                <input class="gx-srs-input gx-srs-money" type="text" id="gx-srs-patr-fin" name="patrimonio_financeiro" inputmode="numeric" placeholder="<?= lang('Simuladores.srs_ph_patr_fin'); ?>" value="0">
+                <div class="gx-srs-hint"><?= lang('Simuladores.srs_hint_patr_fin'); ?></div>
               </div>
             </div>
             <div class="gx-srs-field">
-              <label for="gx-srs-dividas">Dívidas / financiamentos (R$)</label>
-              <input class="gx-srs-input gx-srs-money" type="text" id="gx-srs-dividas" name="dividas" inputmode="numeric" placeholder="Ex.: 200.000" value="0">
-              <div class="gx-srs-hint">Saldo que a família precisaria quitar num imprevisto.</div>
+              <label for="gx-srs-dividas"><?= lang('Simuladores.srs_lbl_dividas'); ?></label>
+              <input class="gx-srs-input gx-srs-money" type="text" id="gx-srs-dividas" name="dividas" inputmode="numeric" placeholder="<?= lang('Simuladores.srs_ph_dividas'); ?>" value="0">
+              <div class="gx-srs-hint"><?= lang('Simuladores.srs_hint_dividas'); ?></div>
             </div>
           </div>
 
           <!-- 4. Objetivo -->
           <div class="gx-srs-section">
-            <div class="gx-srs-section-label">4 · Seu objetivo</div>
+            <div class="gx-srs-section-label"><?= lang('Simuladores.srs_sec4'); ?></div>
             <div class="gx-srs-field">
-              <label for="gx-srs-objetivo">O que mais importa para você?</label>
+              <label for="gx-srs-objetivo"><?= lang('Simuladores.srs_lbl_objetivo'); ?></label>
               <select class="gx-srs-input" id="gx-srs-objetivo" name="objetivo">
-                <option value="protecao_familiar" selected>Proteger a renda da minha família</option>
-                <option value="sucessao">Planejar sucessão com liquidez</option>
-                <option value="quitar_dividas">Garantir a quitação de dívidas num imprevisto</option>
-                <option value="aposentadoria">Complementar a aposentadoria</option>
+                <option value="protecao_familiar" selected><?= lang('Simuladores.srs_obj_protecao'); ?></option>
+                <option value="sucessao"><?= lang('Simuladores.srs_obj_sucessao'); ?></option>
+                <option value="quitar_dividas"><?= lang('Simuladores.srs_obj_quitar'); ?></option>
+                <option value="aposentadoria"><?= lang('Simuladores.srs_obj_aposentadoria'); ?></option>
               </select>
             </div>
             <div class="gx-srs-field">
-              <label>Em quanto tempo quer quitar o plano?</label>
-              <div class="gx-srs-seg" role="group" aria-label="Estratégia">
-                <button type="button" data-seg="estrategia" data-value="WL10" aria-pressed="true">10 anos</button>
-                <button type="button" data-seg="estrategia" data-value="WL20" aria-pressed="false">20 anos</button>
+              <label><?= lang('Simuladores.srs_lbl_estrategia'); ?></label>
+              <div class="gx-srs-seg" role="group" aria-label="<?= lang('Simuladores.srs_aria_estrategia'); ?>">
+                <button type="button" data-seg="estrategia" data-value="WL10" aria-pressed="true"><?= lang('Simuladores.srs_10anos'); ?></button>
+                <button type="button" data-seg="estrategia" data-value="WL20" aria-pressed="false"><?= lang('Simuladores.srs_20anos'); ?></button>
               </div>
               <input type="hidden" name="estrategia" id="gx-srs-estrategia" value="WL10">
             </div>
@@ -159,29 +159,30 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
 
           <!-- Proteção recomendada (calculada) -->
           <div class="gx-srs-reco">
-            <div class="gx-srs-reco-label">Sua proteção recomendada</div>
-            <div class="gx-srs-reco-insight" id="gx-srs-reco-insight">Preencha os campos acima para calcularmos.</div>
+            <div class="gx-srs-reco-label"><?= lang('Simuladores.srs_reco_label'); ?></div>
+            <div class="gx-srs-reco-insight" id="gx-srs-reco-insight"><?= lang('Simuladores.srs_reco_insight_default'); ?></div>
             <div class="gx-srs-field" style="margin-top:var(--space-4); margin-bottom:var(--space-3)">
-              <label for="gx-srs-cap-vida">Capital segurado <span class="gx-srs-reco-edit">(ajuste se quiser)</span></label>
+              <label for="gx-srs-cap-vida"><?= lang('Simuladores.srs_capital_segurado'); ?> <span class="gx-srs-reco-edit"><?= lang('Simuladores.srs_reco_edit'); ?></span></label>
               <input class="gx-srs-input gx-srs-money" type="text" id="gx-srs-cap-vida" name="capital_vida" inputmode="numeric" value="150.000" required>
             </div>
             <label class="gx-srs-check">
               <input type="checkbox" id="gx-srs-dg-toggle" checked>
-              <span>Incluir proteção contra <strong>Doenças Graves</strong> <small style="opacity:.65">(capital até R$ 1 mi)</small></span>
+              <span><?= lang('Simuladores.srs_dg_toggle'); ?></span>
             </label>
             <input type="hidden" id="gx-srs-cap-dg" name="capital_dg_plus" value="200000">
           </div>
 
-          <button type="submit" class="gx-srs-btn gx-srs-btn-primary" id="gx-srs-calc">Ver meu diagnóstico e projeção</button>
+          <button type="submit" class="gx-srs-btn gx-srs-btn-primary" id="gx-srs-calc"><?= lang('Simuladores.srs_calc_btn'); ?></button>
           <div class="gx-srs-status" id="gx-srs-form-status"></div>
         </form>
 
         <!-- result -->
         <section class="gx-srs-card">
-          <div class="gx-srs-card-title"><span>Patrimônio x Aporte — projeção até os 100</span></div>
+          <div class="gx-srs-card-title"><span><?= lang('Simuladores.srs_result_title'); ?></span></div>
 
           <div class="gx-srs-placeholder" id="gx-srs-placeholder">
-            Preencha seu perfil e clique em “Desenhar minha projeção”.
+            <?= lang('Simuladores.srs_placeholder'); ?>
+
           </div>
 
           <div class="gx-srs-result" id="gx-srs-result">
@@ -191,45 +192,46 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
                 <div class="gx-srs-lock-badge" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="0"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 </div>
-                <h3 id="gx-srs-lock-title">Sua reserva vira lucro a partir de um certo ponto.</h3>
-                <p id="gx-srs-lock-sub">Descubra o aporte mensal exato e o tamanho da sua reserva em Reais. Liberamos o relatório completo na hora.</p>
-                <button type="button" class="gx-srs-btn gx-srs-btn-gold" id="gx-srs-unlock-cta">Desbloquear relatório</button>
+                <h3 id="gx-srs-lock-title"><?= lang('Simuladores.srs_lock_title'); ?></h3>
+                <p id="gx-srs-lock-sub"><?= lang('Simuladores.srs_lock_sub'); ?></p>
+                <button type="button" class="gx-srs-btn gx-srs-btn-gold" id="gx-srs-unlock-cta"><?= lang('Simuladores.srs_desbloquear'); ?></button>
               </div>
             </div>
 
             <div class="gx-srs-legend">
-              <span><i class="gx-srs-dot red"></i> O que você paga (aporte acumulado)</span>
-              <span><i class="gx-srs-dot green"></i> O que você junta (reserva acumulada)</span>
+              <span><i class="gx-srs-dot red"></i> <?= lang('Simuladores.srs_legend_red'); ?></span>
+              <span><i class="gx-srs-dot green"></i> <?= lang('Simuladores.srs_legend_green'); ?></span>
             </div>
 
             <div class="gx-srs-kpis">
               <div class="gx-srs-kpi is-navy">
-                <div class="gx-srs-kpi-label">Aporte mensal</div>
+                <div class="gx-srs-kpi-label"><?= lang('Simuladores.srs_aporte_mensal'); ?></div>
                 <div class="gx-srs-kpi-value gx-srs-blur" id="gx-srs-kpi-aporte">R$ ••••</div>
-                <div class="gx-srs-kpi-sub">já com IOF</div>
+                <div class="gx-srs-kpi-sub"><?= lang('Simuladores.srs_kpi_aporte_sub'); ?></div>
               </div>
               <div class="gx-srs-kpi is-dark">
-                <div class="gx-srs-kpi-label">Reserva projetada aos 65</div>
+                <div class="gx-srs-kpi-label"><?= lang('Simuladores.srs_kpi_reserva65'); ?></div>
                 <div class="gx-srs-kpi-value gx-srs-blur" id="gx-srs-kpi-reserva65">R$ ••••</div>
-                <div class="gx-srs-kpi-sub">valor de resgate estimado</div>
+                <div class="gx-srs-kpi-sub"><?= lang('Simuladores.srs_kpi_reserva65_sub'); ?></div>
               </div>
               <div class="gx-srs-kpi">
-                <div class="gx-srs-kpi-label">Break-even</div>
+                <div class="gx-srs-kpi-label"><?= lang('Simuladores.srs_kpi_breakeven'); ?></div>
                 <div class="gx-srs-kpi-value" id="gx-srs-kpi-breakeven" style="color:var(--gx-primary)">—</div>
-                <div class="gx-srs-kpi-sub" id="gx-srs-kpi-breakeven-sub">reserva ultrapassa o pago</div>
+                <div class="gx-srs-kpi-sub" id="gx-srs-kpi-breakeven-sub"><?= lang('Simuladores.srs_kpi_breakeven_sub'); ?></div>
               </div>
             </div>
 
             <div class="gx-srs-celebrate" id="gx-srs-celebrate">
-              <div class="gx-srs-eyebrow">Relatório liberado</div>
+              <div class="gx-srs-eyebrow"><?= lang('Simuladores.srs_celebrate_eyebrow'); ?></div>
               <p class="gx-srs-kpi-sub" id="gx-srs-celebrate-text" style="color:#fff;opacity:.9;font-size:var(--fs-md)"></p>
               <?php if (!empty($whatsAppBaseUrl)): ?>
-                <a class="gx-srs-btn gx-srs-btn-gold" id="gx-srs-wa" href="<?= esc($whatsAppBaseUrl); ?>" target="_blank" rel="noopener" style="width:auto;padding:0 var(--space-8);margin-top:var(--space-4)">Falar com um planejador</a>
+                <a class="gx-srs-btn gx-srs-btn-gold" id="gx-srs-wa" href="<?= esc($whatsAppBaseUrl); ?>" target="_blank" rel="noopener" style="width:auto;padding:0 var(--space-8);margin-top:var(--space-4)"><?= lang('Simuladores.srs_wa_btn'); ?></a>
               <?php endif; ?>
             </div>
 
             <div class="gx-srs-disclaimer">
-              Simulação educativa. Os valores são <strong>projetados</strong> a partir de IPCA estimado (5,5% a.a.) e dos fatores de resgate da apólice; <strong>não constituem garantia</strong> de rentabilidade nem proposta de contratação. Condições, carências e coberturas seguem o regulamento do produto e a regulação da SUSEP. O prêmio inclui IOF de 0,38%.
+              <?= lang('Simuladores.srs_disclaimer'); ?>
+
             </div>
           </div>
         </section>
@@ -244,26 +246,26 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
       <article class="gx-srs-report" id="gx-srs-report">
 
         <div class="gx-srs-report-toolbar gx-srs-noprint">
-          <span class="gx-srs-eyebrow">Relatório liberado · pronto para você</span>
-          <button class="gx-srs-btn gx-srs-btn-primary" id="gx-srs-print" type="button" style="width:auto; padding:0 var(--space-6);">↓ Baixar relatório (PDF)</button>
+          <span class="gx-srs-eyebrow"><?= lang('Simuladores.srs_report_toolbar'); ?></span>
+          <button class="gx-srs-btn gx-srs-btn-primary" id="gx-srs-print" type="button" style="width:auto; padding:0 var(--space-6);"><?= lang('Simuladores.srs_print_btn'); ?></button>
         </div>
 
         <header class="gx-srs-report-cover"<?= $reportCoverUrl ? ' style="background-image: linear-gradient(100deg, var(--gx-primary-dark) 0%, rgba(0,13,35,0.94) 36%, rgba(0,13,35,0.55) 62%, rgba(0,13,35,0.20) 100%), url(\'' . esc($reportCoverUrl, 'attr') . '\');"' : ''; ?>>
           <div class="gx-srs-cover-inner">
-            <img class="gx-srs-cover-logo" src="<?= getLogoFooter(); ?>" alt="GX Capital">
-            <div class="gx-srs-cover-kicker">Planejamento de Proteção & Sucessão</div>
-            <h2 class="gx-srs-cover-title">Relatório de<br>Diagnóstico Patrimonial</h2>
-            <div class="gx-srs-cover-meta">Preparado para <strong id="gx-srs-rp-nome">—</strong><span id="gx-srs-rp-data">—</span></div>
+            <img class="gx-srs-cover-logo" src="<?= getLogoFooter(); ?>" alt="<?= esc(brand('display_name')); ?>">
+            <div class="gx-srs-cover-kicker"><?= lang('Simuladores.srs_cover_kicker'); ?></div>
+            <h2 class="gx-srs-cover-title"><?= lang('Simuladores.srs_cover_title'); ?></h2>
+            <div class="gx-srs-cover-meta"><?= lang('Simuladores.srs_cover_meta'); ?> <strong id="gx-srs-rp-nome">—</strong><span id="gx-srs-rp-data">—</span></div>
           </div>
         </header>
 
         <section class="gx-srs-rp-section">
-          <div class="gx-srs-rp-label">01 · Seu diagnóstico</div>
+          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_01'); ?></div>
           <div class="gx-srs-rp-grid" id="gx-srs-rp-diag"></div>
         </section>
 
         <section class="gx-srs-rp-section">
-          <div class="gx-srs-rp-label">02 · Proteção recomendada</div>
+          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_02'); ?></div>
           <div class="gx-srs-rp-reco">
             <div class="gx-srs-rp-reco-num" id="gx-srs-rp-capital">—</div>
             <p class="gx-srs-rp-reco-txt" id="gx-srs-rp-reco-txt"></p>
@@ -271,44 +273,45 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
         </section>
 
         <section class="gx-srs-rp-section">
-          <div class="gx-srs-rp-label">03 · Seu plano GX</div>
+          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_03'); ?></div>
           <div class="gx-srs-rp-kpis" id="gx-srs-rp-kpis"></div>
           <table class="gx-srs-rp-table">
-            <thead><tr><th>Cobertura</th><th>Capital segurado</th><th>Prêmio mensal</th></tr></thead>
+            <thead><tr><th><?= lang('Simuladores.srs_th_cobertura'); ?></th><th><?= lang('Simuladores.srs_capital_segurado'); ?></th><th><?= lang('Simuladores.srs_th_premio'); ?></th></tr></thead>
             <tbody id="gx-srs-rp-cob"></tbody>
           </table>
         </section>
 
         <section class="gx-srs-rp-section">
-          <div class="gx-srs-rp-label">04 · Vida produtiva, patrimônio e reserva</div>
+          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_04'); ?></div>
           <div class="gx-srs-rp-chartwrap"><canvas id="gx-srs-rp-chart" height="320"></canvas></div>
           <p class="gx-srs-rp-caption" id="gx-srs-rp-caption"></p>
           <table class="gx-srs-rp-table">
-            <thead><tr><th>Momento</th><th>Total aportado</th><th>Reserva resgatável</th></tr></thead>
+            <thead><tr><th><?= lang('Simuladores.srs_th_momento'); ?></th><th><?= lang('Simuladores.srs_total_aportado'); ?></th><th><?= lang('Simuladores.srs_reserva_resgatavel'); ?></th></tr></thead>
             <tbody id="gx-srs-rp-marcos"></tbody>
           </table>
         </section>
 
         <section class="gx-srs-rp-section gx-srs-rp-suc" id="gx-srs-rp-suc" hidden>
-          <div class="gx-srs-rp-label">05 · Blindagem sucessória</div>
+          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_05'); ?></div>
           <p id="gx-srs-rp-suc-txt"></p>
         </section>
 
         <section class="gx-srs-rp-cta">
-          <h3>O próximo passo é desenhar isso com um especialista GX.</h3>
+          <h3><?= lang('Simuladores.srs_rp_cta_title'); ?></h3>
           <ul class="gx-srs-rp-bullets">
-            <li>Validação do capital ideal para o seu momento e objetivo.</li>
-            <li>Estruturação da apólice resgatável com a melhor seguradora.</li>
-            <li>Otimização tributária e de liquidez para a sucessão.</li>
-            <li>Acompanhamento do plano ao longo dos anos, sem custo de consultoria.</li>
+            <li><?= lang('Simuladores.srs_rp_bullet_1'); ?></li>
+            <li><?= lang('Simuladores.srs_rp_bullet_2'); ?></li>
+            <li><?= lang('Simuladores.srs_rp_bullet_3'); ?></li>
+            <li><?= lang('Simuladores.srs_rp_bullet_4'); ?></li>
           </ul>
           <?php if (!empty($whatsAppBaseUrl)): ?>
-            <a class="gx-srs-btn gx-srs-btn-gold gx-srs-noprint" id="gx-srs-rp-wa" href="<?= esc($whatsAppBaseUrl); ?>" target="_blank" rel="noopener" style="width:auto; padding:0 var(--space-8); background:var(--gx-primary);">Falar com um especialista agora</a>
+            <a class="gx-srs-btn gx-srs-btn-gold gx-srs-noprint" id="gx-srs-rp-wa" href="<?= esc($whatsAppBaseUrl); ?>" target="_blank" rel="noopener" style="width:auto; padding:0 var(--space-8); background:var(--gx-primary);"><?= lang('Simuladores.srs_rp_wa_btn'); ?></a>
           <?php endif; ?>
         </section>
 
         <footer class="gx-srs-report-foot">
-          Documento gerado pelo simulador GX Capital. Os valores são <strong>projeções</strong> baseadas em IPCA estimado (5,5% a.a.), nos fatores de resgate da apólice e nas informações fornecidas; <strong>não constituem garantia</strong> de rentabilidade, oferta ou proposta de contratação. Custos de sucessão (ITCMD/inventário) são estimativas de referência e variam conforme a legislação estadual e o caso concreto. Condições, carências e coberturas seguem o regulamento do produto e a regulação da SUSEP. Prêmios incluem IOF de 0,38%.
+          <?= brandLang('Simuladores.srs_report_foot'); ?>
+
         </footer>
 
       </article>
@@ -318,24 +321,24 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
   <!-- modal de lead -->
   <div class="gx-srs-modal" id="gx-srs-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="gx-srs-modal-title">
     <div class="gx-srs-dialog">
-      <button type="button" class="gx-srs-close" id="gx-srs-modal-close" aria-label="Fechar">&times;</button>
-      <h2 id="gx-srs-modal-title">Veja o valor exato</h2>
-      <p>Liberamos na hora o aporte mensal recomendado e a sua reserva projetada em Reais. Um planejador da GX pode validar o plano com você.</p>
+      <button type="button" class="gx-srs-close" id="gx-srs-modal-close" aria-label="<?= esc(lang('Simuladores.srs_modal_close'), 'attr'); ?>">&times;</button>
+      <h2 id="gx-srs-modal-title"><?= lang('Simuladores.srs_modal_title'); ?></h2>
+      <p><?= lang('Simuladores.srs_modal_sub'); ?></p>
       <form id="gx-srs-lead-form" novalidate>
         <div class="gx-srs-field">
-          <label for="gx-srs-name">Nome</label>
+          <label for="gx-srs-name"><?= lang('Simuladores.srs_lbl_nome'); ?></label>
           <input class="gx-srs-input" type="text" id="gx-srs-name" name="name" autocomplete="name" required>
         </div>
         <div class="gx-srs-field">
-          <label for="gx-srs-email">E-mail</label>
+          <label for="gx-srs-email"><?= lang('Simuladores.srs_lbl_email'); ?></label>
           <input class="gx-srs-input" type="email" id="gx-srs-email" name="email" autocomplete="email" required>
         </div>
         <?= view('partials/_lead_phone_field', [
             'fieldIdPrefix' => 'gx-srs-phone',
-            'label' => 'WhatsApp / Telefone',
+            'label' => lang('Simuladores.srs_lbl_whatsapp'),
             'hint' => '',
         ]); ?>
-        <button type="submit" class="gx-srs-btn gx-srs-btn-primary" id="gx-srs-lead-submit">Desbloquear relatório</button>
+        <button type="submit" class="gx-srs-btn gx-srs-btn-primary" id="gx-srs-lead-submit"><?= lang('Simuladores.srs_desbloquear'); ?></button>
         <div class="gx-srs-status" id="gx-srs-lead-status"></div>
       </form>
     </div>
