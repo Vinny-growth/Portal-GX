@@ -89,10 +89,10 @@ class HomeController extends BaseController
     {
         $this->cachePage(300);
         $data = $this->buildEditorialHomeData([
-            'title' => 'Blog GX Capital',
-            'description' => 'Conteúdo técnico sobre câmbio, crédito estruturado, mercado de capitais, consórcios e investimentos.',
+            'title' => brandLang('Home.blog_title'),
+            'description' => brandLang('Home.blog_description'),
             'keywords' => trim($this->settings->keywords . ', blog gx capital, conteúdo técnico, mercado financeiro', ' ,'),
-            'homeTitle' => 'Blog GX Capital'
+            'homeTitle' => brandLang('Home.blog_title')
         ]);
 
         echo loadView('partials/_header', $data);
@@ -594,7 +594,7 @@ class HomeController extends BaseController
             'title' => $meta['title'] ?? $this->settings->home_title,
             'description' => $meta['description'] ?? $this->settings->site_description,
             'keywords' => $meta['keywords'] ?? $this->settings->keywords,
-            'homeTitle' => $meta['homeTitle'] ?? 'Blog GX Capital',
+            'homeTitle' => $meta['homeTitle'] ?? brandLang('Home.blog_title'),
             'latestPosts' => $this->postModel->getLatestPosts($this->activeLang->id, POST_NUM_LOAD_MORE, 0)
         ];
 
@@ -1147,9 +1147,9 @@ class HomeController extends BaseController
     {
         $canonicalUrl = langBaseUrl($page->slug ?? 'simulador-consorcio');
         $title = 'Simulador de Consórcio Inteligente';
-        $description = 'Simule seu consórcio grátis. Compare com financiamento, planeje sua compra e descubra a rota de contemplação mais rápida com IA. 20+ administradoras analisadas pela GX Capital.';
+        $description = brandLang('Home.consorcio_description');
         $contactChannels = $this->getMarketingContactChannels();
-        $defaultWhatsAppMessage = 'Olá! Vim pelo simulador de consórcio da GX Capital e quero validar a melhor estratégia para o meu caso.';
+        $defaultWhatsAppMessage = brandLang('Home.consorcio_wa');
         $whatsAppBaseUrl = '';
         if (!empty($contactChannels['whatsapp_digits'])) {
             $whatsAppBaseUrl = 'https://wa.me/' . $contactChannels['whatsapp_digits'];
@@ -1206,7 +1206,7 @@ class HomeController extends BaseController
         $description = 'Simule um seguro de vida resgatável (Whole Life) quitado em 10 anos, com correção anual e formação de reserva. Veja o ponto de break-even em que a reserva ultrapassa o que você pagou.';
 
         $contactChannels = $this->getMarketingContactChannels();
-        $defaultWhatsAppMessage = 'Olá! Fiz a simulação do Seguro de Vida Resgatável na GX Capital e quero estruturar meu plano.';
+        $defaultWhatsAppMessage = brandLang('Home.seguro_wa');
         $whatsAppBaseUrl = '';
         if (!empty($contactChannels['whatsapp_digits'])) {
             $whatsAppBaseUrl = 'https://wa.me/' . $contactChannels['whatsapp_digits'];
