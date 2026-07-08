@@ -689,6 +689,22 @@ if (!function_exists('escMeta')) {
     }
 }
 
+//monta o <title> de SEO: sufixo de marca condicional (higiene de títulos — site audit)
+if (!function_exists('seoTitle')) {
+    /**
+     * Anexa " - {site_title}" (marca) ao título só quando o resultado couber em ~60
+     * chars. Se o título editorial já é longo, retorna só o título — assim o Google
+     * mostra a keyword em vez de truncar a marca. Usado nos temas de conteúdo.
+     */
+    function seoTitle($title, $siteTitle, $max = 60)
+    {
+        $title = trim((string) $title);
+        $brand = ' - ' . trim((string) $siteTitle);
+
+        return (mb_strlen($title . $brand) <= $max) ? $title . $brand : $title;
+    }
+}
+
 //generate slug
 if (!function_exists('strSlug')) {
     function strSlug($str)

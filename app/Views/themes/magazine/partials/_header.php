@@ -23,7 +23,7 @@ if (document.cookie.indexOf('gx_cookie_consent=accepted') !== -1) {
     gtag('consent', 'update', { 'ad_storage': 'granted', 'ad_user_data': 'granted', 'ad_personalization': 'granted', 'analytics_storage': 'granted' });
 }
 </script>
-<title><?= escMeta($title); ?> - <?= escMeta($baseSettings->site_title); ?></title>
+<title><?= escMeta(seoTitle($title, $baseSettings->site_title)); ?></title>
 <meta name="description" content="<?= escMeta($description); ?>"/>
 <meta name="author" content="<?= escMeta($baseSettings->application_name); ?>"/>
 <meta name="robots" content="max-image-preview:large, max-snippet:-1, max-video-preview:-1">
