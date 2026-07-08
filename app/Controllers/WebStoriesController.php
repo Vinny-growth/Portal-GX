@@ -47,7 +47,7 @@ class WebStoriesController extends BaseController
      */
     public function index()
     {
-        $data['title'] = 'Web Stories - ' . esc($this->settings->site_title);
+        $data['title'] = 'Web Stories';
         $data['description'] = 'Explore our web stories collection';
         $data['keywords'] = 'web stories, visual content';
         

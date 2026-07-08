@@ -735,7 +735,7 @@ $aiSteps = [
                                         <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp gx-btn-sm" data-gx-whatsapp-link><?= $whatsAppIcon; ?>WhatsApp</a>
                                     <?php endif; ?>
                                     <?php if (!empty($contactPhone)): ?>
-                                        <a href="<?= !empty($contactPhoneHref) ? esc($contactPhoneHref) : '#'; ?>" class="gx-btn gx-btn-ghost gx-btn-sm"><?= esc($contactPhone); ?></a>
+                                        <a href="<?= !empty($contactPhoneHref) ? 'tel:' . esc($contactPhoneHref) : '#'; ?>" class="gx-btn gx-btn-ghost gx-btn-sm"><?= esc($contactPhone); ?></a>
                                     <?php endif; ?>
                                 </div>
                             </div>

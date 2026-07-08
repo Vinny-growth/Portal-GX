@@ -4,7 +4,7 @@
         <div class="col-12">
             <div class="web-stories-container">
                 <div class="section-header">
-                    <h1 class="page-title"><?= trans('web_stories'); ?></h1>
+                    <h1 class="page-title"><?= trans('web_stories') ?: 'Web Stories'; ?></h1>
                     <p class="page-description"><?= trans('explore_our_visual_stories'); ?></p>
                 </div>
 

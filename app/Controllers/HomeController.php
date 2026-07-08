@@ -352,6 +352,9 @@ class HomeController extends BaseController
         'itau-preve-desaceleracao-do-credito-o-que-isso-significa-para-sua-empresa-38'                    => 'itau-preve-desaceleracao-do-credito-o-que-isso-significa-para-sua-empresa',
         'selic-a-1475-analise-da-gx-capital-sobre-a-ata-do-copom-e-o-cenario-economico-atual-29'          => 'selic-a-1475-analise-da-gx-capital-sobre-a-ata-do-copom-e-o-cenario-economico-atual',
         'spread-bancario-como-e-formado-e-5-estrategias-para-pagar-menos-no-credito-empresarial'          => 'o-que-e-spread-bancario-e-por-que-o-credito-e-tao-caro-no-brasil',
+        // Slug renomeado (id 68): o "&" do título ("Defesa de Crédito & Risco") virou
+        // "ampamp" no slug (double-encoding). Renomeado p/ a versão limpa; 301 do antigo.
+        'guia-de-defesa-de-credito-ampamp-risco-ferramentas-processos-e-exemplos-para-blindar-fluxo-de-caixa' => 'guia-de-defesa-de-credito-risco-ferramentas-processos-e-exemplos-para-blindar-fluxo-de-caixa',
     ];
 
     public function duplicateRedirect()
