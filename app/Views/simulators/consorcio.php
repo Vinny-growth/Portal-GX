@@ -9,24 +9,24 @@ $whatsAppDefaultMessage = $whatsAppDefaultMessage ?? '';
 $whatsAppIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.52 3.48A11.8 11.8 0 0 0 12.08 0C5.55 0 .24 5.31.24 11.84c0 2.08.54 4.11 1.58 5.89L0 24l6.46-1.69a11.8 11.8 0 0 0 5.62 1.43h.01c6.53 0 11.84-5.31 11.84-11.84 0-3.16-1.23-6.13-3.41-8.42Zm-8.44 18.26h-.01a9.84 9.84 0 0 1-5.01-1.37l-.36-.22-3.84 1 1.03-3.74-.24-.38a9.8 9.8 0 0 1-1.51-5.2C2.14 6.42 6.66 1.9 12.08 1.9c2.63 0 5.1 1.02 6.96 2.88a9.78 9.78 0 0 1 2.89 6.97c0 5.42-4.42 9.99-9.85 9.99Zm5.39-7.41c-.29-.14-1.71-.84-1.98-.94-.26-.1-.45-.14-.64.14-.19.29-.74.94-.91 1.13-.17.19-.34.22-.63.07-.29-.14-1.21-.45-2.31-1.45-.85-.76-1.42-1.69-1.59-1.98-.17-.29-.02-.44.13-.58.13-.13.29-.34.43-.5.14-.17.19-.29.29-.48.1-.19.05-.36-.02-.5-.07-.14-.64-1.55-.87-2.12-.23-.55-.47-.48-.64-.49h-.55c-.19 0-.5.07-.76.36-.26.29-.99.97-.99 2.37s1.01 2.75 1.15 2.94c.14.19 1.98 3.03 4.79 4.25.67.29 1.2.47 1.61.6.68.22 1.3.19 1.79.12.55-.08 1.71-.7 1.95-1.37.24-.67.24-1.24.17-1.37-.07-.12-.26-.19-.55-.34Z"/></svg>';
 $termsHref = !empty($termsUrl) ? $termsUrl : '#';
 $navLinks = [
-    ['label' => 'A Mesa', 'href' => '#quem-somos'],
-    ['label' => 'Estratégias', 'href' => '#estrategias'],
-    ['label' => 'Simulador', 'href' => '#simulador'],
-    ['label' => 'Tecnologia', 'href' => '#tecnologia-ia'],
-    ['label' => 'Especialista', 'href' => '#fale-especialista'],
+    ['label' => lang('Consorcio.nav_mesa'), 'href' => '#quem-somos'],
+    ['label' => lang('Consorcio.nav_estrategias'), 'href' => '#estrategias'],
+    ['label' => lang('Consorcio.nav_simulador'), 'href' => '#simulador'],
+    ['label' => lang('Consorcio.nav_tecnologia'), 'href' => '#tecnologia-ia'],
+    ['label' => lang('Consorcio.nav_especialista'), 'href' => '#fale-especialista'],
 ];
 $heroProof = [
     [
-        'title' => '20+ administradoras',
-        'text' => 'Você não fica preso a uma prateleira. Comparamos as melhores opções do mercado.',
+        'title' => lang('Consorcio.hp1_title'),
+        'text' => lang('Consorcio.hp1_text'),
     ],
     [
-        'title' => '1.000+ grupos analisados',
-        'text' => 'IA cruza prazo, taxa e assembleia para achar o grupo certo para o seu perfil.',
+        'title' => lang('Consorcio.hp2_title'),
+        'text' => lang('Consorcio.hp2_text'),
     ],
     [
-        'title' => 'Resultado em minutos',
-        'text' => 'Diagnóstico imediato com números reais para decidir com segurança.',
+        'title' => lang('Consorcio.hp3_title'),
+        'text' => lang('Consorcio.hp3_text'),
     ],
 ];
 $heroSignals = [
@@ -108,8 +108,8 @@ $aiSteps = [
 <main class="gx-marketing gx-consorcio" data-gx-consorcio-page>
     <nav class="gx-nav" id="gx-nav">
         <div class="gx-nav-inner">
-            <a href="<?= langBaseUrl(); ?>" class="gx-nav-brand" aria-label="GX Capital">
-                <img src="<?= getLogo(); ?>" alt="GX Capital" width="<?= getLogoSize('width'); ?>" height="<?= getLogoSize('height'); ?>">
+            <a href="<?= langBaseUrl(); ?>" class="gx-nav-brand" aria-label="<?= esc(brand('display_name')); ?>">
+                <img src="<?= getLogo(); ?>" alt="<?= esc(brand('display_name')); ?>" width="<?= getLogoSize('width'); ?>" height="<?= getLogoSize('height'); ?>">
             </a>
 
             <div class="gx-nav-links" id="gx-nav-links">
@@ -117,15 +117,15 @@ $aiSteps = [
                     <a href="<?= esc($item['href']); ?>" class="gx-nav-link"><?= esc($item['label']); ?></a>
                 <?php endforeach; ?>
                 <div class="gx-nav-menu-extra">
-                    <a href="<?= esc($blogUrl); ?>" class="gx-nav-link">Blog</a>
-                    <a href="#fale-especialista" class="gx-btn gx-btn-primary">Receber meu plano</a>
+                    <a href="<?= esc($blogUrl); ?>" class="gx-nav-link"><?= lang('Consorcio.nav_blog'); ?></a>
+                    <a href="#fale-especialista" class="gx-btn gx-btn-primary"><?= lang('Consorcio.nav_cta'); ?></a>
                 </div>
             </div>
 
             <div class="gx-nav-right">
-                <a href="<?= esc($blogUrl); ?>" class="gx-nav-link">Blog</a>
-                <a href="#fale-especialista" class="gx-btn gx-btn-primary">Receber meu plano</a>
-                <button type="button" class="gx-nav-toggle" id="gx-nav-toggle" aria-expanded="false" aria-controls="gx-nav-links" aria-label="Menu">
+                <a href="<?= esc($blogUrl); ?>" class="gx-nav-link"><?= lang('Consorcio.nav_blog'); ?></a>
+                <a href="#fale-especialista" class="gx-btn gx-btn-primary"><?= lang('Consorcio.nav_cta'); ?></a>
+                <button type="button" class="gx-nav-toggle" id="gx-nav-toggle" aria-expanded="false" aria-controls="gx-nav-links" aria-label="<?= lang('Consorcio.nav_menu'); ?>">
                     <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
             </div>
@@ -136,14 +136,15 @@ $aiSteps = [
         <div class="gx-wrap">
             <div class="gx-consorcio-hero-grid">
                 <div data-gx-reveal>
-                    <div class="gx-consorcio-badge">Exclusivo GX Capital &mdash; simulador com inteligência artificial</div>
-                    <h1 class="gx-consorcio-title">Consórcio ou financiamento? Simule e descubra.</h1>
+                    <div class="gx-consorcio-badge"><?= brandLang('Consorcio.hero_badge'); ?></div>
+                    <h1 class="gx-consorcio-title"><?= lang('Consorcio.hero_title'); ?></h1>
                     <p class="gx-consorcio-copy">
-                        A GX Capital cruza 20+ administradoras com IA para encontrar a rota de contemplação mais rápida para o seu caso.
+                        <?= brandLang('Consorcio.hero_copy'); ?>
+
                     </p>
                     <div class="gx-consorcio-actions">
-                        <a href="#simulador" class="gx-btn gx-btn-primary gx-btn-lg">Simular agora &mdash; grátis</a>
-                        <p class="gx-consorcio-reassurance">Gratuito &bull; Sem compromisso &bull; Resultado em minutos</p>
+                        <a href="#simulador" class="gx-btn gx-btn-primary gx-btn-lg"><?= lang('Consorcio.hero_cta'); ?></a>
+                        <p class="gx-consorcio-reassurance"><?= lang('Consorcio.hero_reassurance'); ?></p>
                     </div>
                     <div class="gx-consorcio-proof-grid">
                         <?php foreach ($heroProof as $item): ?>
@@ -157,28 +158,28 @@ $aiSteps = [
 
                 <aside class="gx-consorcio-hero-card gx-mini-sim" data-gx-reveal data-gx-delay="120">
                     <div class="gx-consorcio-hero-card-top">
-                        <span>Simulação rápida</span>
-                        <span>GX Capital</span>
+                        <span><?= lang('Consorcio.mini_title'); ?></span>
+                        <span><?= esc(brand('display_name')); ?></span>
                     </div>
                     <div class="gx-mini-sim-body">
                         <div class="gx-mini-sim-field">
-                            <label for="gx-mini-sim-credit">Quanto você quer de carta de crédito?</label>
+                            <label for="gx-mini-sim-credit"><?= lang('Consorcio.mini_credit_label'); ?></label>
                             <output id="gx-mini-sim-credit-value" class="gx-mini-sim-output">R$ 450.000</output>
                             <input type="range" id="gx-mini-sim-credit" min="50000" max="1500000" step="50000" value="450000" class="gx-mini-sim-range">
                             <div class="gx-mini-sim-range-labels"><span>R$ 50 mil</span><span>R$ 1,5 mi</span></div>
                         </div>
                         <div class="gx-mini-sim-field">
-                            <label for="gx-mini-sim-months">Em quanto tempo quer ser contemplado?</label>
+                            <label for="gx-mini-sim-months"><?= lang('Consorcio.mini_months_label'); ?></label>
                             <output id="gx-mini-sim-months-value" class="gx-mini-sim-output">18 meses</output>
                             <input type="range" id="gx-mini-sim-months" min="12" max="200" step="1" value="18" class="gx-mini-sim-range">
                             <div class="gx-mini-sim-range-labels"><span>12 meses</span><span>200 meses</span></div>
                         </div>
-                        <button type="button" id="gx-mini-sim-btn" class="gx-btn gx-btn-primary gx-btn-lg gx-mini-sim-btn">Ver minha economia estimada &rarr;</button>
+                        <button type="button" id="gx-mini-sim-btn" class="gx-btn gx-btn-primary gx-btn-lg gx-mini-sim-btn"><?= lang('Consorcio.mini_btn'); ?></button>
                     </div>
                     <div id="gx-mini-sim-result" class="gx-mini-sim-result" hidden>
                         <strong id="gx-mini-sim-result-text">Você pode economizar até R$ 0</strong>
-                        <p>em relação ao financiamento tradicional.</p>
-                        <a href="#fale-especialista" class="gx-text-link">Quer o plano detalhado? &rarr;</a>
+                        <p><?= lang('Consorcio.mini_result_suffix'); ?></p>
+                        <a href="#fale-especialista" class="gx-text-link"><?= lang('Consorcio.mini_result_link'); ?></a>
                     </div>
                 </aside>
             </div>
@@ -189,8 +190,8 @@ $aiSteps = [
         <div class="gx-wrap">
             <div class="gx-quick-lead-card">
                 <div class="gx-quick-lead-text">
-                    <h2>Prefere que um especialista simule para você?</h2>
-                    <p>Deixe seu WhatsApp e receba um plano personalizado em até 24h. Sem compromisso.</p>
+                    <h2><?= lang('Consorcio.quick_h2'); ?></h2>
+                    <p><?= lang('Consorcio.quick_p'); ?></p>
                 </div>
                 <form id="gx-quick-lead-form" class="gx-quick-lead-form" novalidate>
                     <input type="hidden" name="lead_origin" value="Simulador de Consórcio - Quick Form Hero">
@@ -201,12 +202,12 @@ $aiSteps = [
                     <input type="hidden" name="meta_currency" value="BRL">
                     <input type="hidden" name="meta_value" value="">
                     <div class="gx-quick-lead-fields">
-                        <input type="text" name="name" placeholder="Seu nome" maxlength="199" autocomplete="name" required class="gx-quick-lead-input">
+                        <input type="text" name="name" placeholder="<?= esc(lang('Consorcio.quick_ph_name')); ?>" maxlength="199" autocomplete="name" required class="gx-quick-lead-input">
                         <input type="tel" name="phone" placeholder="(00) 00000-0000" maxlength="16" autocomplete="tel" inputmode="numeric" required class="gx-quick-lead-input" data-gx-quick-phone>
                         <input type="hidden" name="phone_country" value="BR">
-                        <button type="submit" class="gx-btn gx-btn-whatsapp gx-btn-lg gx-quick-lead-btn">Quero meu plano gratuito</button>
+                        <button type="submit" class="gx-btn gx-btn-whatsapp gx-btn-lg gx-quick-lead-btn"><?= lang('Consorcio.quick_btn'); ?></button>
                     </div>
-                    <p class="gx-quick-lead-trust">&#128274; Seus dados estão seguros. Sem spam.</p>
+                    <p class="gx-quick-lead-trust">&#128274; <?= lang('Consorcio.quick_trust'); ?></p>
                     <div id="gx-quick-lead-status" class="gx-consorcio-lead-status" aria-live="polite" hidden></div>
                 </form>
             </div>
@@ -215,11 +216,11 @@ $aiSteps = [
 
     <div class="gx-strip">
         <div class="gx-strip-inner" data-gx-reveal>
-            <span class="gx-strip-lead">4 passos</span>
-            <span class="gx-strip-item">Escolha seu objetivo</span>
-            <span class="gx-strip-item">Ajuste os números</span>
-            <span class="gx-strip-item">Veja o resultado ao vivo</span>
-            <span class="gx-strip-item">Receba o plano do especialista</span>
+            <span class="gx-strip-lead"><?= lang('Consorcio.strip_lead'); ?></span>
+            <span class="gx-strip-item"><?= lang('Consorcio.strip_1'); ?></span>
+            <span class="gx-strip-item"><?= lang('Consorcio.strip_2'); ?></span>
+            <span class="gx-strip-item"><?= lang('Consorcio.strip_3'); ?></span>
+            <span class="gx-strip-item"><?= lang('Consorcio.strip_4'); ?></span>
         </div>
     </div>
 
@@ -227,38 +228,40 @@ $aiSteps = [
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label">Quem está por trás do simulador</p>
-                    <h2 class="gx-section-title">Consórcio com estratégia de contemplação, não com parcela genérica.</h2>
+                    <p class="gx-label"><?= lang('Consorcio.auth_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Consorcio.auth_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    A GX Capital é uma boutique financeira fundada por <strong>Vinicius Teixeira</strong>, com mais de 16 anos de atuação em mercado financeiro. A frente de consórcio nasceu da mesma lógica que a mesa de câmbio e crédito: comparar dezenas de opções, filtrar com tecnologia e recomendar a estrutura mais eficiente para cada perfil.
+                    <?= brandLang('Consorcio.auth_desc'); ?>
+
                 </p>
             </div>
 
             <div class="gx-grid-3 gx-consorcio-authority-grid" data-gx-reveal data-gx-delay="80">
                 <article class="gx-card">
                     <div class="gx-card-icon">CF</div>
-                    <p class="gx-card-label">Comparativo estruturado</p>
-                    <h3 class="gx-card-title">Consórcio x financiamento com números reais, não com propaganda.</h3>
-                    <p class="gx-card-desc">A decisão entre consórcio e financiamento depende de entrada disponível, custo total, prazo e capacidade de lance. O simulador coloca os dois lado a lado para que a conta fale por si.</p>
+                    <p class="gx-card-label"><?= lang('Consorcio.auth_card1_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Consorcio.auth_card1_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Consorcio.auth_card1_desc'); ?></p>
                 </article>
                 <article class="gx-card">
                     <div class="gx-card-icon">PLN</div>
-                    <p class="gx-card-label">Planejamento de contemplação</p>
-                    <h3 class="gx-card-title">Rota para contemplar no prazo certo, com o grupo certo.</h3>
-                    <p class="gx-card-desc">A IA cruza mais de 20 administradoras e 1.000+ grupos para encontrar a combinação de taxa, assembleia e estratégia de lance mais aderente ao seu fluxo de caixa e objetivo.</p>
+                    <p class="gx-card-label"><?= lang('Consorcio.auth_card2_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Consorcio.auth_card2_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Consorcio.auth_card2_desc'); ?></p>
                 </article>
                 <article class="gx-card">
                     <div class="gx-card-icon">INV</div>
-                    <p class="gx-card-label">Tese de investimento</p>
-                    <h3 class="gx-card-title">Consórcio como veículo de retorno, não só de compra.</h3>
-                    <p class="gx-card-desc">Para quem quer contemplar e revender com margem, o simulador projeta ROI líquido, custo de carregamento e break-even. O especialista valida a tese antes de você entrar no grupo.</p>
+                    <p class="gx-card-label"><?= lang('Consorcio.auth_card3_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Consorcio.auth_card3_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Consorcio.auth_card3_desc'); ?></p>
                 </article>
             </div>
 
             <div class="gx-fx-boutique-note" data-gx-reveal data-gx-delay="140">
                 <p>
-                    <strong>Modelo independente:</strong> a GX Capital não é administradora de consórcio e não tem cota própria para vender. Isso permite recomendar o grupo, a administradora e a estratégia de lance mais eficiente para o seu caso, sem viés comercial. Os simuladores abaixo são o primeiro passo para dimensionar a operação antes de falar com o especialista.
+                    <?= brandLang('Consorcio.boutique_note'); ?>
+
                 </p>
             </div>
         </div>
