@@ -1208,6 +1208,33 @@ class HomeController extends BaseController
         $title = 'Simulador de Seguro de Vida Resgatável';
         $description = 'Simule um seguro de vida resgatável (Whole Life) quitado em 10 anos, com correção anual e formação de reserva. Veja o ponto de break-even em que a reserva ultrapassa o que você pagou.';
 
+        // SEO/GEO: imagem social dedicada (1200x630) + schema de ferramenta, trilha e FAQ.
+        $ogImage = base_url('uploads/marketing/srs_og.jpg');
+        helper('jsonld');
+        $faqItems = lang('Simuladores.srs_faq');
+        if (!is_array($faqItems)) {
+            $faqItems = [];
+        }
+        $marketingSchema = jsonldGraph([
+            [
+                '@type'              => 'WebPage',
+                '@id'                => $canonicalUrl . '#webpage',
+                'url'                => $canonicalUrl,
+                'name'               => $title,
+                'description'        => $description,
+                'inLanguage'         => $this->activeLang->language_code ?? 'pt-br',
+                'isPartOf'           => ['@id' => base_url() . '/#website'],
+                'primaryImageOfPage' => $ogImage,
+            ],
+            jsonldSoftwareApplication($canonicalUrl, $title, $description, ['image' => $ogImage]),
+            jsonldBreadcrumb([
+                ['name' => 'Início', 'url' => base_url()],
+                ['name' => 'Simuladores', 'url' => langBaseUrl('simuladores')],
+                ['name' => 'Seguro de Vida Resgatável'],
+            ]),
+            jsonldFaqPage($faqItems, $canonicalUrl . '#faq'),
+        ]);
+
         $contactChannels = $this->getMarketingContactChannels();
         $defaultWhatsAppMessage = brandLang('Home.seguro_wa');
         $whatsAppBaseUrl = '';
@@ -1222,8 +1249,16 @@ class HomeController extends BaseController
             'bodyClass' => 'gx-marketing-home gx-srs-page',
             'pageHeadView' => 'simulators/_seguro_resgatavel_head',
             'canonicalUrl' => $canonicalUrl,
-            'socialImage' => getLogo(),
+            'socialImage' => $ogImage,
+            'socialImageWidth' => 1200,
+            'socialImageHeight' => 630,
             'ogDescription' => $description,
+            'marketingSchema' => $marketingSchema,
+            'faqItems' => $faqItems,
+            'hreflangAlternates' => [
+                ['url' => $canonicalUrl, 'hreflang' => $this->activeLang->language_code ?? 'pt-br'],
+                ['url' => $canonicalUrl, 'hreflang' => 'x-default'],
+            ],
             'blogUrl' => langBaseUrl('blog'),
             'simulatorsHubUrl' => langBaseUrl('simuladores'),
             'wealthUrl' => base_url('wealth'),

@@ -149,4 +149,47 @@
 /* consentimento de contato (modal) */
 .gx-srs-consent { display: flex; align-items: flex-start; gap: var(--space-2); margin: 0 0 var(--space-5); font-size: var(--fs-sm); line-height: var(--lh-snug); color: var(--fg2); cursor: pointer; }
 .gx-srs-consent input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--gx-primary); flex: 0 0 auto; }
+
+/* âncora de valor da oferta — "De R$ 1.297 por grátis" (pílula navy que destaca o brinde) */
+.gx-srs-anchor { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--space-1) var(--space-3); padding: var(--space-2) var(--space-4); background: var(--gx-primary-dark); border-left: 3px solid var(--gx-gold); }
+.gx-srs-anchor-tag { font-size: var(--fs-xs); font-weight: var(--fw-bold); letter-spacing: var(--ls-wide); text-transform: uppercase; color: rgba(255,255,255,0.72); }
+.gx-srs-anchor-old { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-decoration: line-through; color: rgba(255,255,255,0.5); }
+.gx-srs-anchor-new { font-family: var(--font-sans); font-weight: var(--fw-black); letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--gx-gold); }
+
+/* ===== conteúdo educacional (SEO/GEO) ===== */
+.gx-srs-learn { background: var(--bg1); border-top: 1px solid var(--gx-border); padding: var(--space-16) 0 var(--space-20); }
+.gx-srs-learn-block { max-width: 820px; margin: 0 auto var(--space-12); }
+.gx-srs-learn-eyebrow { display: inline-flex; align-items: center; gap: var(--space-3); font-size: var(--fs-xs); font-weight: var(--fw-bold); letter-spacing: var(--ls-widest); text-transform: uppercase; color: var(--gx-secondary-dark); margin-bottom: var(--space-3); }
+.gx-srs-learn-eyebrow::before { content: ""; width: 32px; height: 2px; background: var(--gx-primary); display: inline-block; }
+.gx-srs-learn-h2 { font-family: var(--font-display); font-weight: var(--fw-black); font-size: clamp(24px, 3.4vw, 38px); line-height: 1.03; letter-spacing: var(--ls-tight); text-transform: uppercase; color: var(--gx-primary-dark); margin: 0 0 var(--space-5); }
+.gx-srs-learn-p { font-size: var(--fs-md); line-height: var(--lh-relaxed); color: var(--fg2); margin: 0 0 var(--space-4); }
+.gx-srs-learn-p strong { color: var(--gx-primary); font-weight: var(--fw-bold); }
+.gx-srs-learn-p em { font-style: italic; color: var(--fg1); }
+
+/* passos numerados (número em JetBrains Mono) */
+.gx-srs-steps { list-style: none; counter-reset: gxstep; margin: 0; padding: 0; }
+.gx-srs-steps li { counter-increment: gxstep; position: relative; padding: var(--space-4) 0 var(--space-4) var(--space-12); border-bottom: 1px solid var(--gx-border); font-size: var(--fs-md); line-height: var(--lh-normal); color: var(--fg1); }
+.gx-srs-steps li:last-child { border-bottom: 0; }
+.gx-srs-steps li::before { content: counter(gxstep, decimal-leading-zero); position: absolute; left: 0; top: var(--space-4); font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: var(--fw-black); font-size: var(--fs-lg); color: var(--gx-gold); }
+
+/* tabela comparativa (coluna do produto destacada em navy) */
+.gx-srs-cmp-wrap { overflow-x: auto; border: 1px solid var(--gx-border); box-shadow: var(--shadow-card); }
+.gx-srs-cmp { width: 100%; min-width: 640px; border-collapse: collapse; font-size: var(--fs-sm); }
+.gx-srs-cmp th, .gx-srs-cmp td { text-align: left; vertical-align: top; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--gx-border); border-right: 1px solid var(--gx-border); }
+.gx-srs-cmp tr th:last-child, .gx-srs-cmp tr td:last-child { border-right: 0; }
+.gx-srs-cmp tbody tr:last-child th, .gx-srs-cmp tbody tr:last-child td { border-bottom: 0; }
+.gx-srs-cmp thead th { background: var(--bg2); font-size: var(--fs-xs); font-weight: var(--fw-black); letter-spacing: var(--ls-wide); text-transform: uppercase; color: var(--gx-secondary-dark); }
+.gx-srs-cmp tbody th[scope="row"] { background: var(--bg2); font-weight: var(--fw-bold); color: var(--fg1); }
+.gx-srs-cmp .is-hero { background: var(--gx-primary); color: #fff; }
+.gx-srs-cmp thead th.is-hero { color: var(--gx-gold); }
+.gx-srs-cmp tbody td.is-hero { color: #fff; font-weight: var(--fw-semibold); border-right-color: rgba(255,255,255,0.15); }
+
+/* FAQ (componente _faq_section) alinhado à largura de leitura */
+.gx-srs-learn .gx-faq { max-width: 820px; margin: var(--space-12) auto; }
+
+/* links relacionados (internal linking) */
+.gx-srs-related ul { list-style: none; margin: var(--space-2) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+.gx-srs-related li { border-left: 3px solid var(--gx-gold); }
+.gx-srs-related a { display: block; padding: var(--space-3) var(--space-4); background: var(--bg2); color: var(--gx-primary); font-weight: var(--fw-bold); font-size: var(--fs-sm); text-decoration: none; transition: var(--transition-fast); }
+.gx-srs-related a:hover { background: var(--gx-primary); color: #fff; transform: translateX(2px); }
 </style>

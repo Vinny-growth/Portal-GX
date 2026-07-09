@@ -74,12 +74,20 @@ endif; ?>
 <link rel="alternate" type="application/rss+xml" title="<?= escMeta($baseSettings->application_name); ?> - RSS" href="<?= base_url('rss/latest-posts'); ?>">
 <link rel="shortcut icon" type="image/png" href="<?= getFavicon(); ?>">
 <link rel="canonical" href="<?= esc($canonicalUrl ?? langBaseUrl()); ?>">
-<?php if (!empty($activeLanguages)):
-    foreach ($activeLanguages as $language): ?>
-<link rel="alternate" href="<?= esc(generateBaseURLByLang($language)); ?>" hreflang="<?= escMeta($language->language_code); ?>">
+<?php if (!empty($hreflangAlternates)):
+    // Override por página: alternates apontam para a URL da PRÓPRIA página (autorreferência),
+    // não para a home de cada idioma. Retrocompatível — só afeta quem passa a variável.
+    foreach ($hreflangAlternates as $alt): ?>
+<link rel="alternate" href="<?= esc($alt['url']); ?>" hreflang="<?= escMeta($alt['hreflang']); ?>">
 <?php endforeach;
-endif; ?>
+else:
+    if (!empty($activeLanguages)):
+        foreach ($activeLanguages as $language): ?>
+<link rel="alternate" href="<?= esc(generateBaseURLByLang($language)); ?>" hreflang="<?= escMeta($language->language_code); ?>">
+<?php   endforeach;
+    endif; ?>
 <link rel="alternate" href="<?= esc(generateBaseURLByLangId($generalSettings->site_lang)); ?>" hreflang="x-default">
+<?php endif; ?>
 <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/inter/inter-400.woff2'); ?>">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/inter/inter-600.woff2'); ?>">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/inter/inter-700.woff2'); ?>">
