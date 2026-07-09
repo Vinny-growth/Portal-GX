@@ -376,205 +376,205 @@ $aiSteps = [
                     <form class="gx-consorcio-form-grid" id="gx-consorcio-simulator-form" novalidate>
                         <section class="gx-consorcio-fieldset">
                             <div class="gx-consorcio-fieldset-head">
-                                <h3>Dados da cota</h3>
-                                <p>Informe o valor do bem e as condições do grupo. Esses campos valem para qualquer cenário.</p>
+                                <h3><?= lang('Consorcio.f_cota_head'); ?></h3>
+                                <p><?= lang('Consorcio.f_cota_desc'); ?></p>
                             </div>
                             <div class="gx-consorcio-field-grid">
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Valor da carta de crédito</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_credit'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix">R$</span>
                                         <input type="number" name="credit_value" min="50000" step="1000" value="450000" inputmode="decimal">
                                     </div>
-                                    <small>Use o valor do imóvel ou do ativo que pretende adquirir.</small>
+                                    <small><?= lang('Consorcio.f_credit_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Prazo do grupo</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_term'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="term_months" min="24" max="240" step="1" value="180" inputmode="numeric">
-                                        <span class="gx-consorcio-input-suffix">meses</span>
+                                        <span class="gx-consorcio-input-suffix"><?= lang('Consorcio.f_meses'); ?></span>
                                     </div>
-                                    <small>Prazo total de pagamento da cota.</small>
+                                    <small><?= lang('Consorcio.f_term_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Taxa administrativa</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_admin'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="admin_fee_pct" min="0" max="30" step="0.1" value="18" inputmode="decimal">
                                         <span class="gx-consorcio-input-suffix">%</span>
                                     </div>
-                                    <small>Percentual total de taxa administrativa considerado na estrutura.</small>
+                                    <small><?= lang('Consorcio.f_admin_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Fundo de reserva</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_reserve'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="reserve_fee_pct" min="0" max="15" step="0.1" value="2" inputmode="decimal">
                                         <span class="gx-consorcio-input-suffix">%</span>
                                     </div>
-                                    <small>Percentual adicional para reserva e composição do custo.</small>
+                                    <small><?= lang('Consorcio.f_reserve_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Meta de contemplação</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_target'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="target_month" min="1" max="120" step="1" value="18" inputmode="numeric">
-                                        <span class="gx-consorcio-input-suffix">mês</span>
+                                        <span class="gx-consorcio-input-suffix"><?= lang('Consorcio.f_mes'); ?></span>
                                     </div>
-                                    <small>Janela que você deseja mirar para a contemplação.</small>
+                                    <small><?= lang('Consorcio.f_target_h'); ?></small>
                                 </label>
                             </div>
                         </section>
 
                         <section class="gx-consorcio-fieldset" data-gx-scenario-panel="compare">
                             <div class="gx-consorcio-fieldset-head">
-                                <h3>Compare com o financiamento</h3>
-                                <p>Informe quanto você tem de entrada e as condições do financiamento para ver a diferença real.</p>
+                                <h3><?= lang('Consorcio.f_cmp_head'); ?></h3>
+                                <p><?= lang('Consorcio.f_cmp_desc'); ?></p>
                             </div>
                             <div class="gx-consorcio-field-grid">
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Recurso disponível para entrada/lance</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_entry'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix">R$</span>
                                         <input type="number" name="entry_value" min="0" step="1000" value="90000" inputmode="decimal">
                                     </div>
-                                    <small>Valor que você já teria para usar no início da operação.</small>
+                                    <small><?= lang('Consorcio.f_entry_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Taxa anual do financiamento</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_frate'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="financing_rate_annual" min="0" max="40" step="0.1" value="11.5" inputmode="decimal">
-                                        <span class="gx-consorcio-input-suffix">% a.a.</span>
+                                        <span class="gx-consorcio-input-suffix"><?= lang('Consorcio.f_aa'); ?></span>
                                     </div>
-                                    <small>Taxa nominal usada para o comparativo da linha de crédito tradicional.</small>
+                                    <small><?= lang('Consorcio.f_frate_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Prazo do financiamento</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_fterm'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="financing_term_months" min="12" max="420" step="1" value="360" inputmode="numeric">
-                                        <span class="gx-consorcio-input-suffix">meses</span>
+                                        <span class="gx-consorcio-input-suffix"><?= lang('Consorcio.f_meses'); ?></span>
                                     </div>
-                                    <small>Prazo total do contrato de financiamento usado como referência.</small>
+                                    <small><?= lang('Consorcio.f_fterm_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Custos iniciais do financiamento</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_fcost'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="financing_fee_pct" min="0" max="10" step="0.1" value="3" inputmode="decimal">
                                         <span class="gx-consorcio-input-suffix">%</span>
                                     </div>
-                                    <small>Inclua tarifas, seguros embutidos ou custos acessórios de contratação.</small>
+                                    <small><?= lang('Consorcio.f_fcost_h'); ?></small>
                                 </label>
                             </div>
                         </section>
 
                         <section class="gx-consorcio-fieldset" data-gx-scenario-panel="planned" hidden>
                             <div class="gx-consorcio-fieldset-head">
-                                <h3>Planeje sua compra</h3>
-                                <p>Informe quanto consegue guardar por mês e veja se dá para contemplar no prazo que você precisa.</p>
+                                <h3><?= lang('Consorcio.f_pln_head'); ?></h3>
+                                <p><?= lang('Consorcio.f_pln_desc'); ?></p>
                             </div>
                             <div class="gx-consorcio-field-grid">
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Reserva disponível hoje</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_avail'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix">R$</span>
                                         <input type="number" name="available_bid" min="0" step="1000" value="60000" inputmode="decimal">
                                     </div>
-                                    <small>Valor já disponível para compor a estratégia de lance.</small>
+                                    <small><?= lang('Consorcio.f_avail_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Reserva mensal para lance</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_mreserve'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix">R$</span>
                                         <input type="number" name="monthly_reserve" min="0" step="100" value="3500" inputmode="decimal">
                                     </div>
-                                    <small>Quanto você consegue acumular por mês além da parcela.</small>
+                                    <small><?= lang('Consorcio.f_mreserve_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Orçamento mensal confortável</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_mbudget'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix">R$</span>
                                         <input type="number" name="monthly_budget" min="0" step="100" value="7000" inputmode="decimal">
                                     </div>
-                                    <small>Teto que você deseja respeitar somando parcela e formação de reserva.</small>
+                                    <small><?= lang('Consorcio.f_mbudget_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Correção anual esperada do ativo</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_correction'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="expected_correction_annual" min="0" max="20" step="0.1" value="5" inputmode="decimal">
-                                        <span class="gx-consorcio-input-suffix">% a.a.</span>
+                                        <span class="gx-consorcio-input-suffix"><?= lang('Consorcio.f_aa'); ?></span>
                                     </div>
-                                    <small>Serve para ajustar o valor de referência do imóvel até a contemplação.</small>
+                                    <small><?= lang('Consorcio.f_correction_h'); ?></small>
                                 </label>
                             </div>
                         </section>
 
                         <section class="gx-consorcio-fieldset" data-gx-scenario-panel="investor" hidden>
                             <div class="gx-consorcio-fieldset-head">
-                                <h3>Calcule o retorno da revenda</h3>
-                                <p>Informe o capital disponível e a margem esperada para ver se a operação vale o investimento.</p>
+                                <h3><?= lang('Consorcio.f_inv_head'); ?></h3>
+                                <p><?= lang('Consorcio.f_inv_desc'); ?></p>
                             </div>
                             <div class="gx-consorcio-field-grid is-wide">
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Caixa para lance próprio</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_bidcash'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix">R$</span>
                                         <input type="number" name="bid_cash" min="0" step="1000" value="120000" inputmode="decimal">
                                     </div>
-                                    <small>Capital que você pretende usar para acelerar a contemplação.</small>
+                                    <small><?= lang('Consorcio.f_bidcash_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Margem esperada na revenda</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_margin'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="resale_margin_pct" min="0" max="50" step="0.1" value="18" inputmode="decimal">
                                         <span class="gx-consorcio-input-suffix">%</span>
                                     </div>
-                                    <small>Margem bruta estimada entre aquisição e revenda.</small>
+                                    <small><?= lang('Consorcio.f_margin_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Custos de saída e transação</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_salecost'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="sale_cost_pct" min="0" max="15" step="0.1" value="6" inputmode="decimal">
                                         <span class="gx-consorcio-input-suffix">%</span>
                                     </div>
-                                    <small>Inclua corretagem, impostos, documentação e atritos da operação.</small>
+                                    <small><?= lang('Consorcio.f_salecost_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Meses até a revenda após contemplação</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_holdmonths'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix is-empty" aria-hidden="true"></span>
                                         <input type="number" name="holding_months" min="1" max="60" step="1" value="8" inputmode="numeric">
-                                        <span class="gx-consorcio-input-suffix">meses</span>
+                                        <span class="gx-consorcio-input-suffix"><?= lang('Consorcio.f_meses'); ?></span>
                                     </div>
-                                    <small>Horizonte entre contemplação, aquisição e venda do ativo.</small>
+                                    <small><?= lang('Consorcio.f_holdmonths_h'); ?></small>
                                 </label>
 
                                 <label class="gx-consorcio-field">
-                                    <span class="gx-consorcio-field-label">Custo mensal de carregamento</span>
+                                    <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_holdcost'); ?></span>
                                     <div class="gx-consorcio-input-shell">
                                         <span class="gx-consorcio-input-prefix">R$</span>
                                         <input type="number" name="holding_cost_monthly" min="0" step="100" value="900" inputmode="decimal">
                                     </div>
-                                    <small>Condomínio, manutenção, carência de aluguel ou outro custo de carregamento.</small>
+                                    <small><?= lang('Consorcio.f_holdcost_h'); ?></small>
                                 </label>
                             </div>
                         </section>

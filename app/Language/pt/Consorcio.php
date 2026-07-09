@@ -125,4 +125,63 @@ return [
     'sim_switcher_aria'  => 'Escolha a jornada do simulador',
     'sim_infobar_strong' => 'Os resultados atualizam ao vivo.',
     'sim_infobar_span'   => 'Mude qualquer campo e veja o impacto na parcela, no custo total e na viabilidade da contemplação.',
+
+    // ===================================================================
+    // 4b-3 — formulário do simulador (4 fieldsets). Sufixo '%' fica literal.
+    // ===================================================================
+    'f_meses' => 'meses',
+    'f_mes'   => 'mês',
+    'f_aa'    => '% a.a.',
+
+    // fieldset: dados da cota
+    'f_cota_head'  => 'Dados da cota',
+    'f_cota_desc'  => 'Informe o valor do bem e as condições do grupo. Esses campos valem para qualquer cenário.',
+    'f_credit'     => 'Valor da carta de crédito',
+    'f_credit_h'   => 'Use o valor do imóvel ou do ativo que pretende adquirir.',
+    'f_term'       => 'Prazo do grupo',
+    'f_term_h'     => 'Prazo total de pagamento da cota.',
+    'f_admin'      => 'Taxa administrativa',
+    'f_admin_h'    => 'Percentual total de taxa administrativa considerado na estrutura.',
+    'f_reserve'    => 'Fundo de reserva',
+    'f_reserve_h'  => 'Percentual adicional para reserva e composição do custo.',
+    'f_target'     => 'Meta de contemplação',
+    'f_target_h'   => 'Janela que você deseja mirar para a contemplação.',
+
+    // fieldset: compare com o financiamento
+    'f_cmp_head'   => 'Compare com o financiamento',
+    'f_cmp_desc'   => 'Informe quanto você tem de entrada e as condições do financiamento para ver a diferença real.',
+    'f_entry'      => 'Recurso disponível para entrada/lance',
+    'f_entry_h'    => 'Valor que você já teria para usar no início da operação.',
+    'f_frate'      => 'Taxa anual do financiamento',
+    'f_frate_h'    => 'Taxa nominal usada para o comparativo da linha de crédito tradicional.',
+    'f_fterm'      => 'Prazo do financiamento',
+    'f_fterm_h'    => 'Prazo total do contrato de financiamento usado como referência.',
+    'f_fcost'      => 'Custos iniciais do financiamento',
+    'f_fcost_h'    => 'Inclua tarifas, seguros embutidos ou custos acessórios de contratação.',
+
+    // fieldset: planeje sua compra
+    'f_pln_head'    => 'Planeje sua compra',
+    'f_pln_desc'    => 'Informe quanto consegue guardar por mês e veja se dá para contemplar no prazo que você precisa.',
+    'f_avail'       => 'Reserva disponível hoje',
+    'f_avail_h'     => 'Valor já disponível para compor a estratégia de lance.',
+    'f_mreserve'    => 'Reserva mensal para lance',
+    'f_mreserve_h'  => 'Quanto você consegue acumular por mês além da parcela.',
+    'f_mbudget'     => 'Orçamento mensal confortável',
+    'f_mbudget_h'   => 'Teto que você deseja respeitar somando parcela e formação de reserva.',
+    'f_correction'  => 'Correção anual esperada do ativo',
+    'f_correction_h' => 'Serve para ajustar o valor de referência do imóvel até a contemplação.',
+
+    // fieldset: calcule o retorno da revenda
+    'f_inv_head'     => 'Calcule o retorno da revenda',
+    'f_inv_desc'     => 'Informe o capital disponível e a margem esperada para ver se a operação vale o investimento.',
+    'f_bidcash'      => 'Caixa para lance próprio',
+    'f_bidcash_h'    => 'Capital que você pretende usar para acelerar a contemplação.',
+    'f_margin'       => 'Margem esperada na revenda',
+    'f_margin_h'     => 'Margem bruta estimada entre aquisição e revenda.',
+    'f_salecost'     => 'Custos de saída e transação',
+    'f_salecost_h'   => 'Inclua corretagem, impostos, documentação e atritos da operação.',
+    'f_holdmonths'   => 'Meses até a revenda após contemplação',
+    'f_holdmonths_h' => 'Horizonte entre contemplação, aquisição e venda do ativo.',
+    'f_holdcost'     => 'Custo mensal de carregamento',
+    'f_holdcost_h'   => 'Condomínio, manutenção, carência de aluguel ou outro custo de carregamento.',
 ];
