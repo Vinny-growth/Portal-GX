@@ -6,8 +6,6 @@ $previewUrl = base_url('api/quotation/preview');
 $unlockUrl  = base_url('api/quotation/unlock');
 $heroImgRel = 'uploads/marketing/srs_hero.webp';
 $heroImgUrl = is_file(FCPATH . $heroImgRel) ? base_url($heroImgRel) : '';
-$reportCoverRel = 'uploads/marketing/srs_report_cover.webp';
-$reportCoverUrl = is_file(FCPATH . $reportCoverRel) ? base_url($reportCoverRel) : '';
 $ufList = \App\Libraries\QuotationGate::ufList();
 $itcmdMap = \App\Libraries\QuotationGate::itcmdMap();
 $inventarioRate = \App\Libraries\QuotationGate::INVENTARIO_RATE;
@@ -18,8 +16,8 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
   <!-- topbar -->
   <header class="gx-srs-topbar">
     <div class="gx-srs-wrap">
-      <a href="<?= esc(base_url()); ?>" class="gx-srs-brand" aria-label="<?= esc(brand('display_name')); ?>">
-        <img src="<?= getLogoFooter(); ?>" alt="<?= esc(brand('display_name')); ?>">
+      <a href="<?= esc(base_url()); ?>" class="gx-srs-brand" aria-label="<?= esc(brand('display_name'), 'attr'); ?>">
+        <img src="<?= getLogoFooter(); ?>" alt="<?= esc(brand('display_name'), 'attr'); ?>">
       </a>
       <a href="<?= esc($simulatorsHubUrl); ?>" class="gx-srs-back">&larr; <?= lang('Simuladores.srs_back'); ?></a>
     </div>
@@ -182,7 +180,6 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
 
           <div class="gx-srs-placeholder" id="gx-srs-placeholder">
             <?= lang('Simuladores.srs_placeholder'); ?>
-
           </div>
 
           <div class="gx-srs-result" id="gx-srs-result">
@@ -205,19 +202,19 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
 
             <div class="gx-srs-kpis">
               <div class="gx-srs-kpi is-navy">
-                <div class="gx-srs-kpi-label"><?= lang('Simuladores.srs_aporte_mensal'); ?></div>
-                <div class="gx-srs-kpi-value gx-srs-blur" id="gx-srs-kpi-aporte">R$ ••••</div>
-                <div class="gx-srs-kpi-sub"><?= lang('Simuladores.srs_kpi_aporte_sub'); ?></div>
+                <div class="gx-srs-kpi-label"><?= lang('Simuladores.srs_kpi_breakeven'); ?></div>
+                <div class="gx-srs-kpi-value" id="gx-srs-kpi-breakeven">—</div>
+                <div class="gx-srs-kpi-sub" id="gx-srs-kpi-breakeven-sub"><?= lang('Simuladores.srs_kpi_breakeven_sub'); ?></div>
               </div>
               <div class="gx-srs-kpi is-dark">
-                <div class="gx-srs-kpi-label"><?= lang('Simuladores.srs_kpi_reserva65'); ?></div>
-                <div class="gx-srs-kpi-value gx-srs-blur" id="gx-srs-kpi-reserva65">R$ ••••</div>
-                <div class="gx-srs-kpi-sub"><?= lang('Simuladores.srs_kpi_reserva65_sub'); ?></div>
+                <div class="gx-srs-kpi-label"><?= lang('Simuladores.srs_kpi_quitacao'); ?></div>
+                <div class="gx-srs-kpi-value" id="gx-srs-kpi-quitacao">—</div>
+                <div class="gx-srs-kpi-sub"><?= lang('Simuladores.srs_kpi_quitacao_sub'); ?></div>
               </div>
               <div class="gx-srs-kpi">
-                <div class="gx-srs-kpi-label"><?= lang('Simuladores.srs_kpi_breakeven'); ?></div>
-                <div class="gx-srs-kpi-value" id="gx-srs-kpi-breakeven" style="color:var(--gx-primary)">—</div>
-                <div class="gx-srs-kpi-sub" id="gx-srs-kpi-breakeven-sub"><?= lang('Simuladores.srs_kpi_breakeven_sub'); ?></div>
+                <div class="gx-srs-kpi-label"><?= lang('Simuladores.srs_kpi_protecao'); ?></div>
+                <div class="gx-srs-kpi-value" id="gx-srs-kpi-protecao" style="color:var(--gx-primary)">—</div>
+                <div class="gx-srs-kpi-sub"><?= lang('Simuladores.srs_kpi_protecao_sub'); ?></div>
               </div>
             </div>
 
@@ -231,7 +228,6 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
 
             <div class="gx-srs-disclaimer">
               <?= lang('Simuladores.srs_disclaimer'); ?>
-
             </div>
           </div>
         </section>
@@ -239,84 +235,6 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
       </div>
     </div>
   </main>
-
-  <!-- relatório (documento de entrega) -->
-  <section class="gx-srs-reportwrap" id="gx-srs-reportwrap" hidden>
-    <div class="gx-srs-wrap">
-      <article class="gx-srs-report" id="gx-srs-report">
-
-        <div class="gx-srs-report-toolbar gx-srs-noprint">
-          <span class="gx-srs-eyebrow"><?= lang('Simuladores.srs_report_toolbar'); ?></span>
-          <button class="gx-srs-btn gx-srs-btn-primary" id="gx-srs-print" type="button" style="width:auto; padding:0 var(--space-6);"><?= lang('Simuladores.srs_print_btn'); ?></button>
-        </div>
-
-        <header class="gx-srs-report-cover"<?= $reportCoverUrl ? ' style="background-image: linear-gradient(100deg, var(--gx-primary-dark) 0%, rgba(0,13,35,0.94) 36%, rgba(0,13,35,0.55) 62%, rgba(0,13,35,0.20) 100%), url(\'' . esc($reportCoverUrl, 'attr') . '\');"' : ''; ?>>
-          <div class="gx-srs-cover-inner">
-            <img class="gx-srs-cover-logo" src="<?= getLogoFooter(); ?>" alt="<?= esc(brand('display_name')); ?>">
-            <div class="gx-srs-cover-kicker"><?= lang('Simuladores.srs_cover_kicker'); ?></div>
-            <h2 class="gx-srs-cover-title"><?= lang('Simuladores.srs_cover_title'); ?></h2>
-            <div class="gx-srs-cover-meta"><?= lang('Simuladores.srs_cover_meta'); ?> <strong id="gx-srs-rp-nome">—</strong><span id="gx-srs-rp-data">—</span></div>
-          </div>
-        </header>
-
-        <section class="gx-srs-rp-section">
-          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_01'); ?></div>
-          <div class="gx-srs-rp-grid" id="gx-srs-rp-diag"></div>
-        </section>
-
-        <section class="gx-srs-rp-section">
-          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_02'); ?></div>
-          <div class="gx-srs-rp-reco">
-            <div class="gx-srs-rp-reco-num" id="gx-srs-rp-capital">—</div>
-            <p class="gx-srs-rp-reco-txt" id="gx-srs-rp-reco-txt"></p>
-          </div>
-        </section>
-
-        <section class="gx-srs-rp-section">
-          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_03'); ?></div>
-          <div class="gx-srs-rp-kpis" id="gx-srs-rp-kpis"></div>
-          <table class="gx-srs-rp-table">
-            <thead><tr><th><?= lang('Simuladores.srs_th_cobertura'); ?></th><th><?= lang('Simuladores.srs_capital_segurado'); ?></th><th><?= lang('Simuladores.srs_th_premio'); ?></th></tr></thead>
-            <tbody id="gx-srs-rp-cob"></tbody>
-          </table>
-        </section>
-
-        <section class="gx-srs-rp-section">
-          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_04'); ?></div>
-          <div class="gx-srs-rp-chartwrap"><canvas id="gx-srs-rp-chart" height="320"></canvas></div>
-          <p class="gx-srs-rp-caption" id="gx-srs-rp-caption"></p>
-          <table class="gx-srs-rp-table">
-            <thead><tr><th><?= lang('Simuladores.srs_th_momento'); ?></th><th><?= lang('Simuladores.srs_total_aportado'); ?></th><th><?= lang('Simuladores.srs_reserva_resgatavel'); ?></th></tr></thead>
-            <tbody id="gx-srs-rp-marcos"></tbody>
-          </table>
-        </section>
-
-        <section class="gx-srs-rp-section gx-srs-rp-suc" id="gx-srs-rp-suc" hidden>
-          <div class="gx-srs-rp-label"><?= lang('Simuladores.srs_rp_label_05'); ?></div>
-          <p id="gx-srs-rp-suc-txt"></p>
-        </section>
-
-        <section class="gx-srs-rp-cta">
-          <h3><?= lang('Simuladores.srs_rp_cta_title'); ?></h3>
-          <ul class="gx-srs-rp-bullets">
-            <li><?= lang('Simuladores.srs_rp_bullet_1'); ?></li>
-            <li><?= lang('Simuladores.srs_rp_bullet_2'); ?></li>
-            <li><?= lang('Simuladores.srs_rp_bullet_3'); ?></li>
-            <li><?= lang('Simuladores.srs_rp_bullet_4'); ?></li>
-          </ul>
-          <?php if (!empty($whatsAppBaseUrl)): ?>
-            <a class="gx-srs-btn gx-srs-btn-gold gx-srs-noprint" id="gx-srs-rp-wa" href="<?= esc($whatsAppBaseUrl); ?>" target="_blank" rel="noopener" style="width:auto; padding:0 var(--space-8); background:var(--gx-primary);"><?= lang('Simuladores.srs_rp_wa_btn'); ?></a>
-          <?php endif; ?>
-        </section>
-
-        <footer class="gx-srs-report-foot">
-          <?= brandLang('Simuladores.srs_report_foot'); ?>
-
-        </footer>
-
-      </article>
-    </div>
-  </section>
 
   <!-- modal de lead -->
   <div class="gx-srs-modal" id="gx-srs-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="gx-srs-modal-title">
@@ -338,6 +256,10 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
             'label' => lang('Simuladores.srs_lbl_whatsapp'),
             'hint' => '',
         ]); ?>
+        <label class="gx-srs-consent">
+          <input type="checkbox" id="gx-srs-consent" name="consent" value="1" required>
+          <span><?= lang('Simuladores.srs_consent'); ?></span>
+        </label>
         <button type="submit" class="gx-srs-btn gx-srs-btn-primary" id="gx-srs-lead-submit"><?= lang('Simuladores.srs_desbloquear'); ?></button>
         <div class="gx-srs-status" id="gx-srs-lead-status"></div>
       </form>
@@ -377,15 +299,6 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
     });
   });
 
-  function brl(v) {
-    return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-  function brlCompact(v) {
-    var n = Number(v);
-    if (n >= 1000000) return 'R$ ' + (n / 1000000).toFixed(1).replace('.', ',') + 'M';
-    if (n >= 1000) return 'R$ ' + Math.round(n / 1000) + 'k';
-    return 'R$ ' + Math.round(n);
-  }
   function setStatus(el, msg) {
     if (!msg) { el.className = 'gx-srs-status'; el.textContent = ''; return; }
     el.className = 'gx-srs-status is-error';
@@ -418,8 +331,6 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
 
   // Parâmetros da análise de necessidade
   var TETO_INSS = 8475.55;                               // teto de benefício do INSS
-  var PATRIMONIO_CRESC = 0.055;                          // evolução patrimonial projetada (a.a.)
-  var IDADE_APOSENTADORIA = 65;                          // fim da vida produtiva
   var ITCMD_BY_UF = <?= json_encode($itcmdMap); ?>;      // ITCMD por estado
   var INVENTARIO_RATE = <?= json_encode($inventarioRate); ?>; // adv 6% + cartório 2%
   var UF_PADRAO = <?= json_encode($ufPadrao); ?>;
@@ -459,7 +370,7 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
     return d;
   }
 
-  // Justificativa da recomendação (reutilizada na caixa e no relatório).
+  // Justificativa da recomendação (usada na caixa de proteção recomendada).
   function rationaleSentence(r) {
     if (r.objetivo === 'sucessao') {
       return 'cobre as custas de sucessão (' + pct(r.itcmd) + ' de ITCMD em ' + r.uf + ' + ' + pct(INVENTARIO_RATE)
@@ -530,10 +441,8 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
     return p;
   }
 
-  // ---- Chart ----
-  function drawChart(labels, redData, greenData, opts) {
-    opts = opts || {};
-    var money = !!opts.money;
+  // ---- Chart (sempre indexado 0–100; NUNCA exibe R$ ao lead) ----
+  function drawChart(labels, redData, greenData) {
     if (chart) { chart.destroy(); }
     chart = new Chart(chartEl.getContext('2d'), {
       type: 'line',
@@ -549,17 +458,13 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
         interaction: { intersect: false, mode: 'index' },
         plugins: {
           legend: { display: false },
-          tooltip: money ? {
-            callbacks: { label: function (c) { return c.dataset.label + ': ' + brl(c.parsed.y); } }
-          } : { enabled: false }
+          tooltip: { enabled: false }
         },
         scales: {
           x: { title: { display: true, text: 'Idade', font: { family: "'JetBrains Mono', monospace", size: 10 } },
                ticks: { maxTicksLimit: 10, font: { family: "'JetBrains Mono', monospace", size: 10 } },
                grid: { color: 'rgba(12,49,99,0.06)' } },
-          y: { ticks: { display: money, font: { family: "'JetBrains Mono', monospace", size: 10 },
-                        callback: function (v) { return money ? brlCompact(v) : ''; } },
-               grid: { color: 'rgba(12,49,99,0.06)' } }
+          y: { ticks: { display: false }, grid: { color: 'rgba(12,49,99,0.06)' } }
         }
       }
     });
@@ -585,27 +490,21 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
         result.classList.add('is-on');
         result.classList.add('gx-srs-locked');   // mantém borrado/cadeado
         document.getElementById('gx-srs-celebrate').classList.remove('is-on');
-        // reseta KPIs sensíveis
-        document.getElementById('gx-srs-kpi-aporte').textContent = 'R$ ••••';
-        document.getElementById('gx-srs-kpi-aporte').classList.add('gx-srs-blur');
-        document.getElementById('gx-srs-kpi-reserva65').textContent = 'R$ ••••';
-        document.getElementById('gx-srs-kpi-reserva65').classList.add('gx-srs-blur');
-        // break-even é seguro (sem R$)
+        // KPIs do teaser — todos NÃO-monetários e CRÍVEIS (nenhum R$ nem múltiplo inflado antes do especialista)
         document.getElementById('gx-srs-kpi-breakeven').textContent = p.breakeven_idade ? ('idade ' + p.breakeven_idade) : '—';
-        document.getElementById('gx-srs-kpi-breakeven-sub').textContent = p.breakeven_ano ? ('no ano ' + p.breakeven_ano + ' da apólice') : 'reserva ultrapassa o pago';
-        // teaser sem R$
+        document.getElementById('gx-srs-kpi-breakeven-sub').textContent = p.breakeven_ano ? ('no ano ' + p.breakeven_ano + ' da apólice') : 'reserva ultrapassa o total pago';
+        document.getElementById('gx-srs-kpi-quitacao').textContent = p.quitacao_ano ? (p.quitacao_ano + ' anos') : '—';
+        document.getElementById('gx-srs-kpi-protecao').textContent = p.idade_final ? ('até os ' + p.idade_final) : 'vitalícia';
+        // teaser sem R$: só o ponto de virada (break-even), que é característica real do produto
         if (p.breakeven_idade) {
           document.getElementById('gx-srs-lock-title').textContent = 'Aos ' + p.breakeven_idade + ' anos sua reserva ultrapassa tudo que você pagou.';
         }
-        if (p.multiplo_final) {
-          document.getElementById('gx-srs-lock-sub').textContent = 'Ao final do plano, sua reserva chega a cerca de ' + String(p.multiplo_final).replace('.', ',') + 'x o total aportado. Veja os valores exatos em Reais — liberação na hora.';
-        }
         // gráfico com a curva indexada (0–100), eixo R$ oculto + blur
-        drawChart(p.labels, p.pago_idx, p.reserva_idx, { money: false });
+        drawChart(p.labels, p.pago_idx, p.reserva_idx);
         result.scrollIntoView({ behavior: 'smooth', block: 'center' });
       })
       .catch(function (err) { setStatus(formStatus, err.message); })
-      .finally(function () { calcBtn.disabled = false; calcBtn.textContent = 'Desenhar minha projeção'; });
+      .finally(function () { calcBtn.disabled = false; calcBtn.textContent = 'Ver meu diagnóstico e projeção'; });
   });
 
   // ---- abrir modal ----
@@ -615,11 +514,13 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
   document.getElementById('gx-srs-modal-close').addEventListener('click', closeModal);
   modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
 
-  // ---- Unlock (grava lead, revela R$) ----
+  // ---- Unlock (grava o lead; NÃO recebe nem exibe R$ — o relatório é entregue pelo especialista) ----
   leadForm.addEventListener('submit', function (e) {
     e.preventDefault();
     setStatus(leadStatus, '');
-    if (!lastInput) { setStatus(leadStatus, 'Refaça a projeção antes de desbloquear.'); return; }
+    if (!lastInput) { setStatus(leadStatus, 'Refaça a projeção antes de continuar.'); return; }
+    var consentEl = document.getElementById('gx-srs-consent');
+    if (consentEl && !consentEl.checked) { setStatus(leadStatus, 'Marque a autorização de contato para receber seu relatório.'); return; }
     if (!leadForm.reportValidity()) { return; }
 
     var phoneCountry = (leadForm.querySelector('[name="phone_country"]') || {}).value || 'BR';
@@ -630,6 +531,7 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
       email: document.getElementById('gx-srs-email').value,
       phone: phoneNumber,
       phone_country: phoneCountry,
+      consent: consentEl && consentEl.checked ? '1' : '',
       landing_page: window.location.href
     });
     ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'].forEach(function (k) {
@@ -637,164 +539,52 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
       if (v) payload[k] = v;
     });
 
-    leadSubmit.disabled = true; leadSubmit.textContent = 'Liberando...';
+    leadSubmit.disabled = true; leadSubmit.textContent = 'Enviando...';
 
     fetch(UNLOCK_URL, { method: 'POST', body: toBody(payload), credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
-        if (!res.ok || res.d.status !== 'success') { throw new Error(res.d.message || 'Não foi possível liberar agora.'); }
-        revealDossier(res.d.dossie);
+        if (!res.ok || res.d.status !== 'success') { throw new Error(res.d.message || 'Não foi possível registrar agora.'); }
+        onLeadWon();
         closeModal();
       })
       .catch(function (err) { setStatus(leadStatus, err.message); })
-      .finally(function () { leadSubmit.disabled = false; leadSubmit.textContent = 'Desbloquear relatório'; });
+      .finally(function () { leadSubmit.disabled = false; leadSubmit.textContent = 'Quero meu Relatório 360'; });
   });
 
-  function revealDossier(dossie) {
-    if (!dossie) return;
-    // tira o cadeado e o blur
+  // ---- Lead capturado: mensagem de conquista + handoff pro WhatsApp (sem R$) ----
+  function onLeadWon() {
+    // desborra o gráfico indexado (só a FORMA da projeção — nunca há R$ nesta tela)
     result.classList.remove('gx-srs-locked');
-    var aporte = document.getElementById('gx-srs-kpi-aporte');
-    var res65  = document.getElementById('gx-srs-kpi-reserva65');
-    aporte.classList.remove('gx-srs-blur');
-    res65.classList.remove('gx-srs-blur');
-    aporte.textContent = brl(dossie.premio.mensal_bruto);
-    var r65 = dossie.destaques.reserva_aos_65;
-    res65.textContent = r65 ? brl(r65) : '—';
-    // redesenha o gráfico com R$ reais
-    var s = dossie.serie_rs;
-    drawChart(s.labels, s.pago, s.reserva, { money: true });
-    // celebração
+
+    var nome = (document.getElementById('gx-srs-name').value || '').trim();
+    var primeiro = nome ? nome.split(' ')[0] : '';
+    var saud = primeiro ? ('Parabéns, ' + primeiro + '! ') : 'Parabéns! ';
     var celebrate = document.getElementById('gx-srs-celebrate');
-    var txt = 'Seu plano está quitado em ' + dossie.destaques.quitacao_ano + ' anos. ';
-    if (r65) txt += 'Aos 65 você terá construído uma reserva projetada de ' + brl(r65) + '. ';
-    txt += 'Um planejador da GX já recebeu sua simulação e pode estruturar o passo a passo com você.';
-    document.getElementById('gx-srs-celebrate-text').textContent = txt;
+    document.getElementById('gx-srs-celebrate-text').textContent =
+      saud + 'Você ganhou um Relatório Patrimonial 360 completo — o planejamento da sua vida financeira, com proteção, reserva e sucessão desenhados para o seu objetivo. Um especialista GX já está preparando o seu e vai te entregar agora pelo WhatsApp. Fale com ele para receber. 👇';
+
+    // WhatsApp com mensagem pré-preenchida — cai no agente que qualifica o lead na entrada.
+    var wa = document.getElementById('gx-srs-wa');
+    if (wa) {
+      var base = (wa.getAttribute('href') || '').split('?')[0];
+      if (base) {
+        var objLabels = {
+          protecao_familiar: 'proteger a renda da minha família',
+          sucessao: 'planejar a sucessão com liquidez',
+          quitar_dividas: 'garantir a quitação de dívidas num imprevisto',
+          aposentadoria: 'complementar a aposentadoria'
+        };
+        var diag = readDiagnostic();
+        var objTxt = objLabels[diag.objetivo] || 'proteger meu patrimônio';
+        var msg = 'Olá! ' + (primeiro ? ('Sou ' + primeiro + '. ') : '')
+          + 'Fiz meu diagnóstico no simulador de seguro de vida resgatável da GX e quero receber meu Relatório Patrimonial 360 completo. Meu objetivo é ' + objTxt + '.';
+        wa.href = base + '?text=' + encodeURIComponent(msg);
+      }
+    }
+
     celebrate.classList.add('is-on');
-    // monta e revela o relatório completo (documento de entrega)
-    var rw = document.getElementById('gx-srs-reportwrap');
-    rw.hidden = false;            // visível ANTES de desenhar o gráfico (evita canvas 0px)
-    buildReport(dossie);
-    rw.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    celebrate.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
-
-  // ---- Relatório (documento de entrega) ----
-  var COB_LABELS = { vida: 'Vida Inteira (resgatável)', dg_plus: 'Doenças Graves Plus', dg_basico: 'Doenças Graves Básico', invalidez: 'Invalidez', renda_hospitalar: 'Renda Hospitalar', morte_acidental: 'Morte Acidental' };
-  var reportChart = null;
-
-  function rpItem(k, v, isText) {
-    return '<div class="gx-srs-rp-item"><div class="k">' + k + '</div><div class="v' + (isText ? ' txt' : '') + '">' + v + '</div></div>';
-  }
-
-  function buildReport(dossie) {
-    var inp = lastInput || {};
-    var diag = readDiagnostic();
-    var r = computeRecommendation();
-    var pr = dossie.premio, ds = dossie.destaques, s = dossie.serie_rs;
-
-    var nome = (document.getElementById('gx-srs-name').value || '').trim() || 'Você';
-    document.getElementById('gx-srs-rp-nome').textContent = nome;
-    document.getElementById('gx-srs-rp-data').textContent = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-
-    var objLabels = { protecao_familiar: 'Proteger a renda da família', sucessao: 'Planejar sucessão com liquidez', quitar_dividas: 'Garantir a quitação de dívidas', aposentadoria: 'Complementar a aposentadoria' };
-    var patrimonio = (diag.patrimonio_imobiliario || 0) + (diag.patrimonio_financeiro || 0);
-    var diagHtml = '';
-    diagHtml += rpItem('Objetivo', objLabels[diag.objetivo] || '—', true);
-    diagHtml += rpItem('Perfil', (inp.sexo === 'F' ? 'Feminino' : 'Masculino') + ', ' + inp.idade + ' anos', true);
-    diagHtml += rpItem('Dependentes / filhos', diag.dependentes + ' / ' + diag.filhos, true);
-    diagHtml += rpItem('Renda mensal', brl(diag.renda_mensal));
-    diagHtml += rpItem('Patrimônio', brl(patrimonio));
-    diagHtml += rpItem('Estado (ITCMD)', diag.estado + ' · ' + pct(r.itcmd), true);
-    document.getElementById('gx-srs-rp-diag').innerHTML = diagHtml;
-
-    document.getElementById('gx-srs-rp-capital').textContent = brl(inp.capital_vida);
-    document.getElementById('gx-srs-rp-reco-txt').innerHTML = 'Capital de proteção dimensionado para o seu objetivo — ' + rationaleSentence(r);
-
-    var estrat = inp.estrategia === 'WL20' ? '20 anos' : '10 anos';
-    var kpis = '';
-    kpis += '<div class="gx-srs-rp-kpi"><div class="k">Aporte mensal</div><div class="v">' + brl(pr.mensal_bruto) + '</div></div>';
-    kpis += '<div class="gx-srs-rp-kpi"><div class="k">Mensal c/ proteções</div><div class="v">' + brl(pr.total_mensal_com_riders) + '</div></div>';
-    kpis += '<div class="gx-srs-rp-kpi"><div class="k">Plano quitado em</div><div class="v">' + estrat + '</div></div>';
-    kpis += '<div class="gx-srs-rp-kpi"><div class="k">Reserva aos 65</div><div class="v">' + (ds.reserva_aos_65 ? brl(ds.reserva_aos_65) : '—') + '</div></div>';
-    document.getElementById('gx-srs-rp-kpis').innerHTML = kpis;
-
-    var cob = '';
-    (pr.breakdown || []).forEach(function (c) {
-      cob += '<tr><td>' + (COB_LABELS[c.tipo] || c.tipo) + '</td><td class="num">' + brl(c.capital) + '</td><td class="num">' + brl(c.mensal) + '</td></tr>';
-    });
-    document.getElementById('gx-srs-rp-cob').innerHTML = cob;
-
-    // horizonte do gráfico limitado p/ não distorcer com a explosão exponencial no fim
-    var MAX_IDADE = 90;
-    var cut = s.labels.length;
-    for (var k = 0; k < s.labels.length; k++) { if (s.labels[k] > MAX_IDADE) { cut = k; break; } }
-    var L = s.labels.slice(0, cut), pagoC = s.pago.slice(0, cut), reservaC = s.reserva.slice(0, cut);
-
-    // séries adicionais: patrimônio (evolução) e vida produtiva (renda futura protegida)
-    var idade0 = L[0];
-    var rendaMensal = diag.renda_mensal || 0;
-    var patrSerie = L.map(function (ida) { return Math.round(patrimonio * Math.pow(1 + PATRIMONIO_CRESC, ida - idade0)); });
-    var vidaSerie = L.map(function (ida) { return Math.round(rendaMensal * 12 * Math.max(0, IDADE_APOSENTADORIA - ida)); });
-    var vp0 = rendaMensal * 12 * Math.max(0, IDADE_APOSENTADORIA - (parseInt(inp.idade, 10) || idade0));
-
-    if (reportChart) { reportChart.destroy(); }
-    reportChart = new Chart(document.getElementById('gx-srs-rp-chart').getContext('2d'), {
-      type: 'line',
-      data: { labels: L, datasets: [
-        { label: 'Total aportado', data: pagoC, borderColor: '#dc2626', backgroundColor: 'rgba(220,38,38,0.06)', borderWidth: 2, pointRadius: 0, tension: 0.15, fill: true },
-        { label: 'Reserva resgatável', data: reservaC, borderColor: '#16a34a', backgroundColor: 'rgba(22,163,74,0.10)', borderWidth: 2, pointRadius: 0, tension: 0.15, fill: true },
-        { label: 'Patrimônio', data: patrSerie, borderColor: '#1f5694', borderWidth: 2, pointRadius: 0, tension: 0.15, fill: false },
-        { label: 'Vida produtiva', data: vidaSerie, borderColor: '#c9a96a', borderWidth: 2, borderDash: [6, 4], pointRadius: 0, tension: 0, fill: false }
-      ] },
-      options: { responsive: true, maintainAspectRatio: false, animation: false,
-        interaction: { intersect: false, mode: 'index' },
-        plugins: {
-          legend: { display: true, labels: { font: { family: "'JetBrains Mono', monospace", size: 10 }, boxWidth: 12, padding: 12 } },
-          tooltip: { callbacks: { label: function (c) { return c.dataset.label + ': ' + brl(c.parsed.y); } } }
-        },
-        scales: {
-          x: { title: { display: true, text: 'Idade', font: { family: "'JetBrains Mono', monospace", size: 10 } }, ticks: { maxTicksLimit: 10, font: { family: "'JetBrains Mono', monospace", size: 9 } }, grid: { color: 'rgba(12,49,99,0.06)' } },
-          y: { ticks: { font: { family: "'JetBrains Mono', monospace", size: 9 }, callback: function (v) { return brlCompact(v); } }, grid: { color: 'rgba(12,49,99,0.06)' } }
-        } }
-    });
-
-    var capTxt = 'As curvas mostram, ao longo da sua vida: a <b>vida produtiva</b> (a renda futura que sua família perderia num imprevisto, que decresce até a aposentadoria), a evolução do seu <b>patrimônio</b>, a <b>reserva resgatável</b> formada pelo seguro e o <b>total aportado</b>.';
-    if (vp0 > 0) {
-      capTxt += ' Hoje, sua vida produtiva vale <strong>' + brl(vp0) + '</strong> para a sua família — é exatamente o que o seguro de vida resgatável garante desde já, enquanto a reserva cresce para ocupar esse lugar.';
-    }
-    document.getElementById('gx-srs-rp-caption').innerHTML = capTxt;
-
-    // Marcos: início, FIM DO PERÍODO DE APORTE (destaque), 65 anos e reserva vitalícia.
-    var idadeContrat = parseInt(inp.idade, 10) || (s.labels[0] - 1);
-    var fimAportes = idadeContrat + (ds.quitacao_ano || 0);   // idade ao terminar de aportar
-    var marcos = [
-      { idade: s.labels[0], rotulo: 'Início do plano' },
-      { idade: fimAportes, rotulo: 'Fim dos aportes', nota: '(' + (ds.quitacao_ano || 0) + ' anos pagos)', hi: true },
-      { idade: 65, rotulo: 'Aos 65 anos' },
-      { idade: s.labels[s.labels.length - 1], rotulo: 'Reserva vitalícia' }
-    ];
-    var seen = {}, mrows = '';
-    marcos.forEach(function (m) {
-      var i = s.labels.indexOf(m.idade);
-      if (i === -1 || seen[m.idade]) { return; }
-      seen[m.idade] = 1;
-      var label = m.rotulo + ' · ' + m.idade + ' anos' + (m.nota ? ' <span style="opacity:.6">' + m.nota + '</span>' : '');
-      mrows += '<tr' + (m.hi ? ' class="hi"' : '') + '><td>' + label + '</td><td class="num">' + brl(s.pago[i]) + '</td><td class="num">' + brl(s.reserva[i]) + '</td></tr>';
-    });
-    document.getElementById('gx-srs-rp-marcos').innerHTML = mrows;
-
-    var sucEl = document.getElementById('gx-srs-rp-suc');
-    if (patrimonio > 0) {
-      document.getElementById('gx-srs-rp-suc-txt').innerHTML = 'Na transmissão do seu patrimônio de <strong>' + brl(patrimonio)
-        + '</strong>, a família enfrentaria cerca de <strong>' + brl(r.sucessao) + '</strong> em custos de sucessão (ITCMD ' + pct(r.itcmd) + ' em ' + r.uf
-        + ' + inventário ' + pct(INVENTARIO_RATE) + '). Um seguro de vida resgatável entrega essa liquidez na hora e fora do inventário — a família honra os custos e mantém o patrimônio intacto, sem leilão de bens nem resgate de investimentos no pior momento.';
-      sucEl.hidden = false;
-    } else {
-      sucEl.hidden = true;
-    }
-  }
-
-  var printBtn = document.getElementById('gx-srs-print');
-  if (printBtn) { printBtn.addEventListener('click', function () { window.print(); }); }
 })();
 </script>

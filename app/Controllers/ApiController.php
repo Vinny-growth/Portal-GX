@@ -240,6 +240,14 @@ class ApiController extends BaseController
                 'status' => 'error', 'result' => 0, 'message' => 'O email informado é inválido',
             ]);
         }
+        // Consentimento explícito de contato (LGPD + evita abordagem fria "a frio").
+        $consent = !empty($post['consent']);
+        if (!$consent) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status' => 'error', 'result' => 0,
+                'message' => 'É necessário autorizar o contato para receber o relatório.',
+            ]);
+        }
 
         // Mesma normalização de telefone do saveSimulatorLead.
         $phoneCountry = strtoupper(trim((string) ($post['phone_country'] ?? '')));
@@ -268,6 +276,8 @@ class ApiController extends BaseController
                 'phone'         => $phone,
                 'phone_country' => $phoneCountry ?: null,
             ], $post);
+            // Marca o consentimento p/ o corretor (o dossiê em R$ segue em sim_data, só interno).
+            $leadData['observations'] = trim(($leadData['observations'] ?? '') . ' [Contato autorizado pelo lead ao solicitar o relatório.]');
 
             $ok = (new SimLeadModel())->addSimLead($leadData);
             if (!$ok) {
@@ -276,10 +286,11 @@ class ApiController extends BaseController
                 ]);
             }
 
+            // O lead foi gravado (dossiê em R$ persistido p/ o especialista). NENHUM valor em
+            // R$ é devolvido ao browser — o relatório é entregue pelo especialista no WhatsApp.
             return $this->response->setJSON([
                 'status' => 'success',
                 'result' => 1,
-                'dossie' => QuotationGate::publicDossier($dossier),
             ]);
         } catch (\InvalidArgumentException $e) {
             return $this->response->setStatusCode(400)->setJSON([
