@@ -585,17 +585,17 @@ $aiSteps = [
                     <aside class="gx-consorcio-results-card" data-gx-reveal data-gx-delay="110" aria-live="polite">
                         <div class="gx-consorcio-results-head">
                             <div>
-                                <p class="gx-card-kicker" id="gx-consorcio-result-kicker">Comparativo estratégico</p>
-                                <h3 id="gx-consorcio-result-headline">Use a sua entrada como lance e compare o consórcio com o financiamento.</h3>
-                                <p id="gx-consorcio-result-body">Ajuste os campos do seu caso para acompanhar parcela indicativa, custo total e nível de esforço até a contemplação.</p>
+                                <p class="gx-card-kicker" id="gx-consorcio-result-kicker"><?= lang('Consorcio.res_kicker'); ?></p>
+                                <h3 id="gx-consorcio-result-headline"><?= lang('Consorcio.res_headline'); ?></h3>
+                                <p id="gx-consorcio-result-body"><?= lang('Consorcio.res_body'); ?></p>
                             </div>
-                            <span class="gx-consorcio-status-chip">Ao vivo</span>
+                            <span class="gx-consorcio-status-chip"><?= lang('Consorcio.res_live'); ?></span>
                         </div>
 
                         <div class="gx-consorcio-kpi-grid">
                             <?php for ($i = 1; $i <= 4; $i++): ?>
                                 <article class="gx-consorcio-kpi">
-                                    <span id="gx-consorcio-kpi-label-<?= $i; ?>">Indicador</span>
+                                    <span id="gx-consorcio-kpi-label-<?= $i; ?>"><?= lang('Consorcio.res_indicador'); ?></span>
                                     <strong id="gx-consorcio-kpi-value-<?= $i; ?>">-</strong>
                                     <p id="gx-consorcio-kpi-copy-<?= $i; ?>">-</p>
                                 </article>
@@ -604,19 +604,19 @@ $aiSteps = [
 
                         <div class="gx-consorcio-band">
                             <article class="gx-consorcio-band-card">
-                                <span id="gx-consorcio-band-label-a">Estratégia</span>
+                                <span id="gx-consorcio-band-label-a"><?= lang('Consorcio.res_band_a'); ?></span>
                                 <strong id="gx-consorcio-band-value-a">-</strong>
                                 <p id="gx-consorcio-band-copy-a">-</p>
                             </article>
                             <article class="gx-consorcio-band-card">
-                                <span id="gx-consorcio-band-label-b">Leitura GX</span>
+                                <span id="gx-consorcio-band-label-b"><?= lang('Consorcio.res_band_b'); ?></span>
                                 <strong id="gx-consorcio-band-value-b">-</strong>
                                 <p id="gx-consorcio-band-copy-b">-</p>
                             </article>
                         </div>
 
                         <div class="gx-consorcio-insights">
-                            <h4>Leitura executiva inicial</h4>
+                            <h4><?= lang('Consorcio.res_insights_title'); ?></h4>
                             <ul class="gx-consorcio-insight-list">
                                 <li id="gx-consorcio-insight-1">-</li>
                                 <li id="gx-consorcio-insight-2">-</li>
@@ -625,40 +625,41 @@ $aiSteps = [
                         </div>
 
                         <p class="gx-consorcio-disclaimer">
-                            Simulação indicativa. A recomendação final depende de grupo, administradora, histórico de assembleia e estratégia de lance disponível no momento da contratação.
+                            <?= lang('Consorcio.res_disclaimer'); ?>
+
                         </p>
                     </aside>
 
                     <aside class="gx-lead-card gx-consorcio-lead-card" id="fale-especialista" data-gx-reveal data-gx-delay="160">
                         <div class="gx-form-intro">
-                            <p class="gx-label">Último passo</p>
-                            <h2 class="gx-form-title">Transforme essa simulação em um plano real de contemplação.</h2>
-                            <p class="gx-form-copy">Envie seus dados e um especialista vai analisar seu cenário, selecionar os melhores grupos e montar a estratégia de lance para o seu caso.</p>
+                            <p class="gx-label"><?= lang('Consorcio.spec_eyebrow'); ?></p>
+                            <h2 class="gx-form-title"><?= lang('Consorcio.spec_title'); ?></h2>
+                            <p class="gx-form-copy"><?= lang('Consorcio.spec_copy'); ?></p>
                         </div>
 
                         <?php if (!empty($whatsAppUrl)): ?>
                             <div class="gx-contact-highlight">
-                                <span class="gx-fx-live-eyebrow">Resposta rápida</span>
-                                <strong>Quer falar agora com o especialista?</strong>
-                                <p>A conversa já começa com os dados do seu cenário. Sem precisar repetir informações.</p>
+                                <span class="gx-fx-live-eyebrow"><?= lang('Consorcio.spec_ch_eyebrow'); ?></span>
+                                <strong><?= lang('Consorcio.spec_ch_strong'); ?></strong>
+                                <p><?= lang('Consorcio.spec_ch_p'); ?></p>
                                 <div class="gx-contact-cta-grid">
-                                    <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp" data-gx-whatsapp-link><?= $whatsAppIcon; ?>Falar pelo WhatsApp</a>
-                                    <a href="#gx-consorcio-lead-form" class="gx-btn gx-btn-primary">Enviar simulação</a>
+                                    <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp" data-gx-whatsapp-link><?= $whatsAppIcon; ?><?= lang('Consorcio.spec_wa_btn'); ?></a>
+                                    <a href="#gx-consorcio-lead-form" class="gx-btn gx-btn-primary"><?= lang('Consorcio.spec_send_btn'); ?></a>
                                 </div>
-                                <p class="gx-contact-note" data-gx-whatsapp-copy>Atendimento em horário comercial com especialista dedicado.</p>
+                                <p class="gx-contact-note" data-gx-whatsapp-copy><?= lang('Consorcio.spec_ch_note'); ?></p>
                             </div>
                         <?php endif; ?>
 
                         <div class="gx-consorcio-context-box">
-                            <span>Cenário atual</span>
-                            <strong id="gx-consorcio-lead-scenario">Consórcio x financiamento</strong>
-                            <p id="gx-consorcio-lead-hook">Vamos comparar sua entrada, o custo mensal e o desembolso total antes da decisão.</p>
+                            <span><?= lang('Consorcio.spec_ctx_label'); ?></span>
+                            <strong id="gx-consorcio-lead-scenario"><?= lang('Consorcio.sc_compare_title'); ?></strong>
+                            <p id="gx-consorcio-lead-hook"><?= lang('Consorcio.spec_ctx_hook'); ?></p>
                         </div>
 
                         <ul class="gx-consorcio-promise-list">
-                            <li>Você recebe a seleção dos melhores grupos para o seu objetivo e perfil.</li>
-                            <li>Saiba exatamente quanto dar de lance e quanto pagar por mês sem apertar.</li>
-                            <li>Plano de contemplação completo, não apenas uma parcela estimada.</li>
+                            <li><?= lang('Consorcio.spec_promise_1'); ?></li>
+                            <li><?= lang('Consorcio.spec_promise_2'); ?></li>
+                            <li><?= lang('Consorcio.spec_promise_3'); ?></li>
                         </ul>
 
                         <div class="gx-consorcio-inline-links">
@@ -669,9 +670,9 @@ $aiSteps = [
                                 <a href="mailto:<?= esc($contactEmail); ?>" class="gx-consorcio-inline-link"><?= esc($contactEmail); ?></a>
                             <?php endif; ?>
                             <?php if (!empty($whatsAppUrl)): ?>
-                                <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-consorcio-inline-link" data-gx-whatsapp-link>WhatsApp</a>
+                                <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-consorcio-inline-link" data-gx-whatsapp-link><?= lang('Consorcio.spec_link_wa'); ?></a>
                             <?php endif; ?>
-                            <a href="<?= esc($simulatorsHubUrl); ?>" class="gx-consorcio-inline-link">Ver outros simuladores</a>
+                            <a href="<?= esc($simulatorsHubUrl); ?>" class="gx-consorcio-inline-link"><?= lang('Consorcio.spec_link_sims'); ?></a>
                         </div>
 
                         <form id="gx-consorcio-lead-form" class="gx-consorcio-lead-form" novalidate>
@@ -686,37 +687,38 @@ $aiSteps = [
                             <input type="hidden" name="generated_message" id="gx-consorcio-generated-message" value="">
 
                             <div class="gx-form-field">
-                                <label for="gx-consorcio-name">Nome</label>
+                                <label for="gx-consorcio-name"><?= lang('Consorcio.spec_lbl_nome'); ?></label>
                                 <input id="gx-consorcio-name" type="text" name="name" maxlength="199" autocomplete="name" required>
                             </div>
 
                             <div class="gx-form-field">
-                                <label for="gx-consorcio-email">E-mail</label>
+                                <label for="gx-consorcio-email"><?= lang('Consorcio.spec_lbl_email'); ?></label>
                                 <input id="gx-consorcio-email" type="email" name="email" maxlength="199" autocomplete="email" inputmode="email" required>
                             </div>
 
                             <?= view('partials/_lead_phone_field', [
                                 'fieldIdPrefix' => 'gx-consorcio-phone',
                                 'wrapperClass' => 'gx-form-field',
-                                'hint' => 'Selecione o país e informe o telefone principal para retorno.',
+                                'hint' => lang('Consorcio.spec_phone_hint'),
                             ]); ?>
 
                             <div class="gx-form-field">
-                                <label for="gx-consorcio-notes">Observações adicionais</label>
-                                <textarea id="gx-consorcio-notes" name="notes" rows="4" placeholder="Se quiser, detalhe o prazo desejado, o tipo de imóvel ou a tese de revenda."></textarea>
+                                <label for="gx-consorcio-notes"><?= lang('Consorcio.spec_lbl_notes'); ?></label>
+                                <textarea id="gx-consorcio-notes" name="notes" rows="4" placeholder="<?= esc(lang('Consorcio.spec_notes_ph')); ?>"></textarea>
                             </div>
 
                             <label class="gx-check">
                                 <input type="checkbox" required>
                                 <span>
-                                    Li e concordo com os
-                                    <a href="<?= esc($termsHref); ?>" target="_blank" rel="noopener">termos e condições</a>.
+                                    <?= lang('Consorcio.spec_terms_pre'); ?>
+
+                                    <a href="<?= esc($termsHref); ?>" target="_blank" rel="noopener"><?= lang('Consorcio.spec_terms_link'); ?></a>.
                                 </span>
                             </label>
 
                             <div class="gx-form-actions">
-                                <button type="submit" class="gx-btn gx-btn-primary gx-form-submit" id="gx-consorcio-submit">Receber meu plano de contemplação</button>
-                                <p class="gx-form-note">Retorno consultivo e personalizado. Nada de proposta genérica.</p>
+                                <button type="submit" class="gx-btn gx-btn-primary gx-form-submit" id="gx-consorcio-submit"><?= lang('Consorcio.spec_submit'); ?></button>
+                                <p class="gx-form-note"><?= lang('Consorcio.spec_note'); ?></p>
                             </div>
                         </form>
 
@@ -724,25 +726,26 @@ $aiSteps = [
                             <div class="gx-schedule-icon" aria-hidden="true">
                                 <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,106,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="10 14 12 16 16 12"/></svg>
                             </div>
-                            <span class="gx-schedule-badge">Próximo passo</span>
-                            <h3 class="gx-schedule-title">Simulação recebida. Agende com o especialista.</h3>
-                            <p class="gx-schedule-desc">Seus dados já foram enviados. Escolha o melhor horário para conversar com o especialista em consórcio e transformar a simulação em plano de contemplação.</p>
+                            <span class="gx-schedule-badge"><?= lang('Consorcio.sched_badge'); ?></span>
+                            <h3 class="gx-schedule-title"><?= lang('Consorcio.sched_title'); ?></h3>
+                            <p class="gx-schedule-desc"><?= lang('Consorcio.sched_desc'); ?></p>
                             <a id="gx-consorcio-schedule-link" href="#" target="_blank" rel="noopener" class="gx-btn gx-btn-primary gx-btn-lg gx-schedule-cta">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                                Agendar conversa com especialista
+                                <?= lang('Consorcio.sched_cta'); ?>
+
                             </a>
                             <div class="gx-schedule-alt">
-                                <p>Prefere outro canal?</p>
+                                <p><?= lang('Consorcio.sched_alt'); ?></p>
                                 <div class="gx-schedule-alt-links">
                                     <?php if (!empty($whatsAppUrl)): ?>
-                                        <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp gx-btn-sm" data-gx-whatsapp-link><?= $whatsAppIcon; ?>WhatsApp</a>
+                                        <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp gx-btn-sm" data-gx-whatsapp-link><?= $whatsAppIcon; ?><?= lang('Consorcio.spec_link_wa'); ?></a>
                                     <?php endif; ?>
                                     <?php if (!empty($contactPhone)): ?>
                                         <a href="<?= !empty($contactPhoneHref) ? 'tel:' . esc($contactPhoneHref) : '#'; ?>" class="gx-btn gx-btn-ghost gx-btn-sm"><?= esc($contactPhone); ?></a>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                            <p class="gx-schedule-note">Seus dados já estarão preenchidos na agenda. Basta escolher data e horário.</p>
+                            <p class="gx-schedule-note"><?= lang('Consorcio.sched_note'); ?></p>
                         </div>
                     </aside>
                 </div>

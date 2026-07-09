@@ -184,4 +184,54 @@ return [
     'f_holdmonths_h' => 'Horizonte entre contemplação, aquisição e venda do ativo.',
     'f_holdcost'     => 'Custo mensal de carregamento',
     'f_holdcost_h'   => 'Condomínio, manutenção, carência de aluguel ou outro custo de carregamento.',
+
+    // ===================================================================
+    // 4b-4 — painel de resultados + card do especialista + agendamento
+    // ===================================================================
+
+    // painel de resultados (defaults SSR; o JS reescreve por cenário)
+    'res_kicker'         => 'Comparativo estratégico',
+    'res_headline'       => 'Use a sua entrada como lance e compare o consórcio com o financiamento.',
+    'res_body'           => 'Ajuste os campos do seu caso para acompanhar parcela indicativa, custo total e nível de esforço até a contemplação.',
+    'res_live'           => 'Ao vivo',
+    'res_indicador'      => 'Indicador',
+    'res_band_a'         => 'Estratégia',
+    'res_band_b'         => 'Leitura GX',
+    'res_insights_title' => 'Leitura executiva inicial',
+    'res_disclaimer'     => 'Simulação indicativa. A recomendação final depende de grupo, administradora, histórico de assembleia e estratégia de lance disponível no momento da contratação.',
+
+    // card do especialista (fale-especialista)
+    'spec_eyebrow'   => 'Último passo',
+    'spec_title'     => 'Transforme essa simulação em um plano real de contemplação.',
+    'spec_copy'      => 'Envie seus dados e um especialista vai analisar seu cenário, selecionar os melhores grupos e montar a estratégia de lance para o seu caso.',
+    'spec_ch_eyebrow' => 'Resposta rápida',
+    'spec_ch_strong' => 'Quer falar agora com o especialista?',
+    'spec_ch_p'      => 'A conversa já começa com os dados do seu cenário. Sem precisar repetir informações.',
+    'spec_wa_btn'    => 'Falar pelo WhatsApp',
+    'spec_send_btn'  => 'Enviar simulação',
+    'spec_ch_note'   => 'Atendimento em horário comercial com especialista dedicado.',
+    'spec_ctx_label' => 'Cenário atual',
+    'spec_ctx_hook'  => 'Vamos comparar sua entrada, o custo mensal e o desembolso total antes da decisão.',
+    'spec_promise_1' => 'Você recebe a seleção dos melhores grupos para o seu objetivo e perfil.',
+    'spec_promise_2' => 'Saiba exatamente quanto dar de lance e quanto pagar por mês sem apertar.',
+    'spec_promise_3' => 'Plano de contemplação completo, não apenas uma parcela estimada.',
+    'spec_link_wa'   => 'WhatsApp',
+    'spec_link_sims' => 'Ver outros simuladores',
+    'spec_lbl_nome'  => 'Nome',
+    'spec_lbl_email' => 'E-mail',
+    'spec_phone_hint' => 'Selecione o país e informe o telefone principal para retorno.',
+    'spec_lbl_notes' => 'Observações adicionais',
+    'spec_notes_ph'  => 'Se quiser, detalhe o prazo desejado, o tipo de imóvel ou a tese de revenda.',
+    'spec_terms_pre' => 'Li e concordo com os',
+    'spec_terms_link' => 'termos e condições',
+    'spec_submit'    => 'Receber meu plano de contemplação',
+    'spec_note'      => 'Retorno consultivo e personalizado. Nada de proposta genérica.',
+
+    // etapa de agendamento (pós-envio)
+    'sched_badge' => 'Próximo passo',
+    'sched_title' => 'Simulação recebida. Agende com o especialista.',
+    'sched_desc'  => 'Seus dados já foram enviados. Escolha o melhor horário para conversar com o especialista em consórcio e transformar a simulação em plano de contemplação.',
+    'sched_cta'   => 'Agendar conversa com especialista',
+    'sched_alt'   => 'Prefere outro canal?',
+    'sched_note'  => 'Seus dados já estarão preenchidos na agenda. Basta escolher data e horário.',
 ];
