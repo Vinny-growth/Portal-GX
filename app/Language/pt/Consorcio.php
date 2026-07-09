@@ -79,4 +79,50 @@ return [
     'auth_card3_title' => 'Consórcio como veículo de retorno, não só de compra.',
     'auth_card3_desc'  => 'Para quem quer contemplar e revender com margem, o simulador projeta ROI líquido, custo de carregamento e break-even. O especialista valida a tese antes de você entrar no grupo.',
     'boutique_note'    => '<strong>Modelo independente:</strong> a {brand} não é administradora de consórcio e não tem cota própria para vender. Isso permite recomendar o grupo, a administradora e a estratégia de lance mais eficiente para o seu caso, sem viés comercial. Os simuladores abaixo são o primeiro passo para dimensionar a operação antes de falar com o especialista.',
+
+    // ===================================================================
+    // 4b-2 — depoimentos (fallbacks) + estratégias + cards de cenário + header do simulador
+    // ===================================================================
+
+    // depoimentos (fallbacks do config + aria)
+    'testi_label' => 'Quem já simulou',
+    'testi_title' => 'Quem já simulou, aprovou',
+    'testi_stars' => '5 estrelas',
+
+    // seção estratégias
+    'estr_label' => 'Escolha sua jornada',
+    'estr_title' => 'Qual é o seu objetivo com o consórcio? Comece pelo cenário certo.',
+    'estr_desc'  => "Cada objetivo pede uma conta diferente. Escolha o cenário que mais se parece com o seu momento\n                    e veja os números que realmente importam para a sua decisão.",
+
+    // cards de cenário ($scenarioCards) — pílula + compare/planned/investor
+    'sc_gratis'           => 'Simulação gratuita',
+    'sc_compare_eyebrow'  => 'Mais popular',
+    'sc_compare_title'    => 'Consórcio x financiamento',
+    'sc_compare_desc'     => 'Já tem entrada? Veja em números se o consórcio reduz a parcela mensal e o custo total comparado ao financiamento.',
+    'sc_compare_b1'       => 'Descubra a diferença real de parcela entre consórcio e financiamento.',
+    'sc_compare_b2'       => 'Veja quanto sua entrada acelera a contemplação como lance.',
+    'sc_compare_b3'       => 'Saiba exatamente quanto você economiza no desembolso total.',
+    'sc_compare_btn'      => 'Comparar agora',
+    'sc_planned_eyebrow'  => 'Compra inteligente',
+    'sc_planned_title'    => 'Comprar imóvel de forma planejada',
+    'sc_planned_desc'     => 'Quer comprar sem apertar o caixa? Veja se seu ritmo mensal sustenta a contemplação no prazo que você precisa.',
+    'sc_planned_b1'       => 'Saiba quanto de reserva você terá para dar lance no mês certo.',
+    'sc_planned_b2'       => 'Veja se parcela + reserva cabem no seu orçamento confortável.',
+    'sc_planned_b3'       => 'Descubra se sobra ou aperta antes de se comprometer.',
+    'sc_planned_btn'      => 'Planejar minha compra',
+    'sc_investor_eyebrow' => 'Alta rentabilidade',
+    'sc_investor_title'   => 'Investir para revender após contemplação',
+    'sc_investor_desc'    => 'Use o consórcio como alavanca patrimonial. Veja se a margem de revenda compensa o capital investido.',
+    'sc_investor_b1'      => 'Calcule o capital total que você precisa mobilizar até a venda.',
+    'sc_investor_b2'      => 'Veja a margem líquida real depois de todos os custos de saída.',
+    'sc_investor_b3'      => 'Descubra o ROI da operação sobre o seu dinheiro travado.',
+    'sc_investor_btn'     => 'Calcular retorno',
+
+    // seção simulador ao vivo
+    'sim_label'          => 'Simulador ao vivo',
+    'sim_title'          => 'Ajuste os números do seu caso e veja o resultado mudar em tempo real.',
+    'sim_desc'           => "Mexa nos campos abaixo e acompanhe o impacto na parcela, no lance e no custo total. Quando estiver satisfeito,\n                    envie a simulação e receba o plano de contemplação do especialista.",
+    'sim_switcher_aria'  => 'Escolha a jornada do simulador',
+    'sim_infobar_strong' => 'Os resultados atualizam ao vivo.',
+    'sim_infobar_span'   => 'Mude qualquer campo e veja o impacto na parcela, no custo total e na viabilidade da contemplação.',
 ];

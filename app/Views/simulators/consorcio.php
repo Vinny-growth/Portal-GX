@@ -37,39 +37,39 @@ $heroSignals = [
 $scenarioCards = [
     'compare' => [
         'mark' => 'CF',
-        'eyebrow' => 'Mais popular',
-        'title' => 'Consórcio x financiamento',
-        'description' => 'Já tem entrada? Veja em números se o consórcio reduz a parcela mensal e o custo total comparado ao financiamento.',
+        'eyebrow' => lang('Consorcio.sc_compare_eyebrow'),
+        'title' => lang('Consorcio.sc_compare_title'),
+        'description' => lang('Consorcio.sc_compare_desc'),
         'bullets' => [
-            'Descubra a diferença real de parcela entre consórcio e financiamento.',
-            'Veja quanto sua entrada acelera a contemplação como lance.',
-            'Saiba exatamente quanto você economiza no desembolso total.',
+            lang('Consorcio.sc_compare_b1'),
+            lang('Consorcio.sc_compare_b2'),
+            lang('Consorcio.sc_compare_b3'),
         ],
-        'button' => 'Comparar agora',
+        'button' => lang('Consorcio.sc_compare_btn'),
     ],
     'planned' => [
         'mark' => 'PLN',
-        'eyebrow' => 'Compra inteligente',
-        'title' => 'Comprar imóvel de forma planejada',
-        'description' => 'Quer comprar sem apertar o caixa? Veja se seu ritmo mensal sustenta a contemplação no prazo que você precisa.',
+        'eyebrow' => lang('Consorcio.sc_planned_eyebrow'),
+        'title' => lang('Consorcio.sc_planned_title'),
+        'description' => lang('Consorcio.sc_planned_desc'),
         'bullets' => [
-            'Saiba quanto de reserva você terá para dar lance no mês certo.',
-            'Veja se parcela + reserva cabem no seu orçamento confortável.',
-            'Descubra se sobra ou aperta antes de se comprometer.',
+            lang('Consorcio.sc_planned_b1'),
+            lang('Consorcio.sc_planned_b2'),
+            lang('Consorcio.sc_planned_b3'),
         ],
-        'button' => 'Planejar minha compra',
+        'button' => lang('Consorcio.sc_planned_btn'),
     ],
     'investor' => [
         'mark' => 'INV',
-        'eyebrow' => 'Alta rentabilidade',
-        'title' => 'Investir para revender após contemplação',
-        'description' => 'Use o consórcio como alavanca patrimonial. Veja se a margem de revenda compensa o capital investido.',
+        'eyebrow' => lang('Consorcio.sc_investor_eyebrow'),
+        'title' => lang('Consorcio.sc_investor_title'),
+        'description' => lang('Consorcio.sc_investor_desc'),
         'bullets' => [
-            'Calcule o capital total que você precisa mobilizar até a venda.',
-            'Veja a margem líquida real depois de todos os custos de saída.',
-            'Descubra o ROI da operação sobre o seu dinheiro travado.',
+            lang('Consorcio.sc_investor_b1'),
+            lang('Consorcio.sc_investor_b2'),
+            lang('Consorcio.sc_investor_b3'),
         ],
-        'button' => 'Calcular retorno',
+        'button' => lang('Consorcio.sc_investor_btn'),
     ],
 ];
 $aiSteps = [
@@ -279,8 +279,8 @@ $aiSteps = [
     <section class="gx-section gx-section-alt gx-consorcio-testimonials" id="depoimentos">
         <div class="gx-wrap">
             <div class="gx-section-header is-centered" data-gx-reveal>
-                <p class="gx-label"><?= esc($testimonialsCfg['label'] ?? 'Quem já simulou'); ?></p>
-                <h2 class="gx-section-title"><?= esc($testimonialsCfg['title'] ?? 'Quem já simulou, aprovou'); ?></h2>
+                <p class="gx-label"><?= esc($testimonialsCfg['label'] ?? lang('Consorcio.testi_label')); ?></p>
+                <h2 class="gx-section-title"><?= esc($testimonialsCfg['title'] ?? lang('Consorcio.testi_title')); ?></h2>
             </div>
             <div class="gx-testimonial-grid" data-gx-reveal data-gx-delay="80">
                 <?php foreach ($testimonialsItems as $t): ?>
@@ -290,7 +290,7 @@ $aiSteps = [
                         <?php else: ?>
                             <div class="gx-testimonial-avatar" aria-hidden="true"></div>
                         <?php endif; ?>
-                        <div class="gx-testimonial-stars" aria-label="5 estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <div class="gx-testimonial-stars" aria-label="<?= esc(lang('Consorcio.testi_stars')); ?>">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
                         <blockquote><?= esc($t['text'] ?? ''); ?></blockquote>
                         <footer><strong><?= esc($t['name'] ?? ''); ?></strong> <?php if (!empty($t['city'])): ?><span><?= esc($t['city']); ?></span><?php endif; ?></footer>
                     </article>
@@ -306,12 +306,12 @@ $aiSteps = [
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label">Escolha sua jornada</p>
-                    <h2 class="gx-section-title">Qual é o seu objetivo com o consórcio? Comece pelo cenário certo.</h2>
+                    <p class="gx-label"><?= lang('Consorcio.estr_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Consorcio.estr_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    Cada objetivo pede uma conta diferente. Escolha o cenário que mais se parece com o seu momento
-                    e veja os números que realmente importam para a sua decisão.
+                    <?= lang('Consorcio.estr_desc'); ?>
+
                 </p>
             </div>
 
@@ -320,7 +320,7 @@ $aiSteps = [
                     <article class="gx-consorcio-track-card<?= $key === 'compare' ? ' is-active' : ''; ?>" data-gx-scenario-card="<?= esc($key); ?>">
                         <div class="gx-simulator-top">
                             <span class="gx-simulator-mark"><?= esc($card['mark']); ?></span>
-                            <span class="gx-legacy-pill">Simulação gratuita</span>
+                            <span class="gx-legacy-pill"><?= lang('Consorcio.sc_gratis'); ?></span>
                         </div>
                         <p class="gx-card-kicker"><?= esc($card['eyebrow']); ?></p>
                         <h3 class="gx-simulator-title"><?= esc($card['title']); ?></h3>
@@ -343,18 +343,18 @@ $aiSteps = [
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label">Simulador ao vivo</p>
-                    <h2 class="gx-section-title">Ajuste os números do seu caso e veja o resultado mudar em tempo real.</h2>
+                    <p class="gx-label"><?= lang('Consorcio.sim_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Consorcio.sim_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    Mexa nos campos abaixo e acompanhe o impacto na parcela, no lance e no custo total. Quando estiver satisfeito,
-                    envie a simulação e receba o plano de contemplação do especialista.
+                    <?= lang('Consorcio.sim_desc'); ?>
+
                 </p>
             </div>
 
             <div class="gx-consorcio-workbench">
                 <div class="gx-consorcio-main-card" data-gx-reveal data-gx-delay="80">
-                    <div class="gx-consorcio-switcher" role="tablist" aria-label="Escolha a jornada do simulador">
+                    <div class="gx-consorcio-switcher" role="tablist" aria-label="<?= esc(lang('Consorcio.sim_switcher_aria')); ?>">
                         <?php foreach ($scenarioCards as $key => $card): ?>
                             <button
                                 type="button"
@@ -369,8 +369,8 @@ $aiSteps = [
                     </div>
 
                     <div class="gx-consorcio-info-bar">
-                        <strong>Os resultados atualizam ao vivo.</strong>
-                        <span>Mude qualquer campo e veja o impacto na parcela, no custo total e na viabilidade da contemplação.</span>
+                        <strong><?= lang('Consorcio.sim_infobar_strong'); ?></strong>
+                        <span><?= lang('Consorcio.sim_infobar_span'); ?></span>
                     </div>
 
                     <form class="gx-consorcio-form-grid" id="gx-consorcio-simulator-form" novalidate>
