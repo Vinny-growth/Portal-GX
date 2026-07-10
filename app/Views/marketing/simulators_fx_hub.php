@@ -769,6 +769,58 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
 
 <script>
 (function() {
+    // i18n: microcopy do JS vem do catálogo (app/Language/<locale>/Fx.php).
+    // {x} são placeholders preenchidos no runtime via fill().
+    var L = <?= json_encode([
+        'dias' => lang('Fx.js_dias'),
+        'wa' => lang('Fx.lead_chip_wa'), 'sim' => lang('Fx.lab_sim'), 'nao' => lang('Fx.lab_nao'),
+        'r_list_title' => lang('Fx.js_r_list_title'), 'r_cta_p' => lang('Fx.js_r_cta_p'), 'r_cta_btn' => lang('Fx.js_r_cta_btn'),
+        'wa_tool_fallback' => lang('Fx.js_wa_tool_fallback'), 'wa_copy_tool' => lang('Fx.js_wa_copy_tool'), 'wa_copy_default' => lang('Fx.js_wa_copy_default'),
+        'im_ins1' => lang('Fx.js_im_ins1'), 'im_ins2' => lang('Fx.js_im_ins2'), 'im_ins3' => lang('Fx.js_im_ins3'), 'im_ins3_alt' => lang('Fx.js_im_ins3_alt'),
+        'im_ins_hedge' => lang('Fx.js_im_ins_hedge'), 'im_ins_ok' => lang('Fx.js_im_ins_ok'),
+        'im_badge_hedge' => lang('Fx.js_im_badge_hedge'), 'im_badge_ok' => lang('Fx.js_im_badge_ok'),
+        'im_title_hedge' => lang('Fx.js_im_title_hedge'), 'im_title_ok' => lang('Fx.js_im_title_ok'), 'im_desc' => lang('Fx.js_im_desc'),
+        'im_m1' => lang('Fx.js_im_m1'), 'im_m2' => lang('Fx.js_im_m2'), 'im_m3' => lang('Fx.js_im_m3'), 'im_m4' => lang('Fx.js_im_m4'),
+        'im_livelabel' => lang('Fx.lead_live_label'), 'im_copy_hedge' => lang('Fx.js_im_copy_hedge'), 'im_copy_ok' => lang('Fx.js_im_copy_ok'),
+        'ex_ins1' => lang('Fx.js_ex_ins1'), 'ex_ins2' => lang('Fx.js_ex_ins2'), 'ex_ins3' => lang('Fx.js_ex_ins3'),
+        'ex_ins_min_no' => lang('Fx.js_ex_ins_min_no'), 'ex_ins_min_yes' => lang('Fx.js_ex_ins_min_yes'), 'ex_ins_min_alt' => lang('Fx.js_ex_ins_min_alt'),
+        'ex_ins_hedge' => lang('Fx.js_ex_ins_hedge'), 'ex_ins_ok' => lang('Fx.js_ex_ins_ok'),
+        'ex_badge_hedge' => lang('Fx.js_ex_badge_hedge'), 'ex_badge_ok' => lang('Fx.js_ex_badge_ok'),
+        'ex_title_hedge' => lang('Fx.js_ex_title_hedge'), 'ex_title_ok' => lang('Fx.js_ex_title_ok'), 'ex_desc' => lang('Fx.js_ex_desc'),
+        'ex_m1' => lang('Fx.js_ex_m1'), 'ex_m2' => lang('Fx.js_ex_m2'), 'ex_m3' => lang('Fx.js_ex_m3'), 'ex_m4' => lang('Fx.js_ex_m4'),
+        'ex_livelabel' => lang('Fx.js_ex_livelabel'), 'ex_copy_hedge' => lang('Fx.js_ex_copy_hedge'), 'ex_copy_ok' => lang('Fx.js_ex_copy_ok'),
+        'hd_ins1' => lang('Fx.js_hd_ins1'), 'hd_ins2' => lang('Fx.js_hd_ins2'), 'hd_ins3' => lang('Fx.js_hd_ins3'), 'hd_ins4' => lang('Fx.js_hd_ins4'),
+        'hd_ins_hedge' => lang('Fx.js_hd_ins_hedge'), 'hd_ins_ok' => lang('Fx.js_hd_ins_ok'),
+        'hd_badge_hedge' => lang('Fx.js_hd_badge_hedge'), 'hd_badge_ok' => lang('Fx.js_hd_badge_ok'),
+        'hd_title_hedge' => lang('Fx.js_hd_title_hedge'), 'hd_title_ok' => lang('Fx.js_hd_title_ok'), 'hd_desc' => lang('Fx.js_hd_desc'),
+        'hd_m1' => lang('Fx.js_hd_m1'), 'hd_m2' => lang('Fx.js_hd_m2'), 'hd_m3' => lang('Fx.js_hd_m3'), 'hd_m4' => lang('Fx.js_hd_m4'),
+        'hd_livelabel' => lang('Fx.js_hd_livelabel'), 'hd_copy_hedge' => lang('Fx.js_hd_copy_hedge'), 'hd_copy_ok' => lang('Fx.js_hd_copy_ok'),
+        'fd_ins1' => lang('Fx.js_fd_ins1'), 'fd_ins2' => lang('Fx.js_fd_ins2'), 'fd_ins3_off' => lang('Fx.js_fd_ins3_off'), 'fd_ins3_on' => lang('Fx.js_fd_ins3_on'),
+        'fd_ins4_yes' => lang('Fx.js_fd_ins4_yes'), 'fd_ins4_no' => lang('Fx.js_fd_ins4_no'),
+        'fd_ins_score' => lang('Fx.js_fd_ins_score'), 'fd_ins_noscore' => lang('Fx.js_fd_ins_noscore'),
+        'fd_badge_yes' => lang('Fx.js_fd_badge_yes'), 'fd_badge_no' => lang('Fx.js_fd_badge_no'),
+        'fd_title_yes' => lang('Fx.js_fd_title_yes'), 'fd_title_no' => lang('Fx.js_fd_title_no'), 'fd_desc' => lang('Fx.js_fd_desc'),
+        'fd_m1' => lang('Fx.js_fd_m1'), 'fd_m2' => lang('Fx.js_fd_m2'), 'fd_m3' => lang('Fx.js_fd_m3'), 'fd_m4' => lang('Fx.js_fd_m4'),
+        'fd_livelabel' => lang('Fx.js_fd_livelabel'), 'fd_copy_yes' => lang('Fx.js_fd_copy_yes'), 'fd_copy_no' => lang('Fx.js_fd_copy_no'),
+        'tr_struct_acc' => lang('Fx.js_tr_struct_acc'), 'tr_struct_ace' => lang('Fx.js_tr_struct_ace'), 'tr_struct_finimp' => lang('Fx.js_tr_struct_finimp'),
+        'tr_struct_lc' => lang('Fx.js_tr_struct_lc'), 'tr_struct_supplier' => lang('Fx.js_tr_struct_supplier'), 'tr_struct_custom' => lang('Fx.js_tr_struct_custom'),
+        'tr_struct_big' => lang('Fx.js_tr_struct_big'), 'tr_struct_nocol' => lang('Fx.js_tr_struct_nocol'), 'tr_struct_nohedge' => lang('Fx.js_tr_struct_nohedge'),
+        'tr_profile_importer' => lang('Fx.js_tr_profile_importer'), 'tr_profile_exporter' => lang('Fx.js_tr_profile_exporter'), 'tr_profile_both' => lang('Fx.js_tr_profile_both'),
+        'tr_ins_profile' => lang('Fx.js_tr_ins_profile'),
+        'tr_stage_pre' => lang('Fx.js_tr_stage_pre'), 'tr_stage_post' => lang('Fx.js_tr_stage_post'), 'tr_stage_pay' => lang('Fx.js_tr_stage_pay'), 'tr_stage_guarantee' => lang('Fx.js_tr_stage_guarantee'), 'tr_stage_term' => lang('Fx.js_tr_stage_term'), 'tr_stage_default' => lang('Fx.js_tr_stage_default'),
+        'tr_ins_stage' => lang('Fx.js_tr_ins_stage'), 'tr_ins_prazo' => lang('Fx.js_tr_ins_prazo'),
+        'tr_badge' => lang('Fx.js_tr_badge'), 'tr_desc' => lang('Fx.js_tr_desc'),
+        'tr_m1' => lang('Fx.js_tr_m1'), 'tr_m2' => lang('Fx.js_tr_m2'), 'tr_m3' => lang('Fx.js_tr_m3'), 'tr_m4' => lang('Fx.js_tr_m4'),
+        'tr_opcoes' => lang('Fx.js_tr_opcoes'), 'tr_livelabel' => lang('Fx.js_tr_livelabel'), 'tr_copy' => lang('Fx.js_tr_copy'),
+        'enviando' => lang('Fx.js_enviando'), 'status_loading' => lang('Fx.js_status_loading'),
+        'send_fail' => lang('Fx.js_send_fail'), 'send_err' => lang('Fx.js_send_err'),
+    ], JSON_UNESCAPED_UNICODE); ?>;
+    function fill(tpl, map) {
+        return String(tpl).replace(/\{(\w+)\}/g, function (m, k) {
+            return (map[k] != null) ? map[k] : m;
+        });
+    }
+
     var nav = document.getElementById('gx-nav');
     var toggle = document.getElementById('gx-nav-toggle');
     var links = document.getElementById('gx-nav-links');
@@ -938,7 +990,7 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         }).join('');
 
         var resultCtaWa = whatsAppBaseUrl
-            ? '<a href="' + whatsAppBaseUrl + '" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp" data-gx-whatsapp-link>' + whatsAppIconHtml + 'WhatsApp</a>'
+            ? '<a href="' + whatsAppBaseUrl + '" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp" data-gx-whatsapp-link>' + whatsAppIconHtml + L.wa + '</a>'
             : '';
 
         target.innerHTML =
@@ -949,13 +1001,13 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
             '</div>' +
             '<div class="gx-fx-metric-grid">' + metricsHtml + '</div>' +
             '<div class="gx-fx-result-list">' +
-                '<p class="gx-fx-result-list-title">Leitura inicial da mesa</p>' +
+                '<p class="gx-fx-result-list-title">' + L.r_list_title + '</p>' +
                 '<ul>' + insightsHtml + '</ul>' +
             '</div>' +
             '<div class="gx-fx-result-cta">' +
-                '<p>Esse cenário merece uma leitura da mesa.</p>' +
+                '<p>' + L.r_cta_p + '</p>' +
                 '<div class="gx-fx-result-cta-btns">' +
-                    '<a href="#lead-cambio" class="gx-btn gx-btn-primary">Agendar conversa com especialista</a>' +
+                    '<a href="#lead-cambio" class="gx-btn gx-btn-primary">' + L.r_cta_btn + '</a>' +
                     resultCtaWa +
                 '</div>' +
             '</div>';
@@ -994,7 +1046,7 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
 
         var message = hasToolInteraction ? (whatsAppMessagesByTool[activeTool] || whatsAppDefaultMessage) : whatsAppDefaultMessage;
         var href = whatsAppBaseUrl + '?text=' + encodeURIComponent(message);
-        var toolLabel = toolCards[activeTool] ? toolCards[activeTool].title : 'sua conversa com a mesa';
+        var toolLabel = toolCards[activeTool] ? toolCards[activeTool].title : L.wa_tool_fallback;
 
         document.querySelectorAll('[data-gx-whatsapp-link]').forEach(function(node) {
             node.setAttribute('href', href);
@@ -1002,8 +1054,8 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
 
         document.querySelectorAll('[data-gx-whatsapp-copy]').forEach(function(node) {
             node.textContent = hasToolInteraction
-                ? 'Mensagem pronta para ' + toolLabel.toLowerCase() + '.'
-                : 'Mensagem pronta para iniciar a conversa com a mesa de câmbio.';
+                ? fill(L.wa_copy_tool, { tool: toolLabel.toLowerCase() })
+                : L.wa_copy_default;
         });
     }
 
@@ -1024,38 +1076,34 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         var targetMargin = normalizeNumeric(indicators.importer_target_margin || 0);
         var hedgeScore = settlementDays > 20 || impact > (baseCost * 0.03) || (stressedMargin !== null && stressedMargin < targetMargin);
         var insights = [
-            'Sem proteção, o custo sairia de ' + brl(baseCost) + ' para ' + brl(stressedCost) + ' se o USD/BRL fosse a ' + num(stressRate, 4) + '.',
-            'O impacto indicativo da exposição aberta é de ' + brl(impact) + ' antes de negociar eventual repasse com fornecedor ou cliente.',
+            fill(L.im_ins1, { b: brl(baseCost), s: brl(stressedCost), r: num(stressRate, 4) }),
+            fill(L.im_ins2, { v: brl(impact) }),
         ];
 
         if (projectedSale > 0 && baseMargin !== null && stressedMargin !== null) {
-            insights.push('Com receita projetada de ' + brl(projectedSale) + ', a margem iria de ' + pct(baseMargin) + ' para ' + pct(stressedMargin) + '.');
+            insights.push(fill(L.im_ins3, { v: brl(projectedSale), a: pct(baseMargin), b: pct(stressedMargin) }));
         } else {
-            insights.push('Se você informar a receita projetada em BRL, a mesa também consegue ler compressão de margem no lote.');
+            insights.push(L.im_ins3_alt);
         }
 
-        insights.push(hedgeScore
-            ? 'Leitura inicial: vale comparar NDF, termo ou trava parcial para reduzir a pressão de caixa do fechamento.'
-            : 'Leitura inicial: a exposição parece administrável, mas ainda vale testar cotação e proteção parcial com a mesa.');
+        insights.push(hedgeScore ? L.im_ins_hedge : L.im_ins_ok);
 
         return {
             toolKey: 'import',
             toolLabel: toolCards.import.title,
-            badge: hedgeScore ? 'Hedge recomendado' : 'Monitorar exposição',
-            title: hedgeScore ? 'A margem tende a sofrer se o câmbio andar contra.' : 'A exposição parece controlável, mas merece leitura de mesa.',
-            description: 'O cálculo compara o custo em BRL no cenário atual com um cenário cambial mais pressionado.',
+            badge: hedgeScore ? L.im_badge_hedge : L.im_badge_ok,
+            title: hedgeScore ? L.im_title_hedge : L.im_title_ok,
+            description: L.im_desc,
             metrics: [
-                {label: 'Custo base em BRL', value: brl(baseCost)},
-                {label: 'Custo em estresse', value: brl(stressedCost)},
-                {label: 'Impacto da exposição', value: brl(impact)},
-                {label: 'Prazo até fechamento', value: Math.round(settlementDays) + ' dias'},
+                {label: L.im_m1, value: brl(baseCost)},
+                {label: L.im_m2, value: brl(stressedCost)},
+                {label: L.im_m3, value: brl(impact)},
+                {label: L.im_m4, value: Math.round(settlementDays) + L.dias},
             ],
             insights: insights,
             liveValue: brl(impact),
-            liveLabel: 'impacto indicativo em cenário de estresse',
-            liveCopy: hedgeScore
-                ? 'O cenário sugere discutir hedge ou trava parcial antes do fechamento.'
-                : 'A exposição parece menos agressiva, mas a mesa pode buscar execução mais eficiente.',
+            liveLabel: L.im_livelabel,
+            liveCopy: hedgeScore ? L.im_copy_hedge : L.im_copy_ok,
             leadSummary: 'Importação | Fatura USD ' + num(invoiceAmount) + ' | custo base ' + brl(baseCost) + ' | custo em estresse ' + brl(stressedCost),
             payload: {
                 inputs: {
@@ -1094,41 +1142,37 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         var gap = proceedsProtected - proceedsDownside;
         var hedgeScore = proceedsProtected > proceedsDownside && (minimumNeed > 0 ? proceedsDownside < minimumNeed : settlementDays > 20);
         var insights = [
-            'No cenário atual, a liquidação indicativa seria de ' + brl(proceedsToday) + ' líquidos de spread.',
-            'Se o câmbio cair para ' + num(downsideRate, 4) + ', a receita cairia para ' + brl(proceedsDownside) + '.',
-            'Com piso em ' + num(floorRate, 4) + ', a operação protegeria aproximadamente ' + brl(gap) + ' versus o cenário de queda.',
+            fill(L.ex_ins1, { v: brl(proceedsToday) }),
+            fill(L.ex_ins2, { r: num(downsideRate, 4), v: brl(proceedsDownside) }),
+            fill(L.ex_ins3, { r: num(floorRate, 4), v: brl(gap) }),
         ];
 
         if (minimumNeed > 0) {
             insights.push(minimumNeed > proceedsDownside
-                ? 'O cenário de queda não cobre o caixa mínimo informado de ' + brl(minimumNeed) + '.'
-                : 'Mesmo no cenário de queda, a receita ainda cobre o caixa mínimo informado de ' + brl(minimumNeed) + '.');
+                ? fill(L.ex_ins_min_no, { v: brl(minimumNeed) })
+                : fill(L.ex_ins_min_yes, { v: brl(minimumNeed) }));
         } else {
-            insights.push('Se você informar o caixa mínimo em BRL, a mesa consegue avaliar melhor o piso operacional necessário.');
+            insights.push(L.ex_ins_min_alt);
         }
 
-        insights.push(hedgeScore
-            ? 'Leitura inicial: faz sentido discutir trava de piso, ACC/ACE ou execução escalonada para proteger a conversão.'
-            : 'Leitura inicial: o câmbio ainda parece acomodar a operação, mas vale comparar alternativas de proteção com a mesa.');
+        insights.push(hedgeScore ? L.ex_ins_hedge : L.ex_ins_ok);
 
         return {
             toolKey: 'export',
             toolLabel: toolCards.export.title,
-            badge: hedgeScore ? 'Piso recomendado' : 'Receita monitorada',
-            title: hedgeScore ? 'A queda do câmbio pode comprimir a receita em BRL.' : 'A receita parece mais equilibrada, mas ainda pede disciplina de execução.',
-            description: 'O cálculo compara receita líquida atual, cenário de queda e cenário protegido.',
+            badge: hedgeScore ? L.ex_badge_hedge : L.ex_badge_ok,
+            title: hedgeScore ? L.ex_title_hedge : L.ex_title_ok,
+            description: L.ex_desc,
             metrics: [
-                {label: 'Receita hoje', value: brl(proceedsToday)},
-                {label: 'Receita em queda', value: brl(proceedsDownside)},
-                {label: 'Receita protegida', value: brl(proceedsProtected)},
-                {label: 'Diferença protegida', value: brl(gap)},
+                {label: L.ex_m1, value: brl(proceedsToday)},
+                {label: L.ex_m2, value: brl(proceedsDownside)},
+                {label: L.ex_m3, value: brl(proceedsProtected)},
+                {label: L.ex_m4, value: brl(gap)},
             ],
             insights: insights,
             liveValue: brl(gap),
-            liveLabel: 'proteção indicativa de receita versus cenário de queda',
-            liveCopy: hedgeScore
-                ? 'A operação tende a ganhar previsibilidade se você travar um piso de conversão.'
-                : 'A exposição parece menos crítica, mas a mesa pode calibrar a melhor janela de venda.',
+            liveLabel: L.ex_livelabel,
+            liveCopy: hedgeScore ? L.ex_copy_hedge : L.ex_copy_ok,
             leadSummary: 'Exportação | Recebível USD ' + num(receivableAmount) + ' | receita em queda ' + brl(proceedsDownside) + ' | receita protegida ' + brl(proceedsProtected),
             payload: {
                 inputs: {
@@ -1165,33 +1209,29 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         var breakEvenMove = hedgeCostMonthlyPct * monthsToSettlement;
         var hedgeScore = potentialLoss > hedgeCost * 1.5 || pressureOnMargin > 30;
         var insights = [
-            'Operando aberto, uma variação adversa de ' + pct(adverseMovePct) + ' consumiria aproximadamente ' + brl(potentialLoss) + '.',
-            'O custo indicativo do hedge para ' + Math.round(monthsToSettlement) + ' meses seria de ' + brl(hedgeCost) + '.',
-            'O break-even da proteção fica próximo de ' + pct(breakEvenMove) + ' de movimento cambial no período.',
-            'A perda potencial consome cerca de ' + pct(pressureOnMargin) + ' da margem estimada da operação.',
-            hedgeScore
-                ? 'Leitura inicial: a assimetria favorece discutir hedge total ou parcial com a mesa.'
-                : 'Leitura inicial: a proteção pode ser seletiva, mas ainda vale comparar custos e estruturas antes de decidir operar aberto.',
+            fill(L.hd_ins1, { p: pct(adverseMovePct), v: brl(potentialLoss) }),
+            fill(L.hd_ins2, { m: Math.round(monthsToSettlement), v: brl(hedgeCost) }),
+            fill(L.hd_ins3, { p: pct(breakEvenMove) }),
+            fill(L.hd_ins4, { p: pct(pressureOnMargin) }),
+            hedgeScore ? L.hd_ins_hedge : L.hd_ins_ok,
         ];
 
         return {
             toolKey: 'hedge',
             toolLabel: toolCards.hedge.title,
-            badge: hedgeScore ? 'Assimetria pró-hedge' : 'Proteção seletiva',
-            title: hedgeScore ? 'O custo da proteção parece menor que o risco de ficar aberto.' : 'A decisão pode admitir proteção parcial, mas não deve ignorar o risco.',
-            description: 'O simulador compara perda potencial, custo indicativo do hedge e espaço de margem da operação.',
+            badge: hedgeScore ? L.hd_badge_hedge : L.hd_badge_ok,
+            title: hedgeScore ? L.hd_title_hedge : L.hd_title_ok,
+            description: L.hd_desc,
             metrics: [
-                {label: 'Exposição em BRL', value: brl(exposureBrl)},
-                {label: 'Perda potencial', value: brl(potentialLoss)},
-                {label: 'Custo do hedge', value: brl(hedgeCost)},
-                {label: 'Risco / custo', value: hedgeCost > 0 ? ratio(potentialLoss / hedgeCost) : 'n/a'},
+                {label: L.hd_m1, value: brl(exposureBrl)},
+                {label: L.hd_m2, value: brl(potentialLoss)},
+                {label: L.hd_m3, value: brl(hedgeCost)},
+                {label: L.hd_m4, value: hedgeCost > 0 ? ratio(potentialLoss / hedgeCost) : 'n/a'},
             ],
             insights: insights,
             liveValue: hedgeCost > 0 ? ratio(potentialLoss / hedgeCost) : 'n/a',
-            liveLabel: 'risco potencial em relação ao custo da proteção',
-            liveCopy: hedgeScore
-                ? 'O quadro sugere que vale aprofundar a proteção antes da execução.'
-                : 'A decisão pode admitir hedge parcial ou tático, mas com leitura de margem.',
+            liveLabel: L.hd_livelabel,
+            liveCopy: hedgeScore ? L.hd_copy_hedge : L.hd_copy_ok,
             leadSummary: 'Hedge | Exposição BRL ' + brl(exposureBrl) + ' | perda potencial ' + brl(potentialLoss) + ' | custo do hedge ' + brl(hedgeCost),
             payload: {
                 inputs: {
@@ -1232,37 +1272,31 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         var savingsBrl = principalBrl * (annualDiff / 100) * (tenorMonths / 12);
         var score = annualDiff > 1 && tenorMonths >= 6 && principalUsd >= 500000;
         var insights = [
-            'O custo anual indicativo onshore fica em ' + pct(localAnnual) + ' considerando base local e spread adicional.',
-            'O custo anual indicativo offshore fica em ' + pct(offshoreAnnual) + ' somando SOFR, spread, hedge ajustado e fees.',
+            fill(L.fd_ins1, { p: pct(localAnnual) }),
+            fill(L.fd_ins2, { p: pct(offshoreAnnual) }),
             annualDiff >= 0
-                ? 'A diferença favorece o offshore em cerca de ' + pct(annualDiff) + ' ao ano, ou ' + brl(savingsBrl) + ' no prazo analisado.'
-                : 'A diferença favorece o onshore em cerca de ' + pct(Math.abs(annualDiff)) + ' ao ano no prazo analisado.',
-            naturalHedgePct > 0
-                ? 'A presença de hedge natural reduz parte do custo de proteção considerado no comparativo.'
-                : 'Sem hedge natural, o custo de proteção pesa integralmente na conta offshore.',
-            score
-                ? 'Leitura inicial: a tese de 4131 parece merecer aprofundamento com a mesa e validação jurídica/operacional.'
-                : 'Leitura inicial: a operação pode até ser viável, mas ainda não mostra folga suficiente para priorizar 4131 sem análise mais fina.',
+                ? fill(L.fd_ins3_off, { p: pct(annualDiff), v: brl(savingsBrl) })
+                : fill(L.fd_ins3_on, { p: pct(Math.abs(annualDiff)) }),
+            naturalHedgePct > 0 ? L.fd_ins4_yes : L.fd_ins4_no,
+            score ? L.fd_ins_score : L.fd_ins_noscore,
         ];
 
         return {
             toolKey: 'funding4131',
             toolLabel: toolCards.funding4131.title,
-            badge: score ? '4131 faz sentido analisar' : 'Comparar com funding local',
-            title: score ? 'O offshore parece competitivo para esta operação.' : 'A tese ainda precisa provar eficiência frente ao funding local.',
-            description: 'O simulador compara custo anual indicativo local e internacional já considerando proteção e fees.',
+            badge: score ? L.fd_badge_yes : L.fd_badge_no,
+            title: score ? L.fd_title_yes : L.fd_title_no,
+            description: L.fd_desc,
             metrics: [
-                {label: 'Custo onshore', value: pct(localAnnual)},
-                {label: 'Custo offshore', value: pct(offshoreAnnual)},
-                {label: 'Diferença anual', value: pct(annualDiff)},
-                {label: 'Economia indicativa', value: brl(savingsBrl)},
+                {label: L.fd_m1, value: pct(localAnnual)},
+                {label: L.fd_m2, value: pct(offshoreAnnual)},
+                {label: L.fd_m3, value: pct(annualDiff)},
+                {label: L.fd_m4, value: brl(savingsBrl)},
             ],
             insights: insights,
             liveValue: pct(annualDiff),
-            liveLabel: 'diferença anual indicativa entre funding local e offshore',
-            liveCopy: score
-                ? 'Os números sugerem que vale aprofundar a estrutura 4131 com hedge e documentação.'
-                : 'A conta ainda pede mais cuidado. Talvez o funding local ou outra estrutura continue mais eficiente.',
+            liveLabel: L.fd_livelabel,
+            liveCopy: score ? L.fd_copy_yes : L.fd_copy_no,
             leadSummary: '4131 | Principal USD ' + num(principalUsd) + ' | custo local ' + pct(localAnnual) + ' | custo offshore ' + pct(offshoreAnnual),
             payload: {
                 inputs: {
@@ -1297,63 +1331,63 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         var structures = [];
 
         if (profile === 'exporter' && stage === 'pre_shipment') {
-            structures.push('ACC para financiar antes do embarque e aliviar caixa da produção.');
+            structures.push(L.tr_struct_acc);
         }
         if (profile === 'exporter' && stage === 'post_shipment') {
-            structures.push('ACE ou desconto internacional para antecipar recursos depois do embarque.');
+            structures.push(L.tr_struct_ace);
         }
         if ((profile === 'importer' || profile === 'both') && stage === 'pay_supplier') {
-            structures.push('FINIMP ou supplier credit para alongar o pagamento ao fornecedor.');
+            structures.push(L.tr_struct_finimp);
         }
         if (stage === 'guarantee') {
-            structures.push('Carta de crédito ou garantia bancária para reforçar a segurança da contraparte.');
+            structures.push(L.tr_struct_lc);
         }
         if ((profile === 'importer' || profile === 'both') && stage === 'term_extension' && tenorDays >= 180) {
-            structures.push('Supplier credit, financiamento estruturado ou 4131 para ganhar prazo com critério.');
+            structures.push(L.tr_struct_supplier);
         }
         if (structures.length === 0) {
-            structures.push('A operação pede desenho sob medida entre câmbio, funding e garantia.');
+            structures.push(L.tr_struct_custom);
         }
 
         if (ticketUsd >= 500000 && tenorDays >= 180) {
-            structures.push('Pelo ticket e prazo, vale comparar uma estrutura mais elaborada com funding internacional.');
+            structures.push(L.tr_struct_big);
         }
         if (!hasCollateral) {
-            structures.push('Sem colateral claro, a mesa precisa priorizar instituições e produtos mais aderentes ao risco da operação.');
+            structures.push(L.tr_struct_nocol);
         }
         if (!hasNaturalHedge) {
-            structures.push('Sem hedge natural, a proteção cambial precisa entrar cedo na conversa para evitar que o funding vire nova exposição.');
+            structures.push(L.tr_struct_nohedge);
         }
 
         var title = structures[0];
         var insights = [
-            'Perfil da operação: ' + (profile === 'importer' ? 'importador' : (profile === 'exporter' ? 'exportador' : 'importador e exportador')) + '.',
-            'Objetivo principal: ' + ({
-                pre_shipment: 'financiar antes do embarque',
-                post_shipment: 'antecipar depois do embarque',
-                pay_supplier: 'pagar fornecedor e alongar caixa',
-                guarantee: 'dar segurança para a contraparte',
-                term_extension: 'ganhar prazo para a operação'
-            }[stage] || 'avaliar estrutura') + '.',
-            'Prazo analisado: ' + Math.round(tenorDays) + ' dias para um ticket de aproximadamente USD ' + num(ticketUsd) + '.',
+            fill(L.tr_ins_profile, { v: (profile === 'importer' ? L.tr_profile_importer : (profile === 'exporter' ? L.tr_profile_exporter : L.tr_profile_both)) }),
+            fill(L.tr_ins_stage, { v: ({
+                pre_shipment: L.tr_stage_pre,
+                post_shipment: L.tr_stage_post,
+                pay_supplier: L.tr_stage_pay,
+                guarantee: L.tr_stage_guarantee,
+                term_extension: L.tr_stage_term
+            }[stage] || L.tr_stage_default) }),
+            fill(L.tr_ins_prazo, { d: Math.round(tenorDays), t: num(ticketUsd) }),
         ].concat(structures);
 
         return {
             toolKey: 'trade',
             toolLabel: toolCards.trade.title,
-            badge: 'Estrutura prioritária',
+            badge: L.tr_badge,
             title: title,
-            description: 'O roteador abaixo não substitui análise de crédito e documentação, mas ajuda a separar a conversa certa desde o início.',
+            description: L.tr_desc,
             metrics: [
-                {label: 'Ticket', value: 'USD ' + num(ticketUsd)},
-                {label: 'Prazo', value: Math.round(tenorDays) + ' dias'},
-                {label: 'Colateral', value: hasCollateral ? 'Sim' : 'Não'},
-                {label: 'Hedge natural', value: hasNaturalHedge ? 'Sim' : 'Não'},
+                {label: L.tr_m1, value: 'USD ' + num(ticketUsd)},
+                {label: L.tr_m2, value: Math.round(tenorDays) + L.dias},
+                {label: L.tr_m3, value: hasCollateral ? L.sim : L.nao},
+                {label: L.tr_m4, value: hasNaturalHedge ? L.sim : L.nao},
             ],
             insights: insights,
-            liveValue: structures.length + ' opções',
-            liveLabel: 'estruturas sugeridas para aprofundar com a mesa',
-            liveCopy: 'O objetivo aqui é chegar na instituição certa com uma tese mais madura de execução.',
+            liveValue: structures.length + L.tr_opcoes,
+            liveLabel: L.tr_livelabel,
+            liveCopy: L.tr_copy,
             leadSummary: 'Trade finance | Perfil ' + profile + ' | objetivo ' + stage + ' | ticket USD ' + num(ticketUsd) + ' | prazo ' + Math.round(tenorDays) + ' dias',
             payload: {
                 inputs: {
@@ -1575,9 +1609,9 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
 
             if (submitButton) {
                 submitButton.disabled = true;
-                submitButton.textContent = 'Enviando...';
+                submitButton.textContent = L.enviando;
             }
-            setLeadStatus('loading', 'Enviando cenário para a mesa...');
+            setLeadStatus('loading', L.status_loading);
 
             fetch(leadForm.getAttribute('action'), {
                 method: 'POST',
@@ -1589,7 +1623,7 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                 });
             }).then(function(data) {
                 if (!data || data.status !== 'success') {
-                    throw new Error(data && data.message ? data.message : 'Falha ao enviar a simulação.');
+                    throw new Error(data && data.message ? data.message : L.send_fail);
                 }
 
                 leadForm.reset();
@@ -1614,9 +1648,9 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                     value: 1
                 });
 
-                setLeadStatus('success', <?= json_encode($leadConfig['success_message'] ?? 'Recebemos o seu cenário. A mesa de câmbio da GX Capital vai avaliar o melhor caminho para a sua operação.'); ?>);
+                setLeadStatus('success', <?= json_encode($leadConfig['success_message'] ?? brandLang('Fx.js_success')); ?>);
             }).catch(function(error) {
-                setLeadStatus('error', error && error.message ? error.message : 'Não foi possível enviar o cenário agora.');
+                setLeadStatus('error', error && error.message ? error.message : L.send_err);
             }).finally(function() {
                 if (submitButton) {
                     submitButton.disabled = false;
