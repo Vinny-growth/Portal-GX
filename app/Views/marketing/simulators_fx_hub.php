@@ -34,11 +34,11 @@ $numberValue = static function ($value) {
 };
 
 $navLinks = [
-    ['label' => 'A Mesa', 'href' => '#quem-somos'],
-    ['label' => 'Indicadores', 'href' => '#indicadores-cambio'],
-    ['label' => 'Ferramentas', 'href' => '#ferramentas-cambio'],
-    ['label' => 'Laboratório', 'href' => '#laboratorio-cambio'],
-    ['label' => 'Especialista', 'href' => '#lead-cambio'],
+    ['label' => lang('Fx.nav_mesa'), 'href' => '#quem-somos'],
+    ['label' => lang('Fx.nav_indicadores'), 'href' => '#indicadores-cambio'],
+    ['label' => lang('Fx.nav_ferramentas'), 'href' => '#ferramentas-cambio'],
+    ['label' => lang('Fx.nav_laboratorio'), 'href' => '#laboratorio-cambio'],
+    ['label' => lang('Fx.nav_especialista'), 'href' => '#lead-cambio'],
 ];
 
 $indicatorCards = [
@@ -118,8 +118,8 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
 <main class="gx-marketing gx-home gx-fx-simulators" data-gx-fx-page>
     <nav class="gx-nav" id="gx-nav">
         <div class="gx-nav-inner">
-            <a href="<?= esc($homeUrl); ?>" class="gx-nav-brand" aria-label="GX Capital">
-                <img src="<?= getLogo(); ?>" alt="GX Capital" width="<?= getLogoSize('width'); ?>" height="<?= getLogoSize('height'); ?>">
+            <a href="<?= esc($homeUrl); ?>" class="gx-nav-brand" aria-label="<?= esc(brand('display_name')); ?>">
+                <img src="<?= getLogo(); ?>" alt="<?= esc(brand('display_name')); ?>" width="<?= getLogoSize('width'); ?>" height="<?= getLogoSize('height'); ?>">
             </a>
 
             <div class="gx-nav-links" id="gx-nav-links">
@@ -127,15 +127,15 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                     <a href="<?= esc($item['href']); ?>" class="gx-nav-link"><?= esc($item['label']); ?></a>
                 <?php endforeach; ?>
                 <div class="gx-nav-menu-extra">
-                    <a href="<?= esc($blogUrl); ?>" class="gx-nav-link">Blog</a>
-                    <a href="<?= esc($hero['primary_cta_url'] ?? '#lead-cambio'); ?>" class="gx-btn gx-btn-primary"><?= esc($hero['primary_cta_label'] ?? 'Receber leitura da mesa'); ?></a>
+                    <a href="<?= esc($blogUrl); ?>" class="gx-nav-link"><?= lang('Fx.nav_blog'); ?></a>
+                    <a href="<?= esc($hero['primary_cta_url'] ?? '#lead-cambio'); ?>" class="gx-btn gx-btn-primary"><?= esc($hero['primary_cta_label'] ?? lang('Fx.hero_cta')); ?></a>
                 </div>
             </div>
 
             <div class="gx-nav-right">
-                <a href="<?= esc($blogUrl); ?>" class="gx-nav-link">Blog</a>
-                <a href="<?= esc($hero['primary_cta_url'] ?? '#lead-cambio'); ?>" class="gx-btn gx-btn-primary"><?= esc($hero['primary_cta_label'] ?? 'Receber leitura da mesa'); ?></a>
-                <button type="button" class="gx-nav-toggle" id="gx-nav-toggle" aria-expanded="false" aria-controls="gx-nav-links" aria-label="Menu">
+                <a href="<?= esc($blogUrl); ?>" class="gx-nav-link"><?= lang('Fx.nav_blog'); ?></a>
+                <a href="<?= esc($hero['primary_cta_url'] ?? '#lead-cambio'); ?>" class="gx-btn gx-btn-primary"><?= esc($hero['primary_cta_label'] ?? lang('Fx.hero_cta')); ?></a>
+                <button type="button" class="gx-nav-toggle" id="gx-nav-toggle" aria-expanded="false" aria-controls="gx-nav-links" aria-label="<?= lang('Fx.nav_menu'); ?>">
                     <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
             </div>
@@ -147,23 +147,23 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
             <div class="gx-hero-content" data-gx-reveal>
                 <div class="gx-hero-badge">
                     <span class="gx-hero-badge-dot"></span>
-                    <?= esc($hero['badge'] ?? 'Mesa de câmbio com tecnologia e leitura consultiva'); ?>
+                    <?= esc($hero['badge'] ?? lang('Fx.hero_badge')); ?>
                 </div>
 
                 <h1 class="gx-hero-title">
-                    <?= esc($hero['title'] ?? 'Simuladores de câmbio para decidir com mais clareza antes de fechar a operação.'); ?>
+                    <?= esc($hero['title'] ?? lang('Fx.hero_title')); ?>
                 </h1>
 
                 <p class="gx-hero-sub">
-                    <?= esc($hero['subtitle'] ?? 'Use cenários para importação, exportação, hedge, trade finance e operações 4131. Depois, a GX Capital leva a operação para múltiplas instituições financeiras e apresenta a alternativa mais aderente ao seu momento.'); ?>
+                    <?= esc($hero['subtitle'] ?? brandLang('Fx.hero_subtitle')); ?>
                 </p>
 
                 <div class="gx-hero-cta">
-                    <a href="<?= esc($hero['primary_cta_url'] ?? '#lead-cambio'); ?>" class="gx-btn gx-btn-primary gx-btn-lg"><?= esc($hero['primary_cta_label'] ?? 'Receber leitura da mesa'); ?></a>
+                    <a href="<?= esc($hero['primary_cta_url'] ?? '#lead-cambio'); ?>" class="gx-btn gx-btn-primary gx-btn-lg"><?= esc($hero['primary_cta_label'] ?? lang('Fx.hero_cta')); ?></a>
                     <?php if (!empty($whatsAppUrl)): ?>
-                        <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp gx-btn-lg" data-gx-whatsapp-link><?= $whatsAppIcon; ?>Chamar no WhatsApp</a>
+                        <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp gx-btn-lg" data-gx-whatsapp-link><?= $whatsAppIcon; ?><?= lang('Fx.hero_wa'); ?></a>
                     <?php else: ?>
-                        <a href="<?= esc($hero['secondary_cta_url'] ?? '#laboratorio-cambio'); ?>" class="gx-btn gx-btn-ghost gx-btn-lg"><?= esc($hero['secondary_cta_label'] ?? 'Abrir simuladores'); ?></a>
+                        <a href="<?= esc($hero['secondary_cta_url'] ?? '#laboratorio-cambio'); ?>" class="gx-btn gx-btn-ghost gx-btn-lg"><?= esc($hero['secondary_cta_label'] ?? lang('Fx.hero_secondary_cta')); ?></a>
                     <?php endif; ?>
                 </div>
 
@@ -171,7 +171,7 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                     <div class="gx-hero-proof">
                         <?php foreach ($heroProof as $item): ?>
                             <div class="gx-hero-proof-item">
-                                <strong>GX Capital</strong>
+                                <strong><?= esc(brand('display_name')); ?></strong>
                                 <span><?= esc($item['text']); ?></span>
                             </div>
                         <?php endforeach; ?>
@@ -182,21 +182,21 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
             <aside class="gx-hero-aside" data-gx-reveal data-gx-delay="150">
                 <div class="gx-hero-visual-card gx-fx-hero-card">
                     <div class="gx-visual-header">
-                        <span class="gx-visual-title"><?= esc($technology['label'] ?? 'Mesa GX Capital'); ?></span>
+                        <span class="gx-visual-title"><?= esc($technology['label'] ?? brandLang('Fx.tech_label')); ?></span>
                         <span class="gx-visual-badge">FX Desk</span>
                     </div>
                     <div class="gx-fx-stat-stack">
                         <div class="gx-fx-stat-card">
                             <strong><?= esc($technology['stat_primary_value'] ?? '10+'); ?></strong>
-                            <span><?= esc($technology['stat_primary_label'] ?? 'instituições financeiras monitoradas'); ?></span>
+                            <span><?= esc($technology['stat_primary_label'] ?? lang('Fx.tech_stat1_label')); ?></span>
                         </div>
                         <div class="gx-fx-stat-card">
                             <strong><?= esc($technology['stat_secondary_value'] ?? '16+'); ?></strong>
-                            <span><?= esc($technology['stat_secondary_label'] ?? 'anos de experiência no mercado financeiro'); ?></span>
+                            <span><?= esc($technology['stat_secondary_label'] ?? lang('Fx.tech_stat2_label')); ?></span>
                         </div>
                         <div class="gx-fx-stat-card">
                             <strong><?= esc($technology['stat_tertiary_value'] ?? '360°'); ?></strong>
-                            <span><?= esc($technology['stat_tertiary_label'] ?? 'visão sobre câmbio, hedge, trade finance e funding'); ?></span>
+                            <span><?= esc($technology['stat_tertiary_label'] ?? lang('Fx.tech_stat3_label')); ?></span>
                         </div>
                     </div>
 
@@ -214,11 +214,11 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
 
     <div class="gx-strip">
         <div class="gx-strip-inner" data-gx-reveal>
-            <span class="gx-strip-lead">Fluxo recomendado</span>
-            <span class="gx-strip-item">Ajuste as premissas econômicas da operação</span>
-            <span class="gx-strip-item">Teste impacto em custo, receita, hedge ou funding</span>
-            <span class="gx-strip-item">Envie o cenário para a mesa</span>
-            <span class="gx-strip-item">Receba uma leitura comparativa entre múltiplas instituições</span>
+            <span class="gx-strip-lead"><?= lang('Fx.strip_lead'); ?></span>
+            <span class="gx-strip-item"><?= lang('Fx.strip_1'); ?></span>
+            <span class="gx-strip-item"><?= lang('Fx.strip_2'); ?></span>
+            <span class="gx-strip-item"><?= lang('Fx.strip_3'); ?></span>
+            <span class="gx-strip-item"><?= lang('Fx.strip_4'); ?></span>
         </div>
     </div>
 
@@ -226,38 +226,40 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label">A mesa por trás dos simuladores</p>
-                    <h2 class="gx-section-title">Câmbio estruturado com leitura consultiva, não com produto de prateleira.</h2>
+                    <p class="gx-label"><?= lang('Fx.auth_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Fx.auth_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    A GX Capital é uma boutique financeira fundada por <strong>Vinicius Teixeira</strong>, com mais de 16 anos de experiência em câmbio, crédito e mercado de capitais. O modelo é diferente: em vez de empurrar cotação, a mesa lê a operação, compara entre mais de 10 instituições financeiras e recomenda a estrutura mais eficiente para cada caso.
+                    <?= brandLang('Fx.auth_desc'); ?>
+
                 </p>
             </div>
 
             <div class="gx-grid-3 gx-fx-authority-grid" data-gx-reveal data-gx-delay="80">
                 <article class="gx-card">
                     <div class="gx-card-icon">FX</div>
-                    <p class="gx-card-label">Câmbio Estruturado</p>
-                    <h3 class="gx-card-title">Operações desenhadas sob medida para importadores e exportadores.</h3>
-                    <p class="gx-card-desc">Contratos a termo, NDF, swaps e proteções combinadas para travar custo, proteger margem e dar previsibilidade ao fluxo de caixa. A cotação final vem de uma leitura comparativa entre múltiplas instituições.</p>
+                    <p class="gx-card-label"><?= lang('Fx.auth_card1_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Fx.auth_card1_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Fx.auth_card1_desc'); ?></p>
                 </article>
                 <article class="gx-card">
                     <div class="gx-card-icon">HD</div>
-                    <p class="gx-card-label">Hedge e Proteção Cambial</p>
-                    <h3 class="gx-card-title">Proteção como decisão de margem, não como produto genérico.</h3>
-                    <p class="gx-card-desc">Hedge desenhado conforme exposição real, prazo de liquidação, repasse ao preço final e capacidade de absorver volatilidade. A mesa avalia se proteger faz sentido antes de propor a estrutura.</p>
+                    <p class="gx-card-label"><?= lang('Fx.auth_card2_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Fx.auth_card2_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Fx.auth_card2_desc'); ?></p>
                 </article>
                 <article class="gx-card">
                     <div class="gx-card-icon">TF</div>
-                    <p class="gx-card-label">Trade Finance e Funding</p>
-                    <h3 class="gx-card-title">ACC, FINIMP, 4131 e outras estruturas lidas no mesmo raciocínio.</h3>
-                    <p class="gx-card-desc">A escolha entre financiar embarque, antecipar recebível, alongar caixa ou captar offshore depende da etapa do fluxo, da pressão de caixa e do custo real comparado. A mesa roteia para a melhor alternativa.</p>
+                    <p class="gx-card-label"><?= lang('Fx.auth_card3_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Fx.auth_card3_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Fx.auth_card3_desc'); ?></p>
                 </article>
             </div>
 
             <div class="gx-fx-boutique-note" data-gx-reveal data-gx-delay="140">
                 <p>
-                    <strong>Modelo boutique:</strong> a GX Capital não é banco e não tem produto próprio para distribuir. Isso permite recomendar a instituição e a estrutura mais aderente ao momento do cliente, sem conflito de interesse. Os simuladores abaixo são o primeiro passo para dimensionar a operação antes de levá-la à mesa.
+                    <?= brandLang('Fx.boutique_note'); ?>
+
                 </p>
             </div>
         </div>
