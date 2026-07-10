@@ -601,11 +601,11 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label"><?= esc($technology['label'] ?? 'Mesa GX Capital'); ?></p>
-                    <h2 class="gx-section-title"><?= esc($technology['title'] ?? 'Tecnologia para comparar. Experiência para fechar a operação certa.'); ?></h2>
+                    <p class="gx-label"><?= esc($technology['label'] ?? brandLang('Fx.tech_label')); ?></p>
+                    <h2 class="gx-section-title"><?= esc($technology['title'] ?? lang('Fx.mesa_title')); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    <?= esc($technology['description'] ?? 'A mesa usa agente de IA para cruzar cotação, spread, prazo, documentação e aderência operacional entre múltiplas instituições. O foco não é a menor taxa isolada. É a estrutura mais eficiente para a necessidade real do cliente.'); ?>
+                    <?= esc($technology['description'] ?? lang('Fx.mesa_desc')); ?>
                 </p>
             </div>
 
@@ -613,37 +613,37 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                 <article class="gx-card">
                     <span class="gx-card-index">01</span>
                     <div class="gx-card-icon">FX</div>
-                    <p class="gx-card-label">Cotação inteligente</p>
-                    <h3 class="gx-card-title">Mais de 10 instituições na mesma mesa de comparação.</h3>
-                    <p class="gx-card-desc">Bancos de câmbio e corretoras entram na leitura para buscar a operação mais eficiente para o contexto do cliente.</p>
+                    <p class="gx-card-label"><?= lang('Fx.mesa_c1_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Fx.mesa_c1_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Fx.mesa_c1_desc'); ?></p>
                 </article>
                 <article class="gx-card">
                     <span class="gx-card-index">02</span>
                     <div class="gx-card-icon">HD</div>
-                    <p class="gx-card-label">Proteção</p>
-                    <h3 class="gx-card-title">Hedge como decisão de margem, não como produto de prateleira.</h3>
-                    <p class="gx-card-desc">A proteção é desenhada conforme exposição, prazo, repasse e capacidade de absorver volatilidade.</p>
+                    <p class="gx-card-label"><?= lang('Fx.mesa_c2_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Fx.mesa_c2_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Fx.mesa_c2_desc'); ?></p>
                 </article>
                 <article class="gx-card">
                     <span class="gx-card-index">03</span>
                     <div class="gx-card-icon">TF</div>
-                    <p class="gx-card-label">Trade finance</p>
-                    <h3 class="gx-card-title">ACC, ACE, FINIMP e outras estruturas lidas no mesmo raciocínio.</h3>
-                    <p class="gx-card-desc">A escolha depende de etapa do fluxo, pressão de caixa, risco de contraparte e timing operacional.</p>
+                    <p class="gx-card-label"><?= lang('Fx.mesa_c3_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Fx.mesa_c3_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Fx.mesa_c3_desc'); ?></p>
                 </article>
                 <article class="gx-card">
                     <span class="gx-card-index">04</span>
                     <div class="gx-card-icon">4131</div>
-                    <p class="gx-card-label">Funding</p>
-                    <h3 class="gx-card-title">Operações 4131 entram quando a equação de custo, prazo e proteção fecha.</h3>
-                    <p class="gx-card-desc">O simulador filtra viabilidade. A mesa valida premissas, hedge, documentação e governança da operação.</p>
+                    <p class="gx-card-label"><?= lang('Fx.mesa_c4_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Fx.mesa_c4_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Fx.mesa_c4_desc'); ?></p>
                 </article>
                 <article class="gx-card">
                     <span class="gx-card-index">05</span>
                     <div class="gx-card-icon">16+</div>
-                    <p class="gx-card-label">Experiência</p>
-                    <h3 class="gx-card-title">Time com mais de 16 anos de experiência atendendo operações de diferentes portes.</h3>
-                    <p class="gx-card-desc">Da demanda recorrente de comércio exterior a estruturas sofisticadas de funding, a leitura parte da operação real.</p>
+                    <p class="gx-card-label"><?= lang('Fx.mesa_c5_label'); ?></p>
+                    <h3 class="gx-card-title"><?= lang('Fx.mesa_c5_title'); ?></h3>
+                    <p class="gx-card-desc"><?= lang('Fx.mesa_c5_desc'); ?></p>
                 </article>
             </div>
         </div>
@@ -653,27 +653,27 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         <div class="gx-wrap">
             <div class="gx-lead-grid">
                 <aside class="gx-lead-aside gx-fx-lead-aside" data-gx-reveal>
-                    <p class="gx-label"><?= esc($leadConfig['label'] ?? 'Leve o cenário para a mesa'); ?></p>
-                    <h2 class="gx-section-title"><?= esc($leadConfig['title'] ?? 'Receba uma leitura consultiva da sua operação de câmbio.'); ?></h2>
+                    <p class="gx-label"><?= esc($leadConfig['label'] ?? lang('Fx.lead_label')); ?></p>
+                    <h2 class="gx-section-title"><?= esc($leadConfig['title'] ?? lang('Fx.lead_title')); ?></h2>
                     <p class="gx-section-desc">
-                        <?= esc($leadConfig['description'] ?? 'Envie o seu cenário e nossa mesa avalia cotação, estrutura de hedge, trade finance e melhor janela de execução para o seu fluxo.'); ?>
+                        <?= esc($leadConfig['description'] ?? lang('Fx.lead_desc')); ?>
                     </p>
 
                     <div class="gx-fx-live-panel" data-gx-live-summary>
-                        <span class="gx-fx-live-eyebrow">Ferramenta ativa</span>
-                        <strong data-gx-live-title>Simulador de importação</strong>
+                        <span class="gx-fx-live-eyebrow"><?= lang('Fx.lead_live_eyebrow'); ?></span>
+                        <strong data-gx-live-title><?= lang('Fx.lead_live_title'); ?></strong>
                         <div class="gx-fx-live-metric">
                             <span data-gx-live-value>R$ 0</span>
-                            <small data-gx-live-label>impacto indicativo em cenário de estresse</small>
+                            <small data-gx-live-label><?= lang('Fx.lead_live_label'); ?></small>
                         </div>
-                        <p data-gx-live-copy>Preencha os campos para gerar uma leitura executiva da exposição.</p>
+                        <p data-gx-live-copy><?= lang('Fx.lead_live_copy'); ?></p>
                     </div>
 
                     <div class="gx-fx-credibility">
                         <ul>
-                            <li>Mais de 10 instituições financeiras na cotação comparativa</li>
-                            <li>16+ anos de experiência no mercado financeiro e operações internacionais</li>
-                            <li>Retorno em até 1 dia útil após o envio do cenário</li>
+                            <li><?= lang('Fx.lead_cred_1'); ?></li>
+                            <li><?= lang('Fx.lead_cred_2'); ?></li>
+                            <li><?= lang('Fx.lead_cred_3'); ?></li>
                         </ul>
                     </div>
 
@@ -685,17 +685,17 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                             <a href="mailto:<?= esc($contactEmail); ?>" class="gx-contact-chip"><?= esc($contactEmail); ?></a>
                         <?php endif; ?>
                         <?php if (!empty($whatsAppUrl)): ?>
-                            <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-contact-chip" data-gx-whatsapp-link><?= $whatsAppIcon; ?>WhatsApp</a>
+                            <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-contact-chip" data-gx-whatsapp-link><?= $whatsAppIcon; ?><?= lang('Fx.lead_chip_wa'); ?></a>
                         <?php endif; ?>
-                        <a href="<?= esc($blogUrl); ?>" class="gx-contact-chip">Ver análises técnicas</a>
+                        <a href="<?= esc($blogUrl); ?>" class="gx-contact-chip"><?= lang('Fx.lead_chip_blog'); ?></a>
                     </div>
                 </aside>
 
                 <div class="gx-lead-card gx-fx-lead-card" data-gx-reveal data-gx-delay="120">
                     <div class="gx-form-shell">
                         <div class="gx-form-intro">
-                            <h3 class="gx-form-title"><?= esc($leadConfig['form_title'] ?? 'Fale com a mesa de câmbio GX Capital'); ?></h3>
-                            <p class="gx-form-copy"><?= esc($leadConfig['form_description'] ?? 'Compartilhe os dados da operação. O retorno considera preço, prazo, risco, funding e documentação.'); ?></p>
+                            <h3 class="gx-form-title"><?= esc($leadConfig['form_title'] ?? brandLang('Fx.lead_form_title')); ?></h3>
+                            <p class="gx-form-copy"><?= esc($leadConfig['form_description'] ?? lang('Fx.lead_form_desc')); ?></p>
                         </div>
 
                         <div class="gx-fx-form-status" data-gx-lead-status hidden></div>
@@ -710,11 +710,11 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                             <input type="hidden" name="meta_currency" value="BRL">
 
                             <div class="gx-form-field">
-                                <label for="gx-fx-lead-name">Nome</label>
+                                <label for="gx-fx-lead-name"><?= lang('Fx.lead_nome'); ?></label>
                                 <input id="gx-fx-lead-name" type="text" name="name" maxlength="199" minlength="1" pattern=".*\S+.*" autocomplete="name" required>
                             </div>
                             <div class="gx-form-field">
-                                <label for="gx-fx-lead-email">E-mail</label>
+                                <label for="gx-fx-lead-email"><?= lang('Fx.lead_email'); ?></label>
                                 <input id="gx-fx-lead-email" type="email" name="email" maxlength="199" autocomplete="email" inputmode="email" required>
                             </div>
                             <?= view('partials/_lead_phone_field', [
@@ -724,26 +724,28 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                                 'phoneValue' => '',
                             ]); ?>
                             <div class="gx-form-field">
-                                <label for="gx-fx-lead-company">Empresa</label>
-                                <input id="gx-fx-lead-company" type="text" name="company" maxlength="199" autocomplete="organization" placeholder="Opcional">
+                                <label for="gx-fx-lead-company"><?= lang('Fx.lead_empresa'); ?></label>
+                                <input id="gx-fx-lead-company" type="text" name="company" maxlength="199" autocomplete="organization" placeholder="<?= esc(lang('Fx.lead_opcional')); ?>">
                             </div>
                             <div class="gx-form-field gx-form-field-full">
-                                <label for="gx-fx-lead-message">Complemento <span class="gx-form-optional">(opcional)</span></label>
-                                <textarea id="gx-fx-lead-message" name="message" maxlength="4970" rows="3" placeholder="Ex.: vencimento da fatura, exposição mensal, se já tentou hedge antes."></textarea>
+                                <label for="gx-fx-lead-message"><?= lang('Fx.lead_complemento'); ?> <span class="gx-form-optional"><?= lang('Fx.lead_complemento_opt'); ?></span></label>
+                                <textarea id="gx-fx-lead-message" name="message" maxlength="4970" rows="3" placeholder="<?= esc(lang('Fx.lead_msg_ph')); ?>"></textarea>
                             </div>
                             <input type="text" name="message_content" class="gx-hp" tabindex="-1" autocomplete="off">
                             <label class="gx-check">
                                 <input type="checkbox" required>
                                 <span>
-                                    Li e concordo com os
+                                    <?= lang('Fx.lead_terms_pre'); ?>
+
                                     <a href="<?= getPageLinkByDefaultName('terms_conditions', $activeLang->id); ?>" target="_blank" rel="noopener">
-                                        termos e condições
+                                        <?= lang('Fx.lead_terms_link'); ?>
+
                                     </a>.
                                 </span>
                             </label>
                             <div class="gx-form-actions">
-                                <button type="submit" class="gx-btn gx-btn-primary gx-form-submit"><?= esc($leadConfig['button_label'] ?? 'Solicitar leitura da mesa'); ?></button>
-                                <p class="gx-form-note">Retorno em até 1 dia útil. Priorizamos operações com fechamento nos próximos 30 dias.</p>
+                                <button type="submit" class="gx-btn gx-btn-primary gx-form-submit"><?= esc($leadConfig['button_label'] ?? lang('Fx.lead_button')); ?></button>
+                                <p class="gx-form-note"><?= lang('Fx.lead_note'); ?></p>
                             </div>
                         </form>
                     </div>
@@ -754,9 +756,9 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
 
     <div class="gx-fx-sticky-bar" id="gx-fx-sticky-bar" hidden aria-live="polite">
         <div class="gx-fx-sticky-inner">
-            <p class="gx-fx-sticky-text">Cenário pronto. Fale com um especialista.</p>
+            <p class="gx-fx-sticky-text"><?= lang('Fx.sticky_text'); ?></p>
             <div class="gx-fx-sticky-actions">
-                <a href="#lead-cambio" class="gx-btn gx-btn-primary">Agendar reunião</a>
+                <a href="#lead-cambio" class="gx-btn gx-btn-primary"><?= lang('Fx.sticky_cta'); ?></a>
                 <?php if (!empty($whatsAppUrl)): ?>
                     <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp" data-gx-whatsapp-link><?= $whatsAppIcon; ?></a>
                 <?php endif; ?>

@@ -185,4 +185,58 @@ return [
     'lab_opt_pay'       => 'Pagar fornecedor e alongar caixa',
     'lab_opt_guarantee' => 'Dar mais segurança para a contraparte',
     'lab_opt_term'      => 'Alongar prazo da operação',
+
+    // ===================================================================
+    // 4c-4 — seção mesa-gx + card do especialista/lead + sticky bar
+    // ===================================================================
+
+    // mesa-gx (label reusa tech_label; índices 01-05 e ícones literais)
+    'mesa_title'   => 'Tecnologia para comparar. Experiência para fechar a operação certa.',
+    'mesa_desc'    => 'A mesa usa agente de IA para cruzar cotação, spread, prazo, documentação e aderência operacional entre múltiplas instituições. O foco não é a menor taxa isolada. É a estrutura mais eficiente para a necessidade real do cliente.',
+    'mesa_c1_label' => 'Cotação inteligente',
+    'mesa_c1_title' => 'Mais de 10 instituições na mesma mesa de comparação.',
+    'mesa_c1_desc'  => 'Bancos de câmbio e corretoras entram na leitura para buscar a operação mais eficiente para o contexto do cliente.',
+    'mesa_c2_label' => 'Proteção',
+    'mesa_c2_title' => 'Hedge como decisão de margem, não como produto de prateleira.',
+    'mesa_c2_desc'  => 'A proteção é desenhada conforme exposição, prazo, repasse e capacidade de absorver volatilidade.',
+    'mesa_c3_label' => 'Trade finance',
+    'mesa_c3_title' => 'ACC, ACE, FINIMP e outras estruturas lidas no mesmo raciocínio.',
+    'mesa_c3_desc'  => 'A escolha depende de etapa do fluxo, pressão de caixa, risco de contraparte e timing operacional.',
+    'mesa_c4_label' => 'Funding',
+    'mesa_c4_title' => 'Operações 4131 entram quando a equação de custo, prazo e proteção fecha.',
+    'mesa_c4_desc'  => 'O simulador filtra viabilidade. A mesa valida premissas, hedge, documentação e governança da operação.',
+    'mesa_c5_label' => 'Experiência',
+    'mesa_c5_title' => 'Time com mais de 16 anos de experiência atendendo operações de diferentes portes.',
+    'mesa_c5_desc'  => 'Da demanda recorrente de comércio exterior a estruturas sofisticadas de funding, a leitura parte da operação real.',
+
+    // card do especialista / lead
+    'lead_label' => 'Leve o cenário para a mesa',
+    'lead_title' => 'Receba uma leitura consultiva da sua operação de câmbio.',
+    'lead_desc'  => 'Envie o seu cenário e nossa mesa avalia cotação, estrutura de hedge, trade finance e melhor janela de execução para o seu fluxo.',
+    'lead_live_eyebrow' => 'Ferramenta ativa',
+    'lead_live_title'   => 'Simulador de importação',
+    'lead_live_label'   => 'impacto indicativo em cenário de estresse',
+    'lead_live_copy'    => 'Preencha os campos para gerar uma leitura executiva da exposição.',
+    'lead_cred_1'  => 'Mais de 10 instituições financeiras na cotação comparativa',
+    'lead_cred_2'  => '16+ anos de experiência no mercado financeiro e operações internacionais',
+    'lead_cred_3'  => 'Retorno em até 1 dia útil após o envio do cenário',
+    'lead_chip_wa'   => 'WhatsApp',
+    'lead_chip_blog' => 'Ver análises técnicas',
+    'lead_form_title' => 'Fale com a mesa de câmbio {brand}',
+    'lead_form_desc'  => 'Compartilhe os dados da operação. O retorno considera preço, prazo, risco, funding e documentação.',
+    'lead_nome'    => 'Nome',
+    'lead_email'   => 'E-mail',
+    'lead_empresa' => 'Empresa',
+    'lead_opcional' => 'Opcional',
+    'lead_complemento'     => 'Complemento',
+    'lead_complemento_opt' => '(opcional)',
+    'lead_msg_ph'    => 'Ex.: vencimento da fatura, exposição mensal, se já tentou hedge antes.',
+    'lead_terms_pre'  => 'Li e concordo com os',
+    'lead_terms_link' => 'termos e condições',
+    'lead_button'    => 'Solicitar leitura da mesa',
+    'lead_note'      => 'Retorno em até 1 dia útil. Priorizamos operações com fechamento nos próximos 30 dias.',
+
+    // sticky bar
+    'sticky_text' => 'Cenário pronto. Fale com um especialista.',
+    'sticky_cta'  => 'Agendar reunião',
 ];
