@@ -836,6 +836,85 @@ $aiSteps = [
 
 <script>
 (function() {
+    // i18n: microcopy do JS vem do catálogo (app/Language/<locale>/Consorcio.php).
+    // {x} são placeholders preenchidos no runtime via fill().
+    var L = <?= json_encode([
+        'sm_compare_label'   => lang('Consorcio.sc_compare_title'),
+        'sm_compare_kicker'  => lang('Consorcio.res_kicker'),
+        'sm_compare_hook'    => lang('Consorcio.js_sm_compare_hook'),
+        'sm_compare_ph'      => lang('Consorcio.js_sm_compare_ph'),
+        'sm_planned_label'   => lang('Consorcio.js_sm_planned_label'),
+        'sm_planned_kicker'  => lang('Consorcio.js_sm_planned_kicker'),
+        'sm_planned_hook'    => lang('Consorcio.js_sm_planned_hook'),
+        'sm_planned_ph'      => lang('Consorcio.js_sm_planned_ph'),
+        'sm_investor_label'  => lang('Consorcio.js_sm_investor_label'),
+        'sm_investor_kicker' => lang('Consorcio.auth_card3_label'),
+        'sm_investor_hook'   => lang('Consorcio.js_sm_investor_hook'),
+        'sm_investor_ph'     => lang('Consorcio.js_sm_investor_ph'),
+        'wa_copy_label'      => lang('Consorcio.js_wa_copy_label'),
+        'wa_copy_default'    => lang('Consorcio.js_wa_copy_default'),
+        'c_head_pos' => lang('Consorcio.js_c_head_pos'),
+        'c_head_neg' => lang('Consorcio.js_c_head_neg'),
+        'c_ins1'     => lang('Consorcio.js_c_ins1'),
+        'c_ins_low'  => lang('Consorcio.js_c_ins_low'),
+        'c_ins_ok'   => lang('Consorcio.js_c_ins_ok'),
+        'c_ins3'     => lang('Consorcio.js_c_ins3'),
+        'c_body'     => lang('Consorcio.js_c_body'),
+        'c_m1l' => lang('Consorcio.js_c_m1l'), 'c_m1c' => lang('Consorcio.js_c_m1c'),
+        'c_m2l' => lang('Consorcio.js_c_m2l'), 'c_m2c' => lang('Consorcio.js_c_m2c'),
+        'c_m3l' => lang('Consorcio.js_c_m3l'), 'c_m3c' => lang('Consorcio.js_c_m3c'),
+        'c_m4l' => lang('Consorcio.js_c_m4l'), 'c_m4c' => lang('Consorcio.js_c_m4c'),
+        'c_b1l' => lang('Consorcio.js_c_b1l'), 'c_b1c' => lang('Consorcio.js_c_b1c'),
+        'c_b2l' => lang('Consorcio.js_c_b2l'), 'c_b2c' => lang('Consorcio.js_c_b2c'),
+        'c_lead' => brandLang('Consorcio.js_c_lead'),
+        'p_head_ok'    => lang('Consorcio.js_p_head_ok'),
+        'p_head_over'  => lang('Consorcio.js_p_head_over'),
+        'p_head_short' => lang('Consorcio.js_p_head_short'),
+        'p_ins1'    => lang('Consorcio.js_p_ins1'),
+        'p_ins2'    => lang('Consorcio.js_p_ins2'),
+        'p_ins_pos' => lang('Consorcio.js_p_ins_pos'),
+        'p_ins_neg' => lang('Consorcio.js_p_ins_neg'),
+        'p_body'    => lang('Consorcio.js_p_body'),
+        'p_m1l' => lang('Consorcio.js_p_m1l'), 'p_m1c' => lang('Consorcio.js_p_m1c'),
+        'p_m2l' => lang('Consorcio.js_p_m2l'), 'p_m2c' => lang('Consorcio.js_p_m2c'),
+        'p_m3l' => lang('Consorcio.js_p_m3l'), 'p_m3c' => lang('Consorcio.js_p_m3c'),
+        'p_m4l' => lang('Consorcio.js_p_m4l'), 'p_m4c' => lang('Consorcio.js_p_m4c'),
+        'p_b1l' => lang('Consorcio.js_p_b1l'), 'p_b1c' => lang('Consorcio.js_p_b1c'),
+        'p_b2l' => lang('Consorcio.js_p_b2l'), 'p_b2c' => lang('Consorcio.js_p_b2c'),
+        'p_lead' => brandLang('Consorcio.js_p_lead'),
+        'i_head_strong' => lang('Consorcio.js_i_head_strong'),
+        'i_head_tight'  => lang('Consorcio.js_i_head_tight'),
+        'i_head_neg'    => lang('Consorcio.js_i_head_neg'),
+        'i_ins1'    => lang('Consorcio.js_i_ins1'),
+        'i_ins2'    => lang('Consorcio.js_i_ins2'),
+        'i_ins_low' => lang('Consorcio.js_i_ins_low'),
+        'i_ins_ok'  => lang('Consorcio.js_i_ins_ok'),
+        'i_body'    => lang('Consorcio.js_i_body'),
+        'i_m2l' => lang('Consorcio.js_i_m2l'), 'i_m2c' => lang('Consorcio.js_i_m2c'),
+        'i_m3l' => lang('Consorcio.js_i_m3l'), 'i_m3c' => lang('Consorcio.js_i_m3c'),
+        'i_m4l' => lang('Consorcio.js_i_m4l'), 'i_m4c' => lang('Consorcio.js_i_m4c'),
+        'i_b1l' => lang('Consorcio.js_i_b1l'), 'i_b1c' => lang('Consorcio.js_i_b1c'),
+        'i_b2l' => lang('Consorcio.js_i_b2l'), 'i_b2c' => lang('Consorcio.js_i_b2c'),
+        'i_lead' => brandLang('Consorcio.js_i_lead'),
+        'enviando'      => lang('Consorcio.js_enviando'),
+        'parse_err'     => lang('Consorcio.js_parse_err'),
+        'send_err'      => lang('Consorcio.js_send_err'),
+        'lead_success'  => brandLang('Consorcio.js_lead_success'),
+        'sent'          => lang('Consorcio.js_sent'),
+        'erro_enviar'   => lang('Consorcio.js_erro_enviar'),
+        'quick_success' => lang('Consorcio.js_quick_success'),
+        'enviado'       => lang('Consorcio.js_enviado'),
+        'mini_result'   => lang('Consorcio.js_mini_result'),
+        'exit_success'  => lang('Consorcio.js_exit_success'),
+        'quick_btn'     => lang('Consorcio.quick_btn'),
+        'exit_submit'   => lang('Consorcio.exit_submit'),
+    ], JSON_UNESCAPED_UNICODE); ?>;
+    function fill(tpl, map) {
+        return String(tpl).replace(/\{(\w+)\}/g, function (m, k) {
+            return (map[k] != null) ? map[k] : m;
+        });
+    }
+
     var nav = document.getElementById('gx-nav');
     var toggle = document.getElementById('gx-nav-toggle');
     var links = document.getElementById('gx-nav-links');
@@ -929,24 +1008,24 @@ $aiSteps = [
 
     var scenarioMeta = {
         compare: {
-            label: 'Consórcio x financiamento',
-            kicker: 'Comparativo estratégico',
-            hook: 'Veja se o consórcio reduz sua parcela e o custo total comparado ao financiamento.',
-            notePlaceholder: 'Ex.: tenho R$ 90 mil de entrada e quero saber se consórcio sai mais barato que financiamento.',
+            label: L.sm_compare_label,
+            kicker: L.sm_compare_kicker,
+            hook: L.sm_compare_hook,
+            notePlaceholder: L.sm_compare_ph,
             contentName: 'Simulador de Consórcio - Comparativo com financiamento'
         },
         planned: {
-            label: 'Compra planejada de imóvel',
-            kicker: 'Compra planejada',
-            hook: 'Descubra se seu ritmo mensal sustenta a contemplação no prazo que você precisa.',
-            notePlaceholder: 'Ex.: quero comprar em até 18 meses, consigo guardar R$ 3.500/mês além da parcela.',
+            label: L.sm_planned_label,
+            kicker: L.sm_planned_kicker,
+            hook: L.sm_planned_hook,
+            notePlaceholder: L.sm_planned_ph,
             contentName: 'Simulador de Consórcio - Compra planejada'
         },
         investor: {
-            label: 'Investimento para revenda',
-            kicker: 'Tese de investimento',
-            hook: 'Calcule se a margem de revenda compensa o capital investido na operação.',
-            notePlaceholder: 'Ex.: tenho R$ 120 mil para lance e busco margem de 18% na revenda após contemplação.',
+            label: L.sm_investor_label,
+            kicker: L.sm_investor_kicker,
+            hook: L.sm_investor_hook,
+            notePlaceholder: L.sm_investor_ph,
             contentName: 'Simulador de Consórcio - Tese de revenda'
         }
     };
@@ -1010,7 +1089,7 @@ $aiSteps = [
             node.setAttribute('href', href);
         });
         document.querySelectorAll('[data-gx-whatsapp-copy]').forEach(function(node) {
-            node.textContent = label ? ('Mensagem pronta para iniciar a conversa sobre ' + label.toLowerCase() + '.') : 'Mensagem pronta para iniciar a conversa com o especialista.';
+            node.textContent = label ? fill(L.wa_copy_label, { label: label.toLowerCase() }) : L.wa_copy_default;
         });
     }
 
@@ -1119,59 +1198,59 @@ $aiSteps = [
 
         var headline;
         if (totalDifference >= 0) {
-            headline = 'O consórcio preserva mais caixa ao longo da operação do que o financiamento usado como referência.';
+            headline = L.c_head_pos;
         } else {
-            headline = 'Com esta configuração, o custo total fica pressionado. A escolha do grupo e da estratégia de lance passa a ser decisiva.';
+            headline = L.c_head_neg;
         }
 
         var insights = [];
-        insights.push('Usando a entrada como lance, a pressão mensal indicativa do consórcio fica em ' + signedCurrency(monthlyRelief) + ' frente ao financiamento comparado.');
+        insights.push(fill(L.c_ins1, { v: signedCurrency(monthlyRelief) }));
         if (entryCoverage < 0.1) {
-            insights.push('Sua entrada representa apenas ' + ratioPercent(entryCoverage, 1) + ' da carta. Para contemplar no prazo-alvo, a seleção do grupo precisa ser mais criteriosa.');
+            insights.push(fill(L.c_ins_low, { p: ratioPercent(entryCoverage, 1) }));
         } else {
-            insights.push('A entrada cobre cerca de ' + ratioPercent(entryCoverage, 1) + ' da carta. Isso já permite trabalhar contemplação com estratégia, não apenas com sorteio.');
+            insights.push(fill(L.c_ins_ok, { p: ratioPercent(entryCoverage, 1) }));
         }
-        insights.push('Até o mês ' + common.targetMonth + ', o capital mobilizado estimado pelo consórcio ficaria em ' + currency(projectedCapitalToTarget) + '.');
+        insights.push(fill(L.c_ins3, { m: common.targetMonth, v: currency(projectedCapitalToTarget) }));
 
         return {
             headline: headline,
-            body: 'Esta leitura compara o financiamento tradicional com a estrutura de consórcio considerando sua entrada como lance próprio e o custo-base da cota.',
+            body: L.c_body,
             metrics: [
                 {
-                    label: 'Parcela do consórcio',
+                    label: L.c_m1l,
                     value: currency(common.monthlyInstallment),
-                    copy: 'Base indicativa da cota antes de ajustes finos por grupo.'
+                    copy: L.c_m1c
                 },
                 {
-                    label: 'Parcela do financiamento',
+                    label: L.c_m2l,
                     value: currency(financingInstallment),
-                    copy: 'PMT estimada com taxa e prazo informados.'
+                    copy: L.c_m2c
                 },
                 {
-                    label: 'Diferença mensal',
+                    label: L.c_m3l,
                     value: signedCurrency(monthlyRelief),
-                    copy: 'Folga mensal favorável ao consórcio quando positiva.'
+                    copy: L.c_m3c
                 },
                 {
-                    label: 'Diferença total',
+                    label: L.c_m4l,
                     value: signedCurrency(totalDifference),
-                    copy: 'Comparação entre desembolso total do financiamento e da estratégia de consórcio.'
+                    copy: L.c_m4c
                 }
             ],
             band: [
                 {
-                    label: 'Entrada/lance',
+                    label: L.c_b1l,
                     value: currency(entryValue),
-                    copy: 'Equivale a ' + ratioPercent(entryCoverage, 1) + ' do valor da carta.'
+                    copy: fill(L.c_b1c, { p: ratioPercent(entryCoverage, 1) })
                 },
                 {
-                    label: 'Custo-base da cota',
+                    label: L.c_b2l,
                     value: currency(common.totalQuotaCost),
-                    copy: 'Carta + taxas consideradas na estrutura: ' + percent(common.adminFeePct + common.reserveFeePct, 1) + '.'
+                    copy: fill(L.c_b2c, { p: percent(common.adminFeePct + common.reserveFeePct, 1) })
                 }
             ],
             insights: insights,
-            leadMessage: 'Olá! Vim pelo simulador de consórcio da GX Capital e quero validar uma comparação entre consórcio e financiamento. Minha simulação indica parcela do consórcio em ' + currency(common.monthlyInstallment) + ' e diferença total em ' + signedCurrency(totalDifference) + '.',
+            leadMessage: fill(L.c_lead, { p: currency(common.monthlyInstallment), d: signedCurrency(totalDifference) }),
             metaValue: common.creditValue,
             contentName: scenarioMeta.compare.contentName,
             inputs: {
@@ -1206,61 +1285,61 @@ $aiSteps = [
 
         var headline;
         if (monthlyBalance >= 0 && bidCoverage >= 0.15) {
-            headline = 'Há base para montar uma compra planejada com esforço mensal controlado.';
+            headline = L.p_head_ok;
         } else if (monthlyBalance < 0) {
-            headline = 'O fluxo mensal projetado fica acima do teto informado. A estrutura precisa de ajuste antes de avançar.';
+            headline = L.p_head_over;
         } else {
-            headline = 'O fluxo comporta a operação, mas a reserva para lance ainda está curta para a meta de contemplação informada.';
+            headline = L.p_head_short;
         }
 
         var insights = [];
-        insights.push('Até o mês ' + common.targetMonth + ', sua reserva projetada para lance chegaria a ' + currency(reserveProjection) + '.');
-        insights.push('O lance modelado neste cenário cobre aproximadamente ' + ratioPercent(bidCoverage, 1) + ' do valor corrigido do ativo até a contemplação.');
+        insights.push(fill(L.p_ins1, { m: common.targetMonth, v: currency(reserveProjection) }));
+        insights.push(fill(L.p_ins2, { p: ratioPercent(bidCoverage, 1) }));
         if (monthlyBalance >= 0) {
-            insights.push('Somando parcela e formação de reserva, ainda sobrariam ' + currency(monthlyBalance) + ' por mês dentro do orçamento informado.');
+            insights.push(fill(L.p_ins_pos, { v: currency(monthlyBalance) }));
         } else {
-            insights.push('Parcela e reserva juntas excedem seu orçamento confortável em ' + currency(Math.abs(monthlyBalance)) + ' por mês.');
+            insights.push(fill(L.p_ins_neg, { v: currency(Math.abs(monthlyBalance)) }));
         }
 
         return {
             headline: headline,
-            body: 'A leitura observa se a parcela, a formação de reserva e a correção esperada do ativo conversam com a data que você pretende comprar.',
+            body: L.p_body,
             metrics: [
                 {
-                    label: 'Parcela estimada',
+                    label: L.p_m1l,
                     value: currency(common.monthlyInstallment),
-                    copy: 'Base mensal da cota simulada.'
+                    copy: L.p_m1c
                 },
                 {
-                    label: 'Reserva até a meta',
+                    label: L.p_m2l,
                     value: currency(reserveProjection),
-                    copy: 'Caixa previsto para sustentar o lance no prazo-alvo.'
+                    copy: L.p_m2c
                 },
                 {
-                    label: 'Lance modelado',
+                    label: L.p_m3l,
                     value: currency(modeledBid),
-                    copy: 'Faixa inicial de lance usando sua reserva projetada.'
+                    copy: L.p_m3c
                 },
                 {
-                    label: 'Folga mensal',
+                    label: L.p_m4l,
                     value: signedCurrency(monthlyBalance),
-                    copy: 'Diferença entre teto confortável e compromisso mensal total.'
+                    copy: L.p_m4c
                 }
             ],
             band: [
                 {
-                    label: 'Valor corrigido do ativo',
+                    label: L.p_b1l,
                     value: currency(adjustedCreditValue),
-                    copy: 'Projeção considerando correção de ' + percent(expectedCorrectionAnnual, 1) + ' ao ano.'
+                    copy: fill(L.p_b1c, { p: percent(expectedCorrectionAnnual, 1) })
                 },
                 {
-                    label: 'Compromisso mensal total',
+                    label: L.p_b2l,
                     value: currency(monthlyCommitment),
-                    copy: 'Parcela da cota mais reserva para lance.'
+                    copy: L.p_b2c
                 }
             ],
             insights: insights,
-            leadMessage: 'Olá! Vim pelo simulador de consórcio da GX Capital e quero estruturar uma compra planejada com consórcio. Minha simulação indica reserva projetada de ' + currency(reserveProjection) + ' até o mês ' + common.targetMonth + ' e folga mensal de ' + signedCurrency(monthlyBalance) + '.',
+            leadMessage: fill(L.p_lead, { v: currency(reserveProjection), m: common.targetMonth, d: signedCurrency(monthlyBalance) }),
             metaValue: common.creditValue,
             contentName: scenarioMeta.planned.contentName,
             inputs: {
@@ -1297,61 +1376,61 @@ $aiSteps = [
 
         var headline;
         if (netGain > 0 && roi >= 0.12) {
-            headline = 'A tese mostra margem líquida positiva sobre o capital mobilizado, mas precisa de validação fina de grupo e saída.';
+            headline = L.i_head_strong;
         } else if (netGain > 0) {
-            headline = 'Há ganho potencial, mas a margem sobre o capital travado ainda está apertada para uma tese confortável.';
+            headline = L.i_head_tight;
         } else {
-            headline = 'Nesta configuração, a margem esperada não cobre custos de transação e carregamento.';
+            headline = L.i_head_neg;
         }
 
         var insights = [];
-        insights.push('Até a revenda, o capital mobilizado estimado nesta estrutura seria de ' + currency(capitalMobilized) + '.');
-        insights.push('A margem líquida indicativa após custos fica em ' + currency(netGain) + ', equivalente a ' + ratioPercent(roi, 1) + ' sobre o capital mobilizado.');
+        insights.push(fill(L.i_ins1, { v: currency(capitalMobilized) }));
+        insights.push(fill(L.i_ins2, { v: currency(netGain), p: ratioPercent(roi, 1) }));
         if (bidCoverage < 0.15) {
-            insights.push('O lance próprio informado cobre apenas ' + ratioPercent(bidCoverage, 1) + ' da carta. Para uma tese de revenda, isso exige seleção ainda mais criteriosa de grupos.');
+            insights.push(fill(L.i_ins_low, { p: ratioPercent(bidCoverage, 1) }));
         } else {
-            insights.push('O lance próprio cobre cerca de ' + ratioPercent(bidCoverage, 1) + ' da carta, nível que já permite discutir timing com mais seriedade.');
+            insights.push(fill(L.i_ins_ok, { p: ratioPercent(bidCoverage, 1) }));
         }
 
         return {
             headline: headline,
-            body: 'Aqui o foco é entender se o ganho de revenda compensa o tempo, o capital imobilizado e os atritos de saída da operação.',
+            body: L.i_body,
             metrics: [
                 {
-                    label: 'Parcela estimada',
+                    label: L.p_m1l,
                     value: currency(common.monthlyInstallment),
-                    copy: 'Base mensal da cota simulada.'
+                    copy: L.p_m1c
                 },
                 {
-                    label: 'Capital mobilizado',
+                    label: L.i_m2l,
                     value: currency(capitalMobilized),
-                    copy: 'Lance próprio mais parcelas até a revenda.'
+                    copy: L.i_m2c
                 },
                 {
-                    label: 'Margem líquida',
+                    label: L.i_m3l,
                     value: signedCurrency(netGain),
-                    copy: 'Margem após custos de saída e carregamento.'
+                    copy: L.i_m3c
                 },
                 {
-                    label: 'ROI indicativo',
+                    label: L.i_m4l,
                     value: ratioPercent(roi, 1),
-                    copy: 'Retorno estimado sobre o capital mobilizado.'
+                    copy: L.i_m4c
                 }
             ],
             band: [
                 {
-                    label: 'Alavancagem da tese',
+                    label: L.i_b1l,
                     value: leverage.toFixed(2) + 'x',
-                    copy: 'Relação entre valor da carta e capital próprio mobilizado até a venda.'
+                    copy: L.i_b1c
                 },
                 {
-                    label: 'Custo de carregamento',
+                    label: L.i_b2l,
                     value: currency(holdingCost),
-                    copy: 'Custo acumulado em ' + holdingMonths + ' meses após contemplação.'
+                    copy: fill(L.i_b2c, { m: holdingMonths })
                 }
             ],
             insights: insights,
-            leadMessage: 'Olá! Vim pelo simulador de consórcio da GX Capital e quero validar uma tese de consórcio para revenda. Minha simulação mostra capital mobilizado de ' + currency(capitalMobilized) + ' e margem líquida estimada de ' + signedCurrency(netGain) + '.',
+            leadMessage: fill(L.i_lead, { v: currency(capitalMobilized), d: signedCurrency(netGain) }),
             metaValue: common.creditValue,
             contentName: scenarioMeta.investor.contentName,
             inputs: {
@@ -1551,7 +1630,7 @@ $aiSteps = [
 
         if (submitButton) {
             submitButton.disabled = true;
-            submitButton.textContent = 'Enviando...';
+            submitButton.textContent = L.enviando;
         }
         if (leadStatus) {
             leadStatus.hidden = true;
@@ -1571,13 +1650,13 @@ $aiSteps = [
                 try {
                     data = JSON.parse(text);
                 } catch (error) {
-                    data = {status: 'error', message: 'Não foi possível interpretar a resposta do servidor.'};
+                    data = {status: 'error', message: L.parse_err};
                 }
                 return {ok: response.ok, data: data};
             });
         }).then(function(result) {
             if (!result.ok || result.data.status !== 'success') {
-                throw new Error(result.data.message || 'Não foi possível enviar sua solicitação agora.');
+                throw new Error(result.data.message || L.send_err);
             }
 
             if (scheduleStep && scheduleLink) {
@@ -1603,21 +1682,21 @@ $aiSteps = [
                 scheduleStep.hidden = false;
                 scheduleStep.scrollIntoView({behavior: 'smooth', block: 'center'});
             } else {
-                setLeadStatus('success', 'Recebemos sua simulação. Um especialista da GX Capital vai cruzar grupos, lance e prazo para retornar com um plano de contemplação.');
+                setLeadStatus('success', L.lead_success);
             }
 
             if (submitButton) {
-                submitButton.textContent = 'Solicitação enviada';
+                submitButton.textContent = L.sent;
             }
         }).catch(function(error) {
-            setLeadStatus('danger', error.message || 'Não foi possível enviar sua solicitação agora.');
+            setLeadStatus('danger', error.message || L.send_err);
             if (submitButton) {
                 submitButton.textContent = submitDefaultText;
             }
         }).finally(function() {
             if (submitButton) {
                 submitButton.disabled = false;
-                if (submitButton.textContent === 'Enviando...') {
+                if (submitButton.textContent === L.enviando) {
                     submitButton.textContent = submitDefaultText;
                 }
             }
@@ -1693,7 +1772,7 @@ $aiSteps = [
                 var savings = Math.max(financingTotal - consortiumTotal, 0);
 
                 if (miniResultText) {
-                    miniResultText.textContent = 'Você pode economizar até ' + formatMiniCurrency(savings) + ' com consórcio';
+                    miniResultText.textContent = fill(L.mini_result, { v: formatMiniCurrency(savings) });
                 }
                 if (miniResult) {
                     miniResult.hidden = false;
@@ -1736,24 +1815,24 @@ $aiSteps = [
             appendUrlParams(payload);
 
             var btn = quickForm.querySelector('button[type="submit"]');
-            if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+            if (btn) { btn.disabled = true; btn.textContent = L.enviando; }
 
             fetch(<?= json_encode(base_url('api/save-simulator-lead')); ?>, {
                 method: 'POST', body: payload, credentials: 'same-origin',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             }).then(function(r) { return r.json(); }).then(function(data) {
                 if (data.status === 'success') {
-                    if (quickStatus) { quickStatus.hidden = false; quickStatus.innerHTML = '<div class="alert alert-success">Recebemos seus dados! Um especialista entrará em contato em breve.</div>'; }
-                    if (btn) { btn.textContent = 'Enviado!'; }
+                    if (quickStatus) { quickStatus.hidden = false; quickStatus.innerHTML = '<div class="alert alert-success">' + L.quick_success + '</div>'; }
+                    if (btn) { btn.textContent = L.enviado; }
                     fbqSafe('track', 'Lead', { content_name: 'Simulador Consórcio', currency: 'BRL', value: 0 });
                     gtagSafe('event', 'generate_lead', { event_category: 'conversion', event_label: 'Simulador Consórcio Quick Form', currency: 'BRL', value: 0 });
                     sessionStorage.setItem('gx_lead_sent', '1');
                 } else {
-                    throw new Error(data.message || 'Erro ao enviar.');
+                    throw new Error(data.message || L.erro_enviar);
                 }
             }).catch(function(err) {
-                if (quickStatus) { quickStatus.hidden = false; quickStatus.innerHTML = '<div class="alert alert-danger">' + (err.message || 'Erro ao enviar.') + '</div>'; }
-                if (btn) { btn.disabled = false; btn.textContent = 'Quero meu plano gratuito'; }
+                if (quickStatus) { quickStatus.hidden = false; quickStatus.innerHTML = '<div class="alert alert-danger">' + (err.message || L.erro_enviar) + '</div>'; }
+                if (btn) { btn.disabled = false; btn.textContent = L.quick_btn; }
             });
         });
     }
@@ -1825,7 +1904,7 @@ $aiSteps = [
             appendUrlParams(payload);
 
             var btn = exitForm.querySelector('button[type="submit"]');
-            if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+            if (btn) { btn.disabled = true; btn.textContent = L.enviando; }
 
             fetch(<?= json_encode(base_url('api/save-simulator-lead')); ?>, {
                 method: 'POST', body: payload, credentials: 'same-origin',
@@ -1834,13 +1913,13 @@ $aiSteps = [
                 if (data.status === 'success') {
                     fbqSafe('track', 'Lead', { content_name: 'Simulador Consórcio', currency: 'BRL', value: 0 });
                     sessionStorage.setItem('gx_lead_sent', '1');
-                    exitForm.innerHTML = '<p style="color:#0c3163;font-weight:600;">Recebemos seu WhatsApp! Entraremos em contato em breve.</p>';
+                    exitForm.innerHTML = '<p style="color:#0c3163;font-weight:600;">' + L.exit_success + '</p>';
                     setTimeout(hideExitPopup, 2500);
                 } else {
-                    throw new Error(data.message || 'Erro ao enviar.');
+                    throw new Error(data.message || L.erro_enviar);
                 }
             }).catch(function(err) {
-                if (btn) { btn.disabled = false; btn.textContent = 'Receber minha simulação'; }
+                if (btn) { btn.disabled = false; btn.textContent = L.exit_submit; }
             });
         });
     }
