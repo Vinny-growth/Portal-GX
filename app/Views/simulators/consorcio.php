@@ -75,32 +75,32 @@ $scenarioCards = [
 $aiSteps = [
     [
         'step' => '01',
-        'title' => 'IA filtra os melhores grupos para você',
-        'description' => 'Em vez de pesquisar dezenas de opções, a inteligência artificial elimina os grupos incompatíveis e destaca os que mais se encaixam no seu objetivo.',
+        'title' => lang('Consorcio.ai1_title'),
+        'description' => lang('Consorcio.ai1_desc'),
         'items' => [
-            'Prazos e taxas compatíveis com o valor que você precisa.',
-            'Grupos com histórico favorável de contemplação.',
-            'Alinhamento com seu objetivo: compra, revenda ou comparativo.',
+            lang('Consorcio.ai1_i1'),
+            lang('Consorcio.ai1_i2'),
+            lang('Consorcio.ai1_i3'),
         ],
     ],
     [
         'step' => '02',
-        'title' => 'Monta o plano de contemplação sob medida',
-        'description' => 'A partir do seu caixa, ritmo mensal e prazo desejado, a IA calcula a melhor estratégia de lance para contemplar com o menor custo possível.',
+        'title' => lang('Consorcio.ai2_title'),
+        'description' => lang('Consorcio.ai2_desc'),
         'items' => [
-            'Quanto dar de lance para contemplar no prazo certo.',
-            'Impacto real da parcela no seu fluxo mensal.',
-            'Ajustes para acelerar a contemplação ou proteger caixa.',
+            lang('Consorcio.ai2_i1'),
+            lang('Consorcio.ai2_i2'),
+            lang('Consorcio.ai2_i3'),
         ],
     ],
     [
         'step' => '03',
-        'title' => 'Especialista valida e você decide com segurança',
-        'description' => 'O plano gerado pela IA passa pela análise do especialista, que confere administradora, grupo e timing antes de você dar o próximo passo.',
+        'title' => lang('Consorcio.ai3_title'),
+        'description' => lang('Consorcio.ai3_desc'),
         'items' => [
-            'Plano de contemplação claro, sem jargão técnico.',
-            'Riscos mapeados e alternativas para cada cenário.',
-            'Você decide com todas as informações na mesa.',
+            lang('Consorcio.ai3_i1'),
+            lang('Consorcio.ai3_i2'),
+            lang('Consorcio.ai3_i3'),
         ],
     ],
 ];
@@ -757,11 +757,12 @@ $aiSteps = [
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label">Como funciona</p>
-                    <h2 class="gx-section-title">Da simulação ao plano de contemplação em 3 passos.</h2>
+                    <p class="gx-label"><?= lang('Consorcio.tec_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Consorcio.tec_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    A IA faz o trabalho pesado de análise e comparação. O especialista garante que o plano final faz sentido para o seu momento, seu caixa e seu objetivo.
+                    <?= lang('Consorcio.tec_desc'); ?>
+
                 </p>
             </div>
 
@@ -788,35 +789,35 @@ $aiSteps = [
         <div class="gx-wrap">
             <div class="gx-consorcio-callout" data-gx-reveal>
                 <div>
-                    <p class="gx-label">Pronto para avançar?</p>
-                    <h2>Você já tem os números. Agora deixe o especialista montar o plano para contemplar.</h2>
+                    <p class="gx-label"><?= lang('Consorcio.cta_label'); ?></p>
+                    <h2><?= lang('Consorcio.cta_title'); ?></h2>
                     <p>
-                        Envie sua simulação e receba a análise completa com os melhores grupos, a estratégia de lance ideal
-                        e um cronograma realista de contemplação para o seu caso.
+                        <?= lang('Consorcio.cta_copy'); ?>
+
                     </p>
                 </div>
                 <div class="gx-consorcio-callout-actions">
-                    <a href="#fale-especialista" class="gx-btn gx-btn-primary gx-btn-lg">Receber meu plano de contemplação</a>
+                    <a href="#fale-especialista" class="gx-btn gx-btn-primary gx-btn-lg"><?= lang('Consorcio.spec_submit'); ?></a>
                     <?php if (!empty($whatsAppUrl)): ?>
-                        <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp gx-btn-lg" data-gx-whatsapp-link><?= $whatsAppIcon; ?>Chamar no WhatsApp</a>
+                        <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-btn gx-btn-whatsapp gx-btn-lg" data-gx-whatsapp-link><?= $whatsAppIcon; ?><?= lang('Consorcio.cta_btn_wa'); ?></a>
                     <?php endif; ?>
-                    <a href="<?= esc($contactUrl ?: '#fale-especialista'); ?>" class="gx-btn gx-btn-ghost gx-btn-lg">Ir para contato</a>
+                    <a href="<?= esc($contactUrl ?: '#fale-especialista'); ?>" class="gx-btn gx-btn-ghost gx-btn-lg"><?= lang('Consorcio.cta_btn_contact'); ?></a>
                 </div>
             </div>
         </div>
     </section>
 
     <?php if (!empty($whatsAppUrl)): ?>
-    <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-fab-whatsapp" id="gx-fab-whatsapp" aria-label="Falar pelo WhatsApp" data-gx-whatsapp-link>
+    <a href="<?= esc($whatsAppUrl); ?>" target="_blank" rel="noopener" class="gx-fab-whatsapp" id="gx-fab-whatsapp" aria-label="<?= esc(lang('Consorcio.spec_wa_btn')); ?>" data-gx-whatsapp-link>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.52 3.48A11.8 11.8 0 0 0 12.08 0C5.55 0 .24 5.31.24 11.84c0 2.08.54 4.11 1.58 5.89L0 24l6.46-1.69a11.8 11.8 0 0 0 5.62 1.43h.01c6.53 0 11.84-5.31 11.84-11.84 0-3.16-1.23-6.13-3.41-8.42Zm-8.44 18.26h-.01a9.84 9.84 0 0 1-5.01-1.37l-.36-.22-3.84 1 1.03-3.74-.24-.38a9.8 9.8 0 0 1-1.51-5.2C2.14 6.42 6.66 1.9 12.08 1.9c2.63 0 5.1 1.02 6.96 2.88a9.78 9.78 0 0 1 2.89 6.97c0 5.42-4.42 9.99-9.85 9.99Zm5.39-7.41c-.29-.14-1.71-.84-1.98-.94-.26-.1-.45-.14-.64.14-.19.29-.74.94-.91 1.13-.17.19-.34.22-.63.07-.29-.14-1.21-.45-2.31-1.45-.85-.76-1.42-1.69-1.59-1.98-.17-.29-.02-.44.13-.58.13-.13.29-.34.43-.5.14-.17.19-.29.29-.48.1-.19.05-.36-.02-.5-.07-.14-.64-1.55-.87-2.12-.23-.55-.47-.48-.64-.49h-.55c-.19 0-.5.07-.76.36-.26.29-.99.97-.99 2.37s1.01 2.75 1.15 2.94c.14.19 1.98 3.03 4.79 4.25.67.29 1.2.47 1.61.6.68.22 1.3.19 1.79.12.55-.08 1.71-.7 1.95-1.37.24-.67.24-1.24.17-1.37-.07-.12-.26-.19-.55-.34Z"/></svg>
     </a>
     <?php endif; ?>
 
     <div id="gx-exit-popup" class="gx-exit-overlay" hidden>
         <div class="gx-exit-card">
-            <button type="button" class="gx-exit-close" id="gx-exit-close" aria-label="Fechar">&times;</button>
-            <h2>Espera! Quer receber uma simulação personalizada?</h2>
-            <p>Nosso especialista faz a simulação para você em até 24h.</p>
+            <button type="button" class="gx-exit-close" id="gx-exit-close" aria-label="<?= esc(lang('Consorcio.exit_close')); ?>">&times;</button>
+            <h2><?= lang('Consorcio.exit_title'); ?></h2>
+            <p><?= lang('Consorcio.exit_p'); ?></p>
             <form id="gx-exit-form" class="gx-exit-form" novalidate>
                 <input type="hidden" name="lead_origin" value="Simulador de Consórcio - Exit Intent">
                 <input type="hidden" name="landing_page" value="<?= esc(current_url()); ?>">
@@ -826,9 +827,9 @@ $aiSteps = [
                 <input type="hidden" name="meta_value" value="">
                 <input type="hidden" name="phone_country" value="BR">
                 <input type="tel" name="phone" placeholder="(00) 00000-0000" maxlength="16" autocomplete="tel" inputmode="numeric" required class="gx-exit-input" data-gx-exit-phone>
-                <button type="submit" class="gx-btn gx-btn-whatsapp gx-btn-lg gx-exit-submit">Receber minha simulação</button>
+                <button type="submit" class="gx-btn gx-btn-whatsapp gx-btn-lg gx-exit-submit"><?= lang('Consorcio.exit_submit'); ?></button>
             </form>
-            <button type="button" class="gx-exit-dismiss" id="gx-exit-dismiss">Não, obrigado</button>
+            <button type="button" class="gx-exit-dismiss" id="gx-exit-dismiss"><?= lang('Consorcio.exit_dismiss'); ?></button>
         </div>
     </div>
 </main>

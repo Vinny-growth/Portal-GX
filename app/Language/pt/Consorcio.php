@@ -234,4 +234,44 @@ return [
     'sched_cta'   => 'Agendar conversa com especialista',
     'sched_alt'   => 'Prefere outro canal?',
     'sched_note'  => 'Seus dados já estarão preenchidos na agenda. Basta escolher data e horário.',
+
+    // ===================================================================
+    // 4b-5 — tecnologia (aiSteps) + callout final + FAB + exit popup
+    // ===================================================================
+
+    // seção tecnologia-ia
+    'tec_label' => 'Como funciona',
+    'tec_title' => 'Da simulação ao plano de contemplação em 3 passos.',
+    'tec_desc'  => 'A IA faz o trabalho pesado de análise e comparação. O especialista garante que o plano final faz sentido para o seu momento, seu caixa e seu objetivo.',
+
+    // passos da IA ($aiSteps) — números 01/02/03 ficam literais
+    'ai1_title' => 'IA filtra os melhores grupos para você',
+    'ai1_desc'  => 'Em vez de pesquisar dezenas de opções, a inteligência artificial elimina os grupos incompatíveis e destaca os que mais se encaixam no seu objetivo.',
+    'ai1_i1'    => 'Prazos e taxas compatíveis com o valor que você precisa.',
+    'ai1_i2'    => 'Grupos com histórico favorável de contemplação.',
+    'ai1_i3'    => 'Alinhamento com seu objetivo: compra, revenda ou comparativo.',
+    'ai2_title' => 'Monta o plano de contemplação sob medida',
+    'ai2_desc'  => 'A partir do seu caixa, ritmo mensal e prazo desejado, a IA calcula a melhor estratégia de lance para contemplar com o menor custo possível.',
+    'ai2_i1'    => 'Quanto dar de lance para contemplar no prazo certo.',
+    'ai2_i2'    => 'Impacto real da parcela no seu fluxo mensal.',
+    'ai2_i3'    => 'Ajustes para acelerar a contemplação ou proteger caixa.',
+    'ai3_title' => 'Especialista valida e você decide com segurança',
+    'ai3_desc'  => 'O plano gerado pela IA passa pela análise do especialista, que confere administradora, grupo e timing antes de você dar o próximo passo.',
+    'ai3_i1'    => 'Plano de contemplação claro, sem jargão técnico.',
+    'ai3_i2'    => 'Riscos mapeados e alternativas para cada cenário.',
+    'ai3_i3'    => 'Você decide com todas as informações na mesa.',
+
+    // callout final
+    'cta_label'       => 'Pronto para avançar?',
+    'cta_title'       => 'Você já tem os números. Agora deixe o especialista montar o plano para contemplar.',
+    'cta_copy'        => "Envie sua simulação e receba a análise completa com os melhores grupos, a estratégia de lance ideal\n                        e um cronograma realista de contemplação para o seu caso.",
+    'cta_btn_wa'      => 'Chamar no WhatsApp',
+    'cta_btn_contact' => 'Ir para contato',
+
+    // exit popup
+    'exit_close'   => 'Fechar',
+    'exit_title'   => 'Espera! Quer receber uma simulação personalizada?',
+    'exit_p'       => 'Nosso especialista faz a simulação para você em até 24h.',
+    'exit_submit'  => 'Receber minha simulação',
+    'exit_dismiss' => 'Não, obrigado',
 ];
