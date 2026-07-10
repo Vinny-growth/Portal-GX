@@ -1,51 +1,46 @@
 <?php
 $l = is_array($landing ?? null) ? $landing : [];
-$heroTitle = trim((string)($l['headline'] ?? 'Seu patrimônio precisa de estratégia, não de improviso.'));
-$heroSubtitle = trim((string)($l['subheadline'] ?? 'Diagnóstico patrimonial, leitura de liquidez, alocação e próximos passos consultivos para famílias, executivos e empresários.'));
-$heroBadge = $copy['landing']['hero_badge'] ?? 'Wealth Advisory | GX Capital';
-$primaryCta = $copy['landing']['primary_cta_label'] ?? 'Quero meu diagnóstico';
-$secondaryCta = $copy['landing']['secondary_cta_label'] ?? 'Entender o método';
-$leadFormTitle = $copy['landing']['form_title'] ?? 'Receba um diagnóstico consultivo inicial';
-$leadFormDescription = $copy['landing']['form_description'] ?? 'Preencha os dados principais e descreva o contexto. O retorno vem com direcionamento patrimonial e próximos passos possíveis.';
-$leadFormButton = $copy['landing']['form_button_label'] ?? 'Falar com um especialista';
-$faqItems = !empty($l['faq']) && is_array($l['faq']) ? $l['faq'] : [
-    ['q' => 'Para quem a consultoria é indicada?', 'a' => 'Para famílias, executivos e empresários que querem organizar patrimônio, renda, liquidez e decisões financeiras com visão integrada.'],
-    ['q' => 'Preciso transferir a carteira para ter um diagnóstico?', 'a' => 'Não. O diagnóstico inicial parte do seu contexto atual e identifica onde estão travas, desalinhamentos e prioridades.'],
-    ['q' => 'O que recebo após o primeiro contato?', 'a' => 'Uma leitura consultiva do caso, hipóteses de ganho de eficiência e indicação objetiva dos próximos movimentos possíveis.'],
-    ['q' => 'A análise inclui fluxo de caixa, patrimônio e metas?', 'a' => 'Sim. O foco é conectar patrimônio, liquidez, objetivos e ritmo de construção para evitar decisões isoladas.'],
-];
+$heroTitle = trim((string)($l['headline'] ?? lang('Wealth.l_hero_title')));
+$heroSubtitle = trim((string)($l['subheadline'] ?? lang('Wealth.l_hero_sub')));
+$heroBadge = $copy['landing']['hero_badge'] ?? brandLang('Wealth.l_hero_badge');
+$primaryCta = $copy['landing']['primary_cta_label'] ?? lang('Wealth.l_cta_primary');
+$secondaryCta = $copy['landing']['secondary_cta_label'] ?? lang('Wealth.l_cta_secondary');
+$leadFormTitle = $copy['landing']['form_title'] ?? lang('Wealth.l_form_title');
+$leadFormDescription = $copy['landing']['form_description'] ?? lang('Wealth.l_form_desc');
+$leadFormButton = $copy['landing']['form_button_label'] ?? lang('Wealth.l_form_button');
+$faqItems = !empty($l['faq']) && is_array($l['faq']) ? $l['faq'] : lang('Wealth.l_faq');
 $signalCards = [
-    ['title' => 'Liquidez parada', 'text' => 'Caixa excessivo ou desalocado corrói eficiência e reduz capacidade de execução futura.'],
-    ['title' => 'Carteira sem tese', 'text' => 'Ativos acumulados ao longo do tempo, sem uma lógica clara de função, risco e objetivo.'],
-    ['title' => 'Metas concorrentes', 'text' => 'Proteção, renda, crescimento e legado disputam capital sem hierarquia definida.'],
-    ['title' => 'Decisão fragmentada', 'text' => 'Patrimônio pessoal, empresa, dívidas e reservas andam separados e geram ruído de estratégia.'],
+    ['title' => lang('Wealth.l_sig1_t'), 'text' => lang('Wealth.l_sig1_x')],
+    ['title' => lang('Wealth.l_sig2_t'), 'text' => lang('Wealth.l_sig2_x')],
+    ['title' => lang('Wealth.l_sig3_t'), 'text' => lang('Wealth.l_sig3_x')],
+    ['title' => lang('Wealth.l_sig4_t'), 'text' => lang('Wealth.l_sig4_x')],
 ];
 $deliverables = [
-    ['title' => 'Mapa patrimonial e de liquidez', 'text' => 'Leitura do que precisa ficar líquido, protegido, produtivo ou reorganizado.', 'chips' => ['Reserva e caixa', 'Patrimônio produtivo', 'Risco e concentração']],
-    ['title' => 'Tese de alocação e prioridades', 'text' => 'Hipóteses de melhoria para renda, proteção, crescimento e eficiência do capital.', 'chips' => ['Renda recorrente', 'Proteção', 'Sequência de execução']],
-    ['title' => 'Plano executivo de próximos passos', 'text' => 'Um caminho claro do que fazer primeiro, depois e o que merece acompanhamento consultivo.', 'chips' => ['Ações imediatas', 'Ganho potencial', 'Acompanhamento']],
+    ['title' => lang('Wealth.l_del1_t'), 'text' => lang('Wealth.l_del1_x'), 'chips' => [lang('Wealth.l_del1_c1'), lang('Wealth.l_del1_c2'), lang('Wealth.l_del1_c3')]],
+    ['title' => lang('Wealth.l_del2_t'), 'text' => lang('Wealth.l_del2_x'), 'chips' => [lang('Wealth.l_del2_c1'), lang('Wealth.l_del2_c2'), lang('Wealth.l_del2_c3')]],
+    ['title' => lang('Wealth.l_del3_t'), 'text' => lang('Wealth.l_del3_x'), 'chips' => [lang('Wealth.l_del3_c1'), lang('Wealth.l_del3_c2'), lang('Wealth.l_del3_c3')]],
 ];
 $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/', '', (string)$baseSettings->contact_phone) : '';
 ?>
 <main class="gx-marketing gx-wealth">
     <nav class="gx-nav" id="gx-nav">
         <div class="gx-nav-inner">
-            <a href="<?= langBaseUrl(); ?>" class="gx-nav-brand" aria-label="GX Capital">
-                <img src="<?= getLogo(); ?>" alt="GX Capital" width="<?= getLogoSize('width'); ?>" height="<?= getLogoSize('height'); ?>">
+            <a href="<?= langBaseUrl(); ?>" class="gx-nav-brand" aria-label="<?= esc(brand('display_name')); ?>">
+                <img src="<?= getLogo(); ?>" alt="<?= esc(brand('display_name')); ?>" width="<?= getLogoSize('width'); ?>" height="<?= getLogoSize('height'); ?>">
             </a>
 
             <div class="gx-nav-links" id="gx-nav-links">
-                <a href="#diagnostico" class="gx-nav-link">Diagnóstico</a>
-                <a href="#metodo" class="gx-nav-link">Método</a>
-                <a href="#entregaveis" class="gx-nav-link">Entregáveis</a>
-                <a href="#faq" class="gx-nav-link">FAQ</a>
+                <a href="#diagnostico" class="gx-nav-link"><?= lang('Wealth.l_nav_diag'); ?></a>
+                <a href="#metodo" class="gx-nav-link"><?= lang('Wealth.l_nav_metodo'); ?></a>
+                <a href="#entregaveis" class="gx-nav-link"><?= lang('Wealth.l_nav_entreg'); ?></a>
+                <a href="#faq" class="gx-nav-link"><?= lang('Wealth.l_nav_faq'); ?></a>
                 <div class="gx-nav-menu-extra">
                     <?php if (!empty($isAuthenticated)): ?>
-                        <a href="<?= esc($wealthConversationUrl); ?>" class="gx-nav-link" data-wealth-track="wealth_continue_area">Área completa</a>
+                        <a href="<?= esc($wealthConversationUrl); ?>" class="gx-nav-link" data-wealth-track="wealth_continue_area"><?= lang('Wealth.l_nav_area'); ?></a>
                     <?php elseif (($generalSettings->registration_system ?? 0) == 1): ?>
-                        <a href="#" class="gx-nav-link" data-bs-toggle="modal" data-bs-target="#modalLogin">Entrar</a>
+                        <a href="#" class="gx-nav-link" data-bs-toggle="modal" data-bs-target="#modalLogin"><?= lang('Wealth.l_nav_entrar'); ?></a>
                     <?php else: ?>
-                        <a href="<?= esc($blogUrl); ?>" class="gx-nav-link">Blog</a>
+                        <a href="<?= esc($blogUrl); ?>" class="gx-nav-link"><?= lang('Wealth.l_nav_blog'); ?></a>
                     <?php endif; ?>
                     <a href="#fale-com-especialista" class="gx-btn gx-btn-primary" data-wealth-track="start_signup"><?= esc($primaryCta); ?></a>
                 </div>
@@ -53,14 +48,14 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
 
             <div class="gx-nav-right">
                 <?php if (!empty($isAuthenticated)): ?>
-                    <a href="<?= esc($wealthConversationUrl); ?>" class="gx-nav-link" data-wealth-track="wealth_continue_area">Área completa</a>
+                    <a href="<?= esc($wealthConversationUrl); ?>" class="gx-nav-link" data-wealth-track="wealth_continue_area"><?= lang('Wealth.l_nav_area'); ?></a>
                 <?php elseif (($generalSettings->registration_system ?? 0) == 1): ?>
-                    <a href="#" class="gx-nav-link" data-bs-toggle="modal" data-bs-target="#modalLogin">Entrar</a>
+                    <a href="#" class="gx-nav-link" data-bs-toggle="modal" data-bs-target="#modalLogin"><?= lang('Wealth.l_nav_entrar'); ?></a>
                 <?php else: ?>
-                    <a href="<?= esc($blogUrl); ?>" class="gx-nav-link">Blog</a>
+                    <a href="<?= esc($blogUrl); ?>" class="gx-nav-link"><?= lang('Wealth.l_nav_blog'); ?></a>
                 <?php endif; ?>
                 <a href="#fale-com-especialista" class="gx-btn gx-btn-primary" id="gx-wealth-primary-cta" data-wealth-track="start_signup"><?= esc($primaryCta); ?></a>
-                <button type="button" class="gx-nav-toggle" id="gx-nav-toggle" aria-expanded="false" aria-controls="gx-nav-links" aria-label="Menu">
+                <button type="button" class="gx-nav-toggle" id="gx-nav-toggle" aria-expanded="false" aria-controls="gx-nav-links" aria-label="<?= lang('Wealth.l_nav_menu'); ?>">
                     <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
                 </button>
             </div>
@@ -85,24 +80,25 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
 
                 <div class="gx-hero-proof">
                     <div class="gx-hero-proof-item">
-                        <strong>Diagnóstico em 60s</strong>
-                        <span>Uma leitura inicial para entender direção, gap e urgência consultiva.</span>
+                        <strong><?= lang('Wealth.l_proof1_t'); ?></strong>
+                        <span><?= lang('Wealth.l_proof1_s'); ?></span>
                     </div>
                     <div class="gx-hero-proof-item">
-                        <strong>Visão integrada</strong>
-                        <span>Patrimônio, fluxo, liquidez e objetivos tratados como sistema, não como peças soltas.</span>
+                        <strong><?= lang('Wealth.l_proof2_t'); ?></strong>
+                        <span><?= lang('Wealth.l_proof2_s'); ?></span>
                     </div>
                     <div class="gx-hero-proof-item">
-                        <strong>Plano acionável</strong>
-                        <span>Próximos passos objetivos para blindagem, renda, crescimento e legado.</span>
+                        <strong><?= lang('Wealth.l_proof3_t'); ?></strong>
+                        <span><?= lang('Wealth.l_proof3_s'); ?></span>
                     </div>
                 </div>
 
                 <?php if (!empty($isAuthenticated)): ?>
                     <div class="gx-wealth-auth-note">
-                        <strong>Área completa já disponível.</strong>
-                        Você pode seguir com o diagnóstico guiado ou abrir seu panorama em
-                        <a href="<?= esc($wealthConversationUrl); ?>" data-wealth-track="wealth_continue_area">conversa</a>.
+                        <strong><?= lang('Wealth.l_auth_strong'); ?></strong>
+                        <?= lang('Wealth.l_auth_text'); ?>
+
+                        <a href="<?= esc($wealthConversationUrl); ?>" data-wealth-track="wealth_continue_area"><?= lang('Wealth.l_auth_link'); ?></a>.
                     </div>
                 <?php endif; ?>
             </div>
@@ -111,28 +107,28 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
                 <div class="gx-wealth-hero-panel">
                     <div class="gx-wealth-panel-top">
                         <div>
-                            <p class="gx-wealth-panel-kicker">Leitura inicial</p>
-                            <h2 class="gx-wealth-panel-title">Patrimônio, renda e liquidez em contexto.</h2>
+                            <p class="gx-wealth-panel-kicker"><?= lang('Wealth.l_panel_kicker'); ?></p>
+                            <h2 class="gx-wealth-panel-title"><?= lang('Wealth.l_panel_title'); ?></h2>
                         </div>
-                        <span class="gx-wealth-panel-badge">Consultivo</span>
+                        <span class="gx-wealth-panel-badge"><?= lang('Wealth.l_panel_badge'); ?></span>
                     </div>
 
                     <div class="gx-wealth-mini-grid">
                         <div class="gx-wealth-mini-card">
-                            <span>Foco</span>
-                            <strong>Blindar, organizar e acelerar o capital</strong>
+                            <span><?= lang('Wealth.l_mini1_s'); ?></span>
+                            <strong><?= lang('Wealth.l_mini1_t'); ?></strong>
                         </div>
                         <div class="gx-wealth-mini-card">
-                            <span>Saída</span>
-                            <strong>Próximo passo claro e priorizado</strong>
+                            <span><?= lang('Wealth.l_mini2_s'); ?></span>
+                            <strong><?= lang('Wealth.l_mini2_t'); ?></strong>
                         </div>
                         <div class="gx-wealth-mini-card">
-                            <span>Escopo</span>
-                            <strong>Fluxo, liquidez, alocação e metas</strong>
+                            <span><?= lang('Wealth.l_mini3_s'); ?></span>
+                            <strong><?= lang('Wealth.l_mini3_t'); ?></strong>
                         </div>
                         <div class="gx-wealth-mini-card">
-                            <span>Timing</span>
-                            <strong>Diagnóstico rápido e retorno consultivo</strong>
+                            <span><?= lang('Wealth.l_mini4_s'); ?></span>
+                            <strong><?= lang('Wealth.l_mini4_t'); ?></strong>
                         </div>
                     </div>
 
@@ -146,9 +142,9 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
                         </div>
                     <?php else: ?>
                         <div class="gx-wealth-path">
-                            <div class="gx-wealth-path-step is-active">1. Diagnóstico patrimonial e de liquidez</div>
-                            <div class="gx-wealth-path-step">2. Tese de organização e alocação</div>
-                            <div class="gx-wealth-path-step">3. Plano executivo com prioridade de ações</div>
+                            <div class="gx-wealth-path-step is-active"><?= lang('Wealth.l_path1'); ?></div>
+                            <div class="gx-wealth-path-step"><?= lang('Wealth.l_path2'); ?></div>
+                            <div class="gx-wealth-path-step"><?= lang('Wealth.l_path3'); ?></div>
                         </div>
                     <?php endif; ?>
                 </div>
@@ -156,15 +152,15 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
                 <div class="gx-hero-stat-row">
                     <div class="gx-hero-metric">
                         <strong>60s</strong>
-                        <span>para medir o gap inicial</span>
+                        <span><?= lang('Wealth.l_stat1_s'); ?></span>
                     </div>
                     <div class="gx-hero-metric">
                         <strong>3</strong>
-                        <span>frentes de decisão patrimonial</span>
+                        <span><?= lang('Wealth.l_stat2_s'); ?></span>
                     </div>
                     <div class="gx-hero-metric">
                         <strong>360°</strong>
-                        <span>visão integrada do capital</span>
+                        <span><?= lang('Wealth.l_stat3_s'); ?></span>
                     </div>
                 </div>
             </div>
@@ -173,12 +169,12 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
 
     <div class="gx-strip">
         <div class="gx-strip-inner" data-gx-reveal>
-            <span class="gx-strip-lead">Onde a consultoria atua com mais impacto:</span>
-            <span class="gx-strip-item">Liquidez e reserva</span>
-            <span class="gx-strip-item">Alocação e renda</span>
-            <span class="gx-strip-item">Proteção patrimonial</span>
-            <span class="gx-strip-item">Prioridade de metas</span>
-            <span class="gx-strip-item">Legado e sucessão</span>
+            <span class="gx-strip-lead"><?= lang('Wealth.l_strip_lead'); ?></span>
+            <span class="gx-strip-item"><?= lang('Wealth.l_strip1'); ?></span>
+            <span class="gx-strip-item"><?= lang('Wealth.l_strip2'); ?></span>
+            <span class="gx-strip-item"><?= lang('Wealth.l_strip3'); ?></span>
+            <span class="gx-strip-item"><?= lang('Wealth.l_strip4'); ?></span>
+            <span class="gx-strip-item"><?= lang('Wealth.l_strip5'); ?></span>
         </div>
     </div>
 
@@ -186,76 +182,78 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label">Diagnóstico Rápido</p>
-                    <h2 class="gx-section-title">Meça o tamanho do gap entre patrimônio atual e padrão de vida desejado.</h2>
+                    <p class="gx-label"><?= lang('Wealth.l_diag_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Wealth.l_diag_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    A conta abaixo não substitui uma consultoria, mas expõe rapidamente se o seu patrimônio está organizado para sustentar objetivos, renda e liquidez com eficiência.
+                    <?= lang('Wealth.l_diag_desc'); ?>
+
                 </p>
             </div>
 
             <div class="gx-wealth-diagnostic-grid">
                 <article class="gx-wealth-diagnostic-card" data-gx-reveal>
                     <div class="gx-wealth-objective-grid">
-                        <button type="button" class="gx-wealth-objective is-active" data-wealth-objective="Blindar patrimônio e liquidez">Blindar patrimônio e liquidez</button>
-                        <button type="button" class="gx-wealth-objective" data-wealth-objective="Gerar mais renda recorrente">Gerar mais renda recorrente</button>
-                        <button type="button" class="gx-wealth-objective" data-wealth-objective="Organizar crescimento e alocação">Organizar crescimento e alocação</button>
-                        <button type="button" class="gx-wealth-objective" data-wealth-objective="Planejar legado e sucessão">Planejar legado e sucessão</button>
+                        <button type="button" class="gx-wealth-objective is-active" data-wealth-objective="Blindar patrimônio e liquidez"><?= lang('Wealth.l_obj1'); ?></button>
+                        <button type="button" class="gx-wealth-objective" data-wealth-objective="Gerar mais renda recorrente"><?= lang('Wealth.l_obj2'); ?></button>
+                        <button type="button" class="gx-wealth-objective" data-wealth-objective="Organizar crescimento e alocação"><?= lang('Wealth.l_obj3'); ?></button>
+                        <button type="button" class="gx-wealth-objective" data-wealth-objective="Planejar legado e sucessão"><?= lang('Wealth.l_obj4'); ?></button>
                     </div>
 
                     <div class="gx-wealth-input-grid">
                         <label class="gx-wealth-field">
-                            <span>Patrimônio investido hoje</span>
+                            <span><?= lang('Wealth.l_field_invested'); ?></span>
                             <input type="number" id="gx-wealth-invested" min="0" step="1000" value="250000">
                         </label>
 
                         <label class="gx-wealth-field">
-                            <span>Aporte mensal atual</span>
+                            <span><?= lang('Wealth.l_field_monthly'); ?></span>
                             <input type="number" id="gx-wealth-monthly-invest" min="0" step="100" value="5000">
                         </label>
 
                         <label class="gx-wealth-field gx-wealth-field-full">
-                            <span>Custo de vida mensal que o patrimônio deveria sustentar</span>
+                            <span><?= lang('Wealth.l_field_cost'); ?></span>
                             <input type="number" id="gx-wealth-monthly-cost" min="0" step="100" value="18000">
                         </label>
                     </div>
 
                     <div class="gx-wealth-chip-list">
-                        <span class="gx-wealth-chip">Capital alvo usa referência conservadora de retirada</span>
-                        <span class="gx-wealth-chip">Projeção considera ritmo constante de aportes</span>
-                        <span class="gx-wealth-chip">Leitura inicial para priorização consultiva</span>
+                        <span class="gx-wealth-chip"><?= lang('Wealth.l_chip1'); ?></span>
+                        <span class="gx-wealth-chip"><?= lang('Wealth.l_chip2'); ?></span>
+                        <span class="gx-wealth-chip"><?= lang('Wealth.l_chip3'); ?></span>
                     </div>
                 </article>
 
                 <aside class="gx-wealth-insights-card" data-gx-reveal data-gx-delay="100">
-                    <p class="gx-label">Leitura Inicial</p>
-                    <h3 class="gx-section-title" style="margin-bottom:0;">Seu patrimônio deveria produzir clareza, não ruído.</h3>
+                    <p class="gx-label"><?= lang('Wealth.l_ins_label'); ?></p>
+                    <h3 class="gx-section-title" style="margin-bottom:0;"><?= lang('Wealth.l_ins_title'); ?></h3>
 
                     <div class="gx-wealth-kpi-stack">
                         <div class="gx-wealth-kpi-card">
-                            <span>Capital alvo estimado</span>
+                            <span><?= lang('Wealth.l_kpi1'); ?></span>
                             <strong id="gx-wealth-target-capital">R$ 0</strong>
                         </div>
                         <div class="gx-wealth-kpi-card">
-                            <span>Projeção em 10 anos</span>
+                            <span><?= lang('Wealth.l_kpi2'); ?></span>
                             <strong id="gx-wealth-projection-10y">R$ 0</strong>
                         </div>
                         <div class="gx-wealth-kpi-card">
-                            <span>Cobertura estimada da meta</span>
+                            <span><?= lang('Wealth.l_kpi3'); ?></span>
                             <strong id="gx-wealth-coverage">0,0%</strong>
                         </div>
                         <div class="gx-wealth-kpi-card">
-                            <span>Gap patrimonial projetado</span>
+                            <span><?= lang('Wealth.l_kpi4'); ?></span>
                             <strong id="gx-wealth-gap">R$ 0</strong>
                         </div>
                     </div>
 
                     <p class="gx-wealth-insight-text" id="gx-wealth-insight-text">
-                        Informe os dados principais para estimar o capital-alvo e a distância entre o ritmo atual e o padrão de vida desejado.
+                        <?= lang('Wealth.l_ins_text'); ?>
+
                     </p>
 
                     <div style="margin-top:22px;">
-                        <a href="#fale-com-especialista" class="gx-btn gx-btn-primary gx-btn-lg" data-wealth-track="start_signup">Receber leitura consultiva</a>
+                        <a href="#fale-com-especialista" class="gx-btn gx-btn-primary gx-btn-lg" data-wealth-track="start_signup"><?= lang('Wealth.l_ins_cta'); ?></a>
                     </div>
                 </aside>
             </div>
@@ -267,10 +265,11 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
     <section class="gx-section gx-section-alt">
         <div class="gx-wrap">
             <div class="gx-section-header is-centered" data-gx-reveal>
-                <p class="gx-label">Sinais de Ineficiência</p>
-                <h2 class="gx-section-title">O patrimônio costuma perder eficiência quando a estratégia fica fragmentada.</h2>
+                <p class="gx-label"><?= lang('Wealth.l_sig_label'); ?></p>
+                <h2 class="gx-section-title"><?= lang('Wealth.l_sig_title'); ?></h2>
                 <p class="gx-section-desc" style="margin-left:auto;margin-right:auto;">
-                    Esses são os cenários mais comuns em famílias e empresários com patrimônio relevante, mas sem coordenação consultiva contínua.
+                    <?= lang('Wealth.l_sig_desc'); ?>
+
                 </p>
             </div>
 
@@ -290,30 +289,31 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
     <section class="gx-section" id="metodo">
         <div class="gx-wrap">
             <div class="gx-section-header is-centered" data-gx-reveal>
-                <p class="gx-label">Método Consultivo</p>
-                <h2 class="gx-section-title">Como a GX Capital estrutura o diagnóstico patrimonial.</h2>
+                <p class="gx-label"><?= lang('Wealth.l_met_label'); ?></p>
+                <h2 class="gx-section-title"><?= brandLang('Wealth.l_met_title'); ?></h2>
                 <p class="gx-section-desc" style="margin-left:auto;margin-right:auto;">
-                    A ideia não é adicionar mais produto ao patrimônio, e sim construir ordem, tese e priorização.
+                    <?= lang('Wealth.l_met_desc'); ?>
+
                 </p>
             </div>
 
             <div class="gx-process-grid">
                 <article class="gx-process-card" data-gx-reveal>
                     <span class="gx-process-num">01</span>
-                    <h3 class="gx-process-title">Mapa de patrimônio, liquidez e fluxo</h3>
-                    <p class="gx-process-desc">Entender onde o capital está, que função cada bloco cumpre e quais decisões estão travando eficiência.</p>
+                    <h3 class="gx-process-title"><?= lang('Wealth.l_proc1_t'); ?></h3>
+                    <p class="gx-process-desc"><?= lang('Wealth.l_proc1_x'); ?></p>
                 </article>
 
                 <article class="gx-process-card" data-gx-reveal data-gx-delay="100">
                     <span class="gx-process-num">02</span>
-                    <h3 class="gx-process-title">Tese de organização e alocação</h3>
-                    <p class="gx-process-desc">Definir o que precisa ser protegido, o que deve gerar renda e o que merece assumir risco de crescimento.</p>
+                    <h3 class="gx-process-title"><?= lang('Wealth.l_proc2_t'); ?></h3>
+                    <p class="gx-process-desc"><?= lang('Wealth.l_proc2_x'); ?></p>
                 </article>
 
                 <article class="gx-process-card" data-gx-reveal data-gx-delay="180">
                     <span class="gx-process-num">03</span>
-                    <h3 class="gx-process-title">Plano executivo de próximos passos</h3>
-                    <p class="gx-process-desc">Uma sequência objetiva de ações para ganhar clareza, liquidez, proteção e consistência patrimonial.</p>
+                    <h3 class="gx-process-title"><?= lang('Wealth.l_proc3_t'); ?></h3>
+                    <p class="gx-process-desc"><?= lang('Wealth.l_proc3_x'); ?></p>
                 </article>
             </div>
         </div>
@@ -325,11 +325,12 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label">Entregáveis</p>
-                    <h2 class="gx-section-title">O que destrava quando o patrimônio passa a obedecer uma estratégia.</h2>
+                    <p class="gx-label"><?= lang('Wealth.l_ent_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Wealth.l_ent_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    O ganho raramente está em um único ativo. Ele aparece quando liquidez, renda, proteção e prioridade passam a conversar.
+                    <?= lang('Wealth.l_ent_desc'); ?>
+
                 </p>
             </div>
 
@@ -356,14 +357,15 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
             <div class="gx-wrap">
                 <div class="gx-cta-block" data-gx-reveal>
                     <div class="gx-cta-content">
-                        <p class="gx-label">Área Completa</p>
-                        <h2 class="gx-section-title">Continue a análise detalhada com o mapeamento guiado.</h2>
+                        <p class="gx-label"><?= lang('Wealth.l_area_label'); ?></p>
+                        <h2 class="gx-section-title"><?= lang('Wealth.l_area_title'); ?></h2>
                         <p class="gx-section-desc" style="margin-left:auto;margin-right:auto;">
-                            Se você já tem acesso, avance pelo diagnóstico estruturado e abra o panorama consolidado do patrimônio.
+                            <?= lang('Wealth.l_area_desc'); ?>
+
                         </p>
                         <div class="gx-cta-actions">
-                            <a href="<?= esc($wealthConversationUrl); ?>" class="gx-btn gx-btn-primary gx-btn-lg" data-wealth-track="wealth_continue_area">Continuar diagnóstico</a>
-                            <a href="<?= esc($wealthResultsUrl); ?>" class="gx-btn gx-btn-ghost gx-btn-lg">Ver meu panorama</a>
+                            <a href="<?= esc($wealthConversationUrl); ?>" class="gx-btn gx-btn-primary gx-btn-lg" data-wealth-track="wealth_continue_area"><?= lang('Wealth.l_area_cta1'); ?></a>
+                            <a href="<?= esc($wealthResultsUrl); ?>" class="gx-btn gx-btn-ghost gx-btn-lg"><?= lang('Wealth.l_area_cta2'); ?></a>
                         </div>
                     </div>
                 </div>
@@ -376,10 +378,11 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
     <section class="gx-section" id="faq">
         <div class="gx-wrap">
             <div class="gx-section-header is-centered" data-gx-reveal>
-                <p class="gx-label">FAQ</p>
-                <h2 class="gx-section-title">Perguntas recorrentes antes do primeiro diagnóstico.</h2>
+                <p class="gx-label"><?= lang('Wealth.l_faq_label'); ?></p>
+                <h2 class="gx-section-title"><?= lang('Wealth.l_faq_title'); ?></h2>
                 <p class="gx-section-desc" style="margin-left:auto;margin-right:auto;">
-                    O objetivo é reduzir fricção, qualificar o contexto e tornar a conversa seguinte objetiva.
+                    <?= lang('Wealth.l_faq_desc'); ?>
+
                 </p>
             </div>
 
@@ -401,16 +404,17 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
                     <div class="gx-aside-icon" aria-hidden="true">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="rgba(199,160,83,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h10"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>
                     </div>
-                    <p class="gx-label">Próximo Passo</p>
-                    <h2 class="gx-section-title">Conecte o diagnóstico rápido a uma leitura consultiva.</h2>
+                    <p class="gx-label"><?= lang('Wealth.l_lead_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Wealth.l_lead_title'); ?></h2>
                     <p class="gx-section-desc" style="color:rgba(255,255,255,0.62);">
-                        Informe o contexto principal. A equipe retorna com uma leitura inicial e possíveis próximos movimentos para organizar o patrimônio.
+                        <?= lang('Wealth.l_lead_desc'); ?>
+
                     </p>
 
                     <div class="gx-contact-list">
-                        <span class="gx-contact-chip">Diagnóstico inicial rápido</span>
-                        <span class="gx-contact-chip">Contato consultivo</span>
-                        <span class="gx-contact-chip">Sem compromisso</span>
+                        <span class="gx-contact-chip"><?= lang('Wealth.l_lead_chip1'); ?></span>
+                        <span class="gx-contact-chip"><?= lang('Wealth.l_lead_chip2'); ?></span>
+                        <span class="gx-contact-chip"><?= lang('Wealth.l_lead_chip3'); ?></span>
                         <?php if (!empty($baseSettings->contact_phone)): ?>
                             <a href="<?= !empty($contactPhone) ? 'tel:' . esc($contactPhone) : '#'; ?>" class="gx-contact-chip">
                                 <?= esc($baseSettings->contact_phone); ?>
@@ -422,7 +426,7 @@ $contactPhone = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+]/',
                             </a>
                         <?php endif; ?>
                         <?php if (!empty($isAuthenticated)): ?>
-                            <a href="<?= esc($wealthConversationUrl); ?>" class="gx-contact-chip" data-wealth-track="wealth_continue_area">Abrir área completa</a>
+                            <a href="<?= esc($wealthConversationUrl); ?>" class="gx-contact-chip" data-wealth-track="wealth_continue_area"><?= lang('Wealth.l_lead_area'); ?></a>
                         <?php endif; ?>
                     </div>
                 </aside>
