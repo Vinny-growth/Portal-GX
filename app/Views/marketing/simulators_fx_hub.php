@@ -42,74 +42,74 @@ $navLinks = [
 ];
 
 $indicatorCards = [
-    ['label' => 'USD/BRL', 'value' => $indicators['usd_brl'] ?? '', 'suffix' => '', 'hint' => 'referência base para os cenários'],
-    ['label' => 'Spread comercial', 'value' => $indicators['commercial_spread'] ?? '', 'suffix' => '%', 'hint' => 'default inicial da mesa'],
-    ['label' => 'SELIC', 'value' => $indicators['selic'] ?? '', 'suffix' => '%', 'hint' => 'piso local para custo de capital'],
-    ['label' => 'CDI', 'value' => $indicators['cdi'] ?? '', 'suffix' => '%', 'hint' => 'benchmark onshore usado nos comparativos'],
-    ['label' => 'IPCA 12m', 'value' => $indicators['ipca_12m'] ?? '', 'suffix' => '%', 'hint' => 'pressão macro e custo real'],
-    ['label' => 'SOFR', 'value' => $indicators['sofr'] ?? '', 'suffix' => '%', 'hint' => 'base offshore para 4131'],
+    ['label' => 'USD/BRL', 'value' => $indicators['usd_brl'] ?? '', 'suffix' => '', 'hint' => lang('Fx.ind_hint_usdbrl')],
+    ['label' => 'Spread comercial', 'value' => $indicators['commercial_spread'] ?? '', 'suffix' => '%', 'hint' => lang('Fx.ind_hint_spread')],
+    ['label' => 'SELIC', 'value' => $indicators['selic'] ?? '', 'suffix' => '%', 'hint' => lang('Fx.ind_hint_selic')],
+    ['label' => 'CDI', 'value' => $indicators['cdi'] ?? '', 'suffix' => '%', 'hint' => lang('Fx.ind_hint_cdi')],
+    ['label' => 'IPCA 12m', 'value' => $indicators['ipca_12m'] ?? '', 'suffix' => '%', 'hint' => lang('Fx.ind_hint_ipca')],
+    ['label' => 'SOFR', 'value' => $indicators['sofr'] ?? '', 'suffix' => '%', 'hint' => lang('Fx.ind_hint_sofr')],
 ];
 
 $toolCards = [
     'import' => [
         'mark' => 'IMP',
-        'eyebrow' => 'Importadores',
-        'title' => 'Pressão de custo na importação',
-        'description' => 'Compare o custo em BRL hoje com um cenário de estresse cambial e entenda se a margem comporta operar sem proteção.',
+        'eyebrow' => lang('Fx.tc_import_eyebrow'),
+        'title' => lang('Fx.tc_import_title'),
+        'description' => lang('Fx.tc_import_desc'),
         'bullets' => [
-            'Custo base em reais da fatura.',
-            'Impacto de um movimento adverso no câmbio.',
-            'Leitura sobre necessidade de hedge.',
+            lang('Fx.tc_import_b1'),
+            lang('Fx.tc_import_b2'),
+            lang('Fx.tc_import_b3'),
         ],
-        'button' => 'Simular importação',
+        'button' => lang('Fx.tc_import_btn'),
     ],
     'export' => [
         'mark' => 'EXP',
-        'eyebrow' => 'Exportadores',
-        'title' => 'Proteção de receita em BRL',
-        'description' => 'Projete o efeito de uma queda do câmbio na receita e avalie se faz sentido travar um piso antes da liquidação.',
+        'eyebrow' => lang('Fx.tc_export_eyebrow'),
+        'title' => lang('Fx.tc_export_title'),
+        'description' => lang('Fx.tc_export_desc'),
         'bullets' => [
-            'Receita líquida estimada em BRL.',
-            'Gap entre cenário protegido e cenário de queda.',
-            'Cobertura de custos ou caixa mínimo.',
+            lang('Fx.tc_export_b1'),
+            lang('Fx.tc_export_b2'),
+            lang('Fx.tc_export_b3'),
         ],
-        'button' => 'Simular exportação',
+        'button' => lang('Fx.tc_export_btn'),
     ],
     'hedge' => [
         'mark' => 'HDG',
-        'eyebrow' => 'Decisão de hedge',
-        'title' => 'Hedge x exposição aberta',
-        'description' => 'Meça o custo indicativo da proteção contra a perda potencial de operar aberto e compare com a margem disponível.',
+        'eyebrow' => lang('Fx.tc_hedge_eyebrow'),
+        'title' => lang('Fx.tc_hedge_title'),
+        'description' => lang('Fx.tc_hedge_desc'),
         'bullets' => [
-            'Break-even do hedge.',
-            'Perda potencial sem proteção.',
-            'Pressão sobre a margem da operação.',
+            lang('Fx.tc_hedge_b1'),
+            lang('Fx.tc_hedge_b2'),
+            lang('Fx.tc_hedge_b3'),
         ],
-        'button' => 'Diagnosticar hedge',
+        'button' => lang('Fx.tc_hedge_btn'),
     ],
     'funding4131' => [
         'mark' => '4131',
-        'eyebrow' => 'Funding internacional',
-        'title' => 'Viabilidade de uma operação 4131',
-        'description' => 'Compare custo local e offshore, hedge e fees para saber se vale aprofundar a estrutura com a mesa.',
+        'eyebrow' => lang('Fx.tc_funding_eyebrow'),
+        'title' => lang('Fx.tc_funding_title'),
+        'description' => lang('Fx.tc_funding_desc'),
         'bullets' => [
-            'Custo anual indicativo onshore x offshore.',
-            'Economia potencial em BRL no prazo da operação.',
-            'Filtro inicial para ticket, prazo e proteção.',
+            lang('Fx.tc_funding_b1'),
+            lang('Fx.tc_funding_b2'),
+            lang('Fx.tc_funding_b3'),
         ],
-        'button' => 'Avaliar 4131',
+        'button' => lang('Fx.tc_funding_btn'),
     ],
     'trade' => [
         'mark' => 'TF',
-        'eyebrow' => 'Trade finance',
-        'title' => 'Roteador de estruturas de trade finance',
-        'description' => 'Descubra se o caso pende mais para ACC, ACE, FINIMP, supplier credit ou carta de crédito antes da conversa com o time.',
+        'eyebrow' => lang('Fx.tc_trade_eyebrow'),
+        'title' => lang('Fx.tc_trade_title'),
+        'description' => lang('Fx.tc_trade_desc'),
         'bullets' => [
-            'Leitura por etapa do fluxo internacional.',
-            'Estruturas sugeridas conforme prazo e objetivo.',
-            'Prioridade para caixa, garantia ou alongamento.',
+            lang('Fx.tc_trade_b1'),
+            lang('Fx.tc_trade_b2'),
+            lang('Fx.tc_trade_b3'),
         ],
-        'button' => 'Mapear estrutura',
+        'button' => lang('Fx.tc_trade_btn'),
     ],
 ];
 
@@ -271,12 +271,13 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label"><?= esc($indicators['reference_label'] ?? 'Indicadores de referência'); ?></p>
-                    <h2 class="gx-section-title">Os cenários partem de uma base econômica acompanhada de forma recorrente.</h2>
+                    <p class="gx-label"><?= esc($indicators['reference_label'] ?? lang('Fx.ind_ref_label')); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Fx.ind_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    Competência atual: <strong><?= esc($indicators['reference_date'] ?? date('m/Y')); ?></strong>.
-                    SELIC, inflação, SOFR, spread e outras premissas servem como ponto de partida para a leitura inicial da operação.
+                    <?= lang('Fx.ind_desc_label'); ?> <strong><?= esc($indicators['reference_date'] ?? date('m/Y')); ?></strong>.
+                    <?= lang('Fx.ind_desc_2'); ?>
+
                 </p>
             </div>
 
@@ -302,12 +303,12 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label">Ferramentas de decisão</p>
-                    <h2 class="gx-section-title">Cinco frentes para entender preço, margem, proteção e funding antes do fechamento.</h2>
+                    <p class="gx-label"><?= lang('Fx.tools_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Fx.tools_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    As simulações ajudam a amadurecer a conversa com a mesa. A contratação final continua dependendo da leitura consultiva,
-                    da documentação e das condições efetivas de mercado.
+                    <?= lang('Fx.tools_desc'); ?>
+
                 </p>
             </div>
 
@@ -317,7 +318,7 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                     <article class="gx-simulator-card gx-fx-tool-card<?= $toolKey === 'import' ? ' is-active' : ''; ?>" data-gx-tool-card="<?= esc($toolKey); ?>">
                         <div class="gx-simulator-top">
                             <span class="gx-simulator-mark"><?= esc($tool['mark']); ?></span>
-                            <span class="gx-legacy-pill">Simulação orientada</span>
+                            <span class="gx-legacy-pill"><?= lang('Fx.tool_pill'); ?></span>
                         </div>
                         <p class="gx-card-kicker"><?= esc($tool['eyebrow']); ?></p>
                         <h3 class="gx-simulator-title"><?= esc($tool['title']); ?></h3>

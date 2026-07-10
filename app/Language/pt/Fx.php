@@ -58,4 +58,63 @@ return [
     'auth_card3_title' => 'ACC, FINIMP, 4131 e outras estruturas lidas no mesmo raciocínio.',
     'auth_card3_desc'  => 'A escolha entre financiar embarque, antecipar recebível, alongar caixa ou captar offshore depende da etapa do fluxo, da pressão de caixa e do custo real comparado. A mesa roteia para a melhor alternativa.',
     'boutique_note'    => '<strong>Modelo boutique:</strong> a {brand} não é banco e não tem produto próprio para distribuir. Isso permite recomendar a instituição e a estrutura mais aderente ao momento do cliente, sem conflito de interesse. Os simuladores abaixo são o primeiro passo para dimensionar a operação antes de levá-la à mesa.',
+
+    // ===================================================================
+    // 4c-2 — indicadores + seção de ferramentas + arrays (indicatorCards/toolCards)
+    // ===================================================================
+
+    // indicadores (tickers USD/BRL/SELIC... ficam literais)
+    'ind_ref_label'   => 'Indicadores de referência',
+    'ind_title'       => 'Os cenários partem de uma base econômica acompanhada de forma recorrente.',
+    'ind_desc_label'  => 'Competência atual:',
+    'ind_desc_2'      => 'SELIC, inflação, SOFR, spread e outras premissas servem como ponto de partida para a leitura inicial da operação.',
+    'ind_hint_usdbrl' => 'referência base para os cenários',
+    'ind_hint_spread' => 'default inicial da mesa',
+    'ind_hint_selic'  => 'piso local para custo de capital',
+    'ind_hint_cdi'    => 'benchmark onshore usado nos comparativos',
+    'ind_hint_ipca'   => 'pressão macro e custo real',
+    'ind_hint_sofr'   => 'base offshore para 4131',
+
+    // seção ferramentas
+    'tools_label' => 'Ferramentas de decisão',
+    'tools_title' => 'Cinco frentes para entender preço, margem, proteção e funding antes do fechamento.',
+    'tools_desc'  => "As simulações ajudam a amadurecer a conversa com a mesa. A contratação final continua dependendo da leitura consultiva,\n                    da documentação e das condições efetivas de mercado.",
+    'tool_pill'   => 'Simulação orientada',
+
+    // toolCards (marcas IMP/EXP/HDG/4131/TF ficam literais)
+    'tc_import_eyebrow' => 'Importadores',
+    'tc_import_title'   => 'Pressão de custo na importação',
+    'tc_import_desc'    => 'Compare o custo em BRL hoje com um cenário de estresse cambial e entenda se a margem comporta operar sem proteção.',
+    'tc_import_b1'      => 'Custo base em reais da fatura.',
+    'tc_import_b2'      => 'Impacto de um movimento adverso no câmbio.',
+    'tc_import_b3'      => 'Leitura sobre necessidade de hedge.',
+    'tc_import_btn'     => 'Simular importação',
+    'tc_export_eyebrow' => 'Exportadores',
+    'tc_export_title'   => 'Proteção de receita em BRL',
+    'tc_export_desc'    => 'Projete o efeito de uma queda do câmbio na receita e avalie se faz sentido travar um piso antes da liquidação.',
+    'tc_export_b1'      => 'Receita líquida estimada em BRL.',
+    'tc_export_b2'      => 'Gap entre cenário protegido e cenário de queda.',
+    'tc_export_b3'      => 'Cobertura de custos ou caixa mínimo.',
+    'tc_export_btn'     => 'Simular exportação',
+    'tc_hedge_eyebrow'  => 'Decisão de hedge',
+    'tc_hedge_title'    => 'Hedge x exposição aberta',
+    'tc_hedge_desc'     => 'Meça o custo indicativo da proteção contra a perda potencial de operar aberto e compare com a margem disponível.',
+    'tc_hedge_b1'       => 'Break-even do hedge.',
+    'tc_hedge_b2'       => 'Perda potencial sem proteção.',
+    'tc_hedge_b3'       => 'Pressão sobre a margem da operação.',
+    'tc_hedge_btn'      => 'Diagnosticar hedge',
+    'tc_funding_eyebrow' => 'Funding internacional',
+    'tc_funding_title'  => 'Viabilidade de uma operação 4131',
+    'tc_funding_desc'   => 'Compare custo local e offshore, hedge e fees para saber se vale aprofundar a estrutura com a mesa.',
+    'tc_funding_b1'     => 'Custo anual indicativo onshore x offshore.',
+    'tc_funding_b2'     => 'Economia potencial em BRL no prazo da operação.',
+    'tc_funding_b3'     => 'Filtro inicial para ticket, prazo e proteção.',
+    'tc_funding_btn'    => 'Avaliar 4131',
+    'tc_trade_eyebrow'  => 'Trade finance',
+    'tc_trade_title'    => 'Roteador de estruturas de trade finance',
+    'tc_trade_desc'     => 'Descubra se o caso pende mais para ACC, ACE, FINIMP, supplier credit ou carta de crédito antes da conversa com o time.',
+    'tc_trade_b1'       => 'Leitura por etapa do fluxo internacional.',
+    'tc_trade_b2'       => 'Estruturas sugeridas conforme prazo e objetivo.',
+    'tc_trade_b3'       => 'Prioridade para caixa, garantia ou alongamento.',
+    'tc_trade_btn'      => 'Mapear estrutura',
 ];
