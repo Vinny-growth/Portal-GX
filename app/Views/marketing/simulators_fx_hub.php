@@ -341,16 +341,17 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
         <div class="gx-wrap">
             <div class="gx-section-header is-split" data-gx-reveal>
                 <div>
-                    <p class="gx-label">Laboratório de cenário</p>
-                    <h2 class="gx-section-title">Modele a operação antes de pedir cotação ou estruturação.</h2>
+                    <p class="gx-label"><?= lang('Fx.lab_label'); ?></p>
+                    <h2 class="gx-section-title"><?= lang('Fx.lab_title'); ?></h2>
                 </div>
                 <p class="gx-section-desc">
-                    Cada resultado é indicativo. O fechamento final depende da leitura de documentação, fluxo, instituição, prazo, garantia e momento de mercado.
+                    <?= lang('Fx.lab_desc'); ?>
+
                 </p>
             </div>
 
             <div class="gx-fx-workbench" data-gx-reveal data-gx-delay="80">
-                <div class="gx-fx-tablist" role="tablist" aria-label="Escolha a ferramenta">
+                <div class="gx-fx-tablist" role="tablist" aria-label="<?= esc(lang('Fx.lab_tablist_aria')); ?>">
                     <?php foreach ($toolOrder as $toolKey): ?>
                         <?php $tool = $toolCards[$toolKey]; ?>
                         <button
@@ -370,36 +371,36 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                         <div class="gx-fx-panel-grid">
                             <form class="gx-fx-form" data-gx-tool-form="import">
                                 <div class="gx-fx-form-head">
-                                    <span class="gx-label">Importadores</span>
-                                    <h3>Quanto do seu custo em BRL fica exposto se o câmbio andar contra?</h3>
+                                    <span class="gx-label"><?= lang('Fx.tc_import_eyebrow'); ?></span>
+                                    <h3><?= lang('Fx.lab_import_q'); ?></h3>
                                 </div>
                                 <div class="gx-fx-form-grid">
                                     <div class="gx-form-field">
-                                        <label for="gx-import-amount">Valor da fatura (USD)</label>
+                                        <label for="gx-import-amount"><?= lang('Fx.lab_import_amount'); ?></label>
                                         <input id="gx-import-amount" type="number" min="0" step="0.01" name="invoice_amount" value="250000">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-import-spot">USD/BRL atual</label>
+                                        <label for="gx-import-spot"><?= lang('Fx.lab_usdbrl_atual'); ?></label>
                                         <input id="gx-import-spot" type="number" min="0" step="0.0001" name="spot_rate" value="<?= esc($numberValue($indicators['usd_brl'] ?? '5.20')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-import-stress">USD/BRL estressado</label>
+                                        <label for="gx-import-stress"><?= lang('Fx.lab_import_stress'); ?></label>
                                         <input id="gx-import-stress" type="number" min="0" step="0.0001" name="stress_rate" value="">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-import-spread">Spread comercial (%)</label>
+                                        <label for="gx-import-spread"><?= lang('Fx.lab_spread_pct'); ?></label>
                                         <input id="gx-import-spread" type="number" min="0" step="0.01" name="spread_pct" value="<?= esc($numberValue($indicators['commercial_spread'] ?? '1.10')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-import-iof">IOF (%)</label>
+                                        <label for="gx-import-iof"><?= lang('Fx.lab_iof'); ?></label>
                                         <input id="gx-import-iof" type="number" min="0" step="0.01" name="iof_pct" value="<?= esc($numberValue($indicators['iof'] ?? '0.38')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-import-days">Dias até fechamento</label>
+                                        <label for="gx-import-days"><?= lang('Fx.lab_import_days'); ?></label>
                                         <input id="gx-import-days" type="number" min="1" step="1" name="settlement_days" value="30">
                                     </div>
                                     <div class="gx-form-field gx-form-field-full">
-                                        <label for="gx-import-sale">Receita projetada em BRL (opcional)</label>
+                                        <label for="gx-import-sale"><?= lang('Fx.lab_import_sale'); ?></label>
                                         <input id="gx-import-sale" type="number" min="0" step="0.01" name="projected_sale_brl" value="">
                                     </div>
                                 </div>
@@ -412,36 +413,36 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                         <div class="gx-fx-panel-grid">
                             <form class="gx-fx-form" data-gx-tool-form="export">
                                 <div class="gx-fx-form-head">
-                                    <span class="gx-label">Exportadores</span>
-                                    <h3>Qual receita em BRL você perde se o câmbio cair antes da liquidação?</h3>
+                                    <span class="gx-label"><?= lang('Fx.tc_export_eyebrow'); ?></span>
+                                    <h3><?= lang('Fx.lab_export_q'); ?></h3>
                                 </div>
                                 <div class="gx-fx-form-grid">
                                     <div class="gx-form-field">
-                                        <label for="gx-export-amount">Recebível em moeda (USD)</label>
+                                        <label for="gx-export-amount"><?= lang('Fx.lab_export_amount'); ?></label>
                                         <input id="gx-export-amount" type="number" min="0" step="0.01" name="receivable_amount" value="200000">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-export-spot">USD/BRL atual</label>
+                                        <label for="gx-export-spot"><?= lang('Fx.lab_usdbrl_atual'); ?></label>
                                         <input id="gx-export-spot" type="number" min="0" step="0.0001" name="spot_rate" value="<?= esc($numberValue($indicators['usd_brl'] ?? '5.20')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-export-downside">USD/BRL em queda</label>
+                                        <label for="gx-export-downside"><?= lang('Fx.lab_export_downside'); ?></label>
                                         <input id="gx-export-downside" type="number" min="0" step="0.0001" name="downside_rate" value="">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-export-floor">Câmbio piso desejado</label>
+                                        <label for="gx-export-floor"><?= lang('Fx.lab_export_floor'); ?></label>
                                         <input id="gx-export-floor" type="number" min="0" step="0.0001" name="floor_rate" value="<?= esc($numberValue($indicators['exporter_floor_rate'] ?? '5.00')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-export-spread">Spread comercial (%)</label>
+                                        <label for="gx-export-spread"><?= lang('Fx.lab_spread_pct'); ?></label>
                                         <input id="gx-export-spread" type="number" min="0" step="0.01" name="spread_pct" value="<?= esc($numberValue($indicators['commercial_spread'] ?? '1.10')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-export-days">Dias até liquidação</label>
+                                        <label for="gx-export-days"><?= lang('Fx.lab_export_days'); ?></label>
                                         <input id="gx-export-days" type="number" min="1" step="1" name="settlement_days" value="45">
                                     </div>
                                     <div class="gx-form-field gx-form-field-full">
-                                        <label for="gx-export-cost">Custo ou caixa mínimo em BRL (opcional)</label>
+                                        <label for="gx-export-cost"><?= lang('Fx.lab_export_cost'); ?></label>
                                         <input id="gx-export-cost" type="number" min="0" step="0.01" name="minimum_brl_need" value="">
                                     </div>
                                 </div>
@@ -454,32 +455,32 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                         <div class="gx-fx-panel-grid">
                             <form class="gx-fx-form" data-gx-tool-form="hedge">
                                 <div class="gx-fx-form-head">
-                                    <span class="gx-label">Decisão de hedge</span>
-                                    <h3>Quanto custa proteger versus o tamanho da perda potencial operando aberto?</h3>
+                                    <span class="gx-label"><?= lang('Fx.tc_hedge_eyebrow'); ?></span>
+                                    <h3><?= lang('Fx.lab_hedge_q'); ?></h3>
                                 </div>
                                 <div class="gx-fx-form-grid">
                                     <div class="gx-form-field">
-                                        <label for="gx-hedge-exposure">Exposição em USD</label>
+                                        <label for="gx-hedge-exposure"><?= lang('Fx.lab_hedge_exposure'); ?></label>
                                         <input id="gx-hedge-exposure" type="number" min="0" step="0.01" name="exposure_amount" value="300000">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-hedge-spot">USD/BRL atual</label>
+                                        <label for="gx-hedge-spot"><?= lang('Fx.lab_usdbrl_atual'); ?></label>
                                         <input id="gx-hedge-spot" type="number" min="0" step="0.0001" name="spot_rate" value="<?= esc($numberValue($indicators['usd_brl'] ?? '5.20')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-hedge-move">Movimento adverso (%)</label>
+                                        <label for="gx-hedge-move"><?= lang('Fx.lab_hedge_move'); ?></label>
                                         <input id="gx-hedge-move" type="number" min="0" step="0.01" name="adverse_move_pct" value="<?= esc($numberValue($indicators['stress_scenario'] ?? '7.50')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-hedge-margin">Margem da operação (%)</label>
+                                        <label for="gx-hedge-margin"><?= lang('Fx.lab_hedge_margin'); ?></label>
                                         <input id="gx-hedge-margin" type="number" min="0" step="0.01" name="margin_pct" value="<?= esc($numberValue($indicators['importer_target_margin'] ?? '18.00')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-hedge-cost">Custo mensal do hedge (%)</label>
+                                        <label for="gx-hedge-cost"><?= lang('Fx.lab_hedge_cost'); ?></label>
                                         <input id="gx-hedge-cost" type="number" min="0" step="0.01" name="hedge_cost_monthly_pct" value="<?= esc($numberValue($indicators['hedge_cost_monthly'] ?? '0.65')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-hedge-months">Meses até liquidação</label>
+                                        <label for="gx-hedge-months"><?= lang('Fx.lab_hedge_months'); ?></label>
                                         <input id="gx-hedge-months" type="number" min="1" step="1" name="months_to_settlement" value="3">
                                     </div>
                                 </div>
@@ -492,44 +493,44 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                         <div class="gx-fx-panel-grid">
                             <form class="gx-fx-form" data-gx-tool-form="funding4131">
                                 <div class="gx-fx-form-head">
-                                    <span class="gx-label">Operação 4131</span>
-                                    <h3>Faz sentido aprofundar um funding offshore em vez de ficar 100% onshore?</h3>
+                                    <span class="gx-label"><?= lang('Fx.lab_4131_head'); ?></span>
+                                    <h3><?= lang('Fx.lab_4131_q'); ?></h3>
                                 </div>
                                 <div class="gx-fx-form-grid">
                                     <div class="gx-form-field">
-                                        <label for="gx-4131-principal">Principal em USD</label>
+                                        <label for="gx-4131-principal"><?= lang('Fx.lab_4131_principal'); ?></label>
                                         <input id="gx-4131-principal" type="number" min="0" step="0.01" name="principal_usd" value="1000000">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-4131-tenor">Prazo (meses)</label>
+                                        <label for="gx-4131-tenor"><?= lang('Fx.lab_4131_tenor'); ?></label>
                                         <input id="gx-4131-tenor" type="number" min="1" step="1" name="tenor_months" value="18">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-4131-sofr">SOFR base (%)</label>
+                                        <label for="gx-4131-sofr"><?= lang('Fx.lab_4131_sofr'); ?></label>
                                         <input id="gx-4131-sofr" type="number" min="0" step="0.01" name="offshore_base_rate" value="<?= esc($numberValue($indicators['sofr'] ?? '4.70')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-4131-offshore-spread">Spread offshore (%)</label>
+                                        <label for="gx-4131-offshore-spread"><?= lang('Fx.lab_4131_offspread'); ?></label>
                                         <input id="gx-4131-offshore-spread" type="number" min="0" step="0.01" name="offshore_spread_pct" value="<?= esc($numberValue($indicators['offshore_spread'] ?? '3.20')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-4131-local-rate">Base local CDI/SELIC (%)</label>
+                                        <label for="gx-4131-local-rate"><?= lang('Fx.lab_4131_local'); ?></label>
                                         <input id="gx-4131-local-rate" type="number" min="0" step="0.01" name="local_base_rate" value="<?= esc($numberValue($indicators['cdi'] ?? '14.15')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-4131-local-spread">Spread onshore (%)</label>
+                                        <label for="gx-4131-local-spread"><?= lang('Fx.lab_4131_onspread'); ?></label>
                                         <input id="gx-4131-local-spread" type="number" min="0" step="0.01" name="local_spread_pct" value="<?= esc($numberValue($indicators['onshore_spread'] ?? '4.50')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-4131-hedge">Hedge mensal (%)</label>
+                                        <label for="gx-4131-hedge"><?= lang('Fx.lab_4131_hedge'); ?></label>
                                         <input id="gx-4131-hedge" type="number" min="0" step="0.01" name="hedge_monthly_pct" value="<?= esc($numberValue($indicators['hedge_cost_monthly'] ?? '0.65')); ?>">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-4131-fee">Fees de estrutura (%)</label>
+                                        <label for="gx-4131-fee"><?= lang('Fx.lab_4131_fee'); ?></label>
                                         <input id="gx-4131-fee" type="number" min="0" step="0.01" name="fees_pct" value="<?= esc($numberValue($indicators['trade_finance_fee'] ?? '1.20')); ?>">
                                     </div>
                                     <div class="gx-form-field gx-form-field-full">
-                                        <label for="gx-4131-natural-hedge">Receita natural em moeda forte (%)</label>
+                                        <label for="gx-4131-natural-hedge"><?= lang('Fx.lab_4131_natural'); ?></label>
                                         <input id="gx-4131-natural-hedge" type="number" min="0" max="100" step="0.01" name="natural_hedge_pct" value="0">
                                     </div>
                                 </div>
@@ -542,48 +543,48 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                         <div class="gx-fx-panel-grid">
                             <form class="gx-fx-form" data-gx-tool-form="trade">
                                 <div class="gx-fx-form-head">
-                                    <span class="gx-label">Trade finance</span>
-                                    <h3>Qual estrutura faz mais sentido para o ponto do fluxo internacional em que sua empresa está?</h3>
+                                    <span class="gx-label"><?= lang('Fx.tc_trade_eyebrow'); ?></span>
+                                    <h3><?= lang('Fx.lab_trade_q'); ?></h3>
                                 </div>
                                 <div class="gx-fx-form-grid">
                                     <div class="gx-form-field">
-                                        <label for="gx-trade-profile">Perfil</label>
+                                        <label for="gx-trade-profile"><?= lang('Fx.lab_trade_profile'); ?></label>
                                         <select id="gx-trade-profile" name="profile">
-                                            <option value="importer">Importador</option>
-                                            <option value="exporter">Exportador</option>
-                                            <option value="both">Importador e exportador</option>
+                                            <option value="importer"><?= lang('Fx.lab_opt_importer'); ?></option>
+                                            <option value="exporter"><?= lang('Fx.lab_opt_exporter'); ?></option>
+                                            <option value="both"><?= lang('Fx.lab_opt_both'); ?></option>
                                         </select>
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-trade-stage">Objetivo principal</label>
+                                        <label for="gx-trade-stage"><?= lang('Fx.lab_trade_stage'); ?></label>
                                         <select id="gx-trade-stage" name="stage">
-                                            <option value="pre_shipment">Financiar antes do embarque</option>
-                                            <option value="post_shipment">Antecipar depois do embarque</option>
-                                            <option value="pay_supplier">Pagar fornecedor e alongar caixa</option>
-                                            <option value="guarantee">Dar mais segurança para a contraparte</option>
-                                            <option value="term_extension">Alongar prazo da operação</option>
+                                            <option value="pre_shipment"><?= lang('Fx.lab_opt_pre'); ?></option>
+                                            <option value="post_shipment"><?= lang('Fx.lab_opt_post'); ?></option>
+                                            <option value="pay_supplier"><?= lang('Fx.lab_opt_pay'); ?></option>
+                                            <option value="guarantee"><?= lang('Fx.lab_opt_guarantee'); ?></option>
+                                            <option value="term_extension"><?= lang('Fx.lab_opt_term'); ?></option>
                                         </select>
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-trade-ticket">Ticket em USD</label>
+                                        <label for="gx-trade-ticket"><?= lang('Fx.lab_trade_ticket'); ?></label>
                                         <input id="gx-trade-ticket" type="number" min="0" step="0.01" name="ticket_usd" value="350000">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-trade-tenor">Prazo (dias)</label>
+                                        <label for="gx-trade-tenor"><?= lang('Fx.lab_trade_tenor'); ?></label>
                                         <input id="gx-trade-tenor" type="number" min="1" step="1" name="tenor_days" value="180">
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-trade-collateral">Tem colateral/garantia?</label>
+                                        <label for="gx-trade-collateral"><?= lang('Fx.lab_trade_collateral'); ?></label>
                                         <select id="gx-trade-collateral" name="has_collateral">
-                                            <option value="yes">Sim</option>
-                                            <option value="no">Não</option>
+                                            <option value="yes"><?= lang('Fx.lab_sim'); ?></option>
+                                            <option value="no"><?= lang('Fx.lab_nao'); ?></option>
                                         </select>
                                     </div>
                                     <div class="gx-form-field">
-                                        <label for="gx-trade-natural">Tem hedge natural?</label>
+                                        <label for="gx-trade-natural"><?= lang('Fx.lab_trade_natural'); ?></label>
                                         <select id="gx-trade-natural" name="has_natural_hedge">
-                                            <option value="yes">Sim</option>
-                                            <option value="no">Não</option>
+                                            <option value="yes"><?= lang('Fx.lab_sim'); ?></option>
+                                            <option value="no"><?= lang('Fx.lab_nao'); ?></option>
                                         </select>
                                     </div>
                                 </div>

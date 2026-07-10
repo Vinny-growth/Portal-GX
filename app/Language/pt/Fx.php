@@ -117,4 +117,72 @@ return [
     'tc_trade_b2'       => 'Estruturas sugeridas conforme prazo e objetivo.',
     'tc_trade_b3'       => 'Prioridade para caixa, garantia ou alongamento.',
     'tc_trade_btn'      => 'Mapear estrutura',
+
+    // ===================================================================
+    // 4c-3 — laboratório de cenário (5 forms). Heads reusam tc_*_eyebrow.
+    // ===================================================================
+    'lab_label'        => 'Laboratório de cenário',
+    'lab_title'        => 'Modele a operação antes de pedir cotação ou estruturação.',
+    'lab_desc'         => 'Cada resultado é indicativo. O fechamento final depende da leitura de documentação, fluxo, instituição, prazo, garantia e momento de mercado.',
+    'lab_tablist_aria' => 'Escolha a ferramenta',
+
+    // labels compartilhadas
+    'lab_usdbrl_atual' => 'USD/BRL atual',
+    'lab_spread_pct'   => 'Spread comercial (%)',
+    'lab_sim'          => 'Sim',
+    'lab_nao'          => 'Não',
+
+    // form: importação
+    'lab_import_q'      => 'Quanto do seu custo em BRL fica exposto se o câmbio andar contra?',
+    'lab_import_amount' => 'Valor da fatura (USD)',
+    'lab_import_stress' => 'USD/BRL estressado',
+    'lab_iof'           => 'IOF (%)',
+    'lab_import_days'   => 'Dias até fechamento',
+    'lab_import_sale'   => 'Receita projetada em BRL (opcional)',
+
+    // form: exportação
+    'lab_export_q'        => 'Qual receita em BRL você perde se o câmbio cair antes da liquidação?',
+    'lab_export_amount'   => 'Recebível em moeda (USD)',
+    'lab_export_downside' => 'USD/BRL em queda',
+    'lab_export_floor'    => 'Câmbio piso desejado',
+    'lab_export_days'     => 'Dias até liquidação',
+    'lab_export_cost'     => 'Custo ou caixa mínimo em BRL (opcional)',
+
+    // form: hedge
+    'lab_hedge_q'        => 'Quanto custa proteger versus o tamanho da perda potencial operando aberto?',
+    'lab_hedge_exposure' => 'Exposição em USD',
+    'lab_hedge_move'     => 'Movimento adverso (%)',
+    'lab_hedge_margin'   => 'Margem da operação (%)',
+    'lab_hedge_cost'     => 'Custo mensal do hedge (%)',
+    'lab_hedge_months'   => 'Meses até liquidação',
+
+    // form: 4131
+    'lab_4131_head'      => 'Operação 4131',
+    'lab_4131_q'         => 'Faz sentido aprofundar um funding offshore em vez de ficar 100% onshore?',
+    'lab_4131_principal' => 'Principal em USD',
+    'lab_4131_tenor'     => 'Prazo (meses)',
+    'lab_4131_sofr'      => 'SOFR base (%)',
+    'lab_4131_offspread' => 'Spread offshore (%)',
+    'lab_4131_local'     => 'Base local CDI/SELIC (%)',
+    'lab_4131_onspread'  => 'Spread onshore (%)',
+    'lab_4131_hedge'     => 'Hedge mensal (%)',
+    'lab_4131_fee'       => 'Fees de estrutura (%)',
+    'lab_4131_natural'   => 'Receita natural em moeda forte (%)',
+
+    // form: trade finance
+    'lab_trade_q'          => 'Qual estrutura faz mais sentido para o ponto do fluxo internacional em que sua empresa está?',
+    'lab_trade_profile'    => 'Perfil',
+    'lab_trade_stage'      => 'Objetivo principal',
+    'lab_trade_ticket'     => 'Ticket em USD',
+    'lab_trade_tenor'      => 'Prazo (dias)',
+    'lab_trade_collateral' => 'Tem colateral/garantia?',
+    'lab_trade_natural'    => 'Tem hedge natural?',
+    'lab_opt_importer'  => 'Importador',
+    'lab_opt_exporter'  => 'Exportador',
+    'lab_opt_both'      => 'Importador e exportador',
+    'lab_opt_pre'       => 'Financiar antes do embarque',
+    'lab_opt_post'      => 'Antecipar depois do embarque',
+    'lab_opt_pay'       => 'Pagar fornecedor e alongar caixa',
+    'lab_opt_guarantee' => 'Dar mais segurança para a contraparte',
+    'lab_opt_term'      => 'Alongar prazo da operação',
 ];
