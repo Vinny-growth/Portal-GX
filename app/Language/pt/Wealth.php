@@ -130,4 +130,26 @@ return [
     'l_lead_desc'  => 'Informe o contexto principal. A equipe retorna com uma leitura inicial e possíveis próximos movimentos para organizar o patrimônio.',
     'l_lead_chip1' => 'Diagnóstico inicial rápido', 'l_lead_chip2' => 'Contato consultivo', 'l_lead_chip3' => 'Sem compromisso',
     'l_lead_area'  => 'Abrir área completa',
+
+    // ===================================================================
+    // wealth/_lead_form.php (partial). Chaves dos selects (option value) ficam
+    // literais (são valores enviados ao backend); só os labels vão p/ lang().
+    // ===================================================================
+    'lf_title'   => 'Receba um diagnóstico com um especialista',
+    'lf_desc'    => 'Preencha os dados principais. A equipe da {brand} retorna com uma leitura consultiva e próximos passos possíveis.',
+    'lf_submit'  => 'Quero meu diagnóstico',
+    'lf_success_title' => 'Diagnóstico recebido',
+    'lf_success_text'  => 'Seu contexto já entrou na fila consultiva. O retorno acontece com próximos passos objetivos, não com mensagem genérica.',
+    'lf_goal1' => 'Blindar patrimônio e liquidez', 'lf_goal2' => 'Gerar mais renda recorrente', 'lf_goal3' => 'Organizar crescimento e alocação', 'lf_goal4' => 'Planejar legado e sucessão',
+    'lf_patr1' => 'Até R$ 300 mil', 'lf_patr2' => 'De R$ 300 mil a R$ 1 milhão', 'lf_patr3' => 'De R$ 1 milhão a R$ 5 milhões', 'lf_patr4' => 'Acima de R$ 5 milhões',
+    'lf_slot1' => 'Manhã em dias úteis', 'lf_slot2' => 'Tarde em dias úteis', 'lf_slot3' => 'Noite', 'lf_slot4' => 'Prefiro retorno por WhatsApp ou e-mail primeiro',
+    'lf_field_nome'  => 'Nome', 'lf_field_email' => 'E-mail', 'lf_field_phone' => 'Telefone com DDD',
+    'lf_field_patr'  => 'Faixa patrimonial', 'lf_field_goal' => 'Objetivo principal',
+    'lf_field_slot'  => 'Melhor formato para o primeiro retorno', 'lf_field_msg' => 'Contexto adicional',
+    'lf_select' => 'Selecione', 'lf_opcional' => 'Opcional',
+    'lf_msg_ph' => 'Ex.: patrimônio hoje concentrado em caixa, necessidade de renda recorrente, liquidez para empresa ou reorganização de carteira.',
+    'lf_consent_pre'  => 'Autorizo contato consultivo da {brand} e concordo com os',
+    'lf_consent_link' => 'termos e condições',
+    'lf_note' => 'Leitura inicial rápida, com contexto patrimonial e próximos passos possíveis.',
+    'lf_success_cta' => 'Explorar conteúdos enquanto aguardamos',
 ];

@@ -3,28 +3,28 @@ $formId = $formId ?? 'gx-wealth-lead-form';
 $formAction = $formAction ?? base_url('wealth/agendar');
 $ajaxUrl = $ajaxUrl ?? base_url('wealth/lead');
 $sourcePage = $sourcePage ?? 'landing';
-$formTitle = $formTitle ?? 'Receba um diagnóstico com um especialista';
-$formDescription = $formDescription ?? 'Preencha os dados principais. A equipe da GX Capital retorna com uma leitura consultiva e próximos passos possíveis.';
-$submitLabel = $submitLabel ?? 'Quero meu diagnóstico';
-$successTitle = $successTitle ?? 'Diagnóstico recebido';
-$successText = $successText ?? 'Seu contexto já entrou na fila consultiva. O retorno acontece com próximos passos objetivos, não com mensagem genérica.';
+$formTitle = $formTitle ?? lang('Wealth.lf_title');
+$formDescription = $formDescription ?? brandLang('Wealth.lf_desc');
+$submitLabel = $submitLabel ?? lang('Wealth.lf_submit');
+$successTitle = $successTitle ?? lang('Wealth.lf_success_title');
+$successText = $successText ?? lang('Wealth.lf_success_text');
 $goalOptions = $goalOptions ?? [
-    'Blindar patrimônio e liquidez' => 'Blindar patrimônio e liquidez',
-    'Gerar mais renda recorrente' => 'Gerar mais renda recorrente',
-    'Organizar crescimento e alocação' => 'Organizar crescimento e alocação',
-    'Planejar legado e sucessão' => 'Planejar legado e sucessão',
+    'Blindar patrimônio e liquidez' => lang('Wealth.lf_goal1'),
+    'Gerar mais renda recorrente' => lang('Wealth.lf_goal2'),
+    'Organizar crescimento e alocação' => lang('Wealth.lf_goal3'),
+    'Planejar legado e sucessão' => lang('Wealth.lf_goal4'),
 ];
 $patrimonyOptions = $patrimonyOptions ?? [
-    'Até R$ 300 mil' => 'Até R$ 300 mil',
-    'De R$ 300 mil a R$ 1 milhão' => 'De R$ 300 mil a R$ 1 milhão',
-    'De R$ 1 milhão a R$ 5 milhões' => 'De R$ 1 milhão a R$ 5 milhões',
-    'Acima de R$ 5 milhões' => 'Acima de R$ 5 milhões',
+    'Até R$ 300 mil' => lang('Wealth.lf_patr1'),
+    'De R$ 300 mil a R$ 1 milhão' => lang('Wealth.lf_patr2'),
+    'De R$ 1 milhão a R$ 5 milhões' => lang('Wealth.lf_patr3'),
+    'Acima de R$ 5 milhões' => lang('Wealth.lf_patr4'),
 ];
 $preferredSlots = $preferredSlots ?? [
-    'Manhã em dias úteis' => 'Manhã em dias úteis',
-    'Tarde em dias úteis' => 'Tarde em dias úteis',
-    'Noite' => 'Noite',
-    'Prefiro retorno por WhatsApp ou e-mail primeiro' => 'Prefiro retorno por WhatsApp ou e-mail primeiro',
+    'Manhã em dias úteis' => lang('Wealth.lf_slot1'),
+    'Tarde em dias úteis' => lang('Wealth.lf_slot2'),
+    'Noite' => lang('Wealth.lf_slot3'),
+    'Prefiro retorno por WhatsApp ou e-mail primeiro' => lang('Wealth.lf_slot4'),
 ];
 $prefillName = old('name');
 if (empty($prefillName) && authCheck()) {
@@ -74,24 +74,24 @@ $termsUrl = getPageLinkByDefaultName('terms_conditions', $activeLang->id);
 
         <div class="gx-wealth-form-grid">
             <label class="gx-wealth-field">
-                <span>Nome</span>
+                <span><?= lang('Wealth.lf_field_nome'); ?></span>
                 <input type="text" name="name" value="<?= esc($prefillName); ?>" maxlength="199" required autocomplete="name">
             </label>
 
             <label class="gx-wealth-field">
-                <span>E-mail</span>
+                <span><?= lang('Wealth.lf_field_email'); ?></span>
                 <input type="email" name="email" value="<?= esc($prefillEmail); ?>" maxlength="199" required autocomplete="email" inputmode="email">
             </label>
 
             <label class="gx-wealth-field">
-                <span>Telefone com DDD</span>
+                <span><?= lang('Wealth.lf_field_phone'); ?></span>
                 <input type="tel" name="phone" value="<?= esc(old('phone')); ?>" placeholder="(11) 99999-9999" required autocomplete="tel">
             </label>
 
             <label class="gx-wealth-field">
-                <span>Faixa patrimonial</span>
+                <span><?= lang('Wealth.lf_field_patr'); ?></span>
                 <select name="patrimony_range" required>
-                    <option value="">Selecione</option>
+                    <option value=""><?= lang('Wealth.lf_select'); ?></option>
                     <?php foreach ($patrimonyOptions as $value => $label): ?>
                         <option value="<?= esc($value); ?>" <?= $selectedRange === $value ? 'selected' : ''; ?>><?= esc($label); ?></option>
                     <?php endforeach; ?>
@@ -99,9 +99,9 @@ $termsUrl = getPageLinkByDefaultName('terms_conditions', $activeLang->id);
             </label>
 
             <label class="gx-wealth-field gx-wealth-field-full">
-                <span>Objetivo principal</span>
+                <span><?= lang('Wealth.lf_field_goal'); ?></span>
                 <select name="goal" required>
-                    <option value="">Selecione</option>
+                    <option value=""><?= lang('Wealth.lf_select'); ?></option>
                     <?php foreach ($goalOptions as $value => $label): ?>
                         <option value="<?= esc($value); ?>" <?= $selectedGoal === $value ? 'selected' : ''; ?>><?= esc($label); ?></option>
                     <?php endforeach; ?>
@@ -109,9 +109,9 @@ $termsUrl = getPageLinkByDefaultName('terms_conditions', $activeLang->id);
             </label>
 
             <label class="gx-wealth-field gx-wealth-field-full">
-                <span>Melhor formato para o primeiro retorno</span>
+                <span><?= lang('Wealth.lf_field_slot'); ?></span>
                 <select name="preferred_slot">
-                    <option value="">Opcional</option>
+                    <option value=""><?= lang('Wealth.lf_opcional'); ?></option>
                     <?php foreach ($preferredSlots as $value => $label): ?>
                         <option value="<?= esc($value); ?>" <?= $selectedSlot === $value ? 'selected' : ''; ?>><?= esc($label); ?></option>
                     <?php endforeach; ?>
@@ -119,22 +119,23 @@ $termsUrl = getPageLinkByDefaultName('terms_conditions', $activeLang->id);
             </label>
 
             <label class="gx-wealth-field gx-wealth-field-full">
-                <span>Contexto adicional</span>
-                <textarea name="message" rows="4" placeholder="Ex.: patrimônio hoje concentrado em caixa, necessidade de renda recorrente, liquidez para empresa ou reorganização de carteira."><?= esc(old('message')); ?></textarea>
+                <span><?= lang('Wealth.lf_field_msg'); ?></span>
+                <textarea name="message" rows="4" placeholder="<?= esc(lang('Wealth.lf_msg_ph')); ?>"><?= esc(old('message')); ?></textarea>
             </label>
         </div>
 
         <label class="gx-check">
             <input type="checkbox" required>
             <span>
-                Autorizo contato consultivo da GX Capital e concordo com os
-                <a href="<?= esc($termsUrl); ?>" target="_blank" rel="noopener">termos e condições</a>.
+                <?= brandLang('Wealth.lf_consent_pre'); ?>
+
+                <a href="<?= esc($termsUrl); ?>" target="_blank" rel="noopener"><?= lang('Wealth.lf_consent_link'); ?></a>.
             </span>
         </label>
 
         <div class="gx-wealth-form-actions">
             <button type="submit" class="gx-btn gx-btn-primary gx-btn-lg" data-default-label="<?= esc($submitLabel); ?>"><?= esc($submitLabel); ?></button>
-            <p class="gx-wealth-form-note">Leitura inicial rápida, com contexto patrimonial e próximos passos possíveis.</p>
+            <p class="gx-wealth-form-note"><?= lang('Wealth.lf_note'); ?></p>
         </div>
 
         <p class="gx-wealth-form-feedback" aria-live="polite"></p>
@@ -143,6 +144,6 @@ $termsUrl = getPageLinkByDefaultName('terms_conditions', $activeLang->id);
     <div class="gx-wealth-form-success" hidden>
         <strong><?= esc($successTitle); ?></strong>
         <p><?= esc($successText); ?></p>
-        <a href="<?= esc($blogUrl ?? langBaseUrl('blog')); ?>" class="gx-btn gx-btn-secondary">Explorar conteúdos enquanto aguardamos</a>
+        <a href="<?= esc($blogUrl ?? langBaseUrl('blog')); ?>" class="gx-btn gx-btn-secondary"><?= lang('Wealth.lf_success_cta'); ?></a>
     </div>
 </div>
