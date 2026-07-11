@@ -1,23 +1,23 @@
 <?php
 ob_start();
 echo view('newsletter/_status_partial', [
-    'glyph'    => '[ 01 / 01 ] CONCLUÍDO',
-    'eyebrow'  => 'Inscrição confirmada',
-    'headline' => 'Bem-vindo à inteligência GX.',
-    'message'  => 'Sua primeira edição já está a caminho. Em até alguns minutos você receberá um email de boas-vindas com o material exclusivo da frente que você escolheu.',
-    'ctaText'  => 'Conhecer o Wealth Manager',
+    'glyph'    => lang('Newsletter.ty_glyph'),
+    'eyebrow'  => lang('Newsletter.ty_eyebrow'),
+    'headline' => lang('Newsletter.ty_headline'),
+    'message'  => lang('Newsletter.ty_message'),
+    'ctaText'  => lang('Newsletter.ty_cta'),
     'ctaUrl'   => '/wealth',
-    'secondaryCtaText' => 'Voltar ao início',
+    'secondaryCtaText' => lang('Newsletter.ty_cta2'),
     'secondaryCtaUrl'  => '/',
     'meta' => [
-        ['label' => 'Frequência', 'value' => '3× / dia'],
-        ['label' => 'Cancelar', 'value' => '1 clique'],
-        ['label' => 'Inbox típico', 'value' => '90s leitura'],
+        ['label' => lang('Newsletter.ty_meta1_l'), 'value' => lang('Newsletter.ty_meta1_v')],
+        ['label' => lang('Newsletter.ty_meta2_l'), 'value' => lang('Newsletter.ty_meta2_v')],
+        ['label' => lang('Newsletter.ty_meta3_l'), 'value' => lang('Newsletter.ty_meta3_v')],
     ],
 ]);
 $body = ob_get_clean();
 echo view('newsletter/_layout', [
-    'title' => 'Bem-vindo à GX Capital',
+    'title' => brandLang('Newsletter.ty_title'),
     'bodyContent' => $body,
 ]);
 ?>

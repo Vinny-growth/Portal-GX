@@ -87,7 +87,7 @@
         <?php if (!empty($glyph)): ?>
             <div class="status-glyph"><?= esc($glyph); ?></div>
         <?php endif; ?>
-        <div class="status-eyebrow gx-eyebrow-bar"><?= esc($eyebrow ?? 'Newsletter GX Capital'); ?></div>
+        <div class="status-eyebrow gx-eyebrow-bar"><?= esc($eyebrow ?? brandLang('Newsletter.nl_brand_title')); ?></div>
         <h1><?= esc($headline); ?></h1>
         <p><?= $message; // pode conter <strong> ?></p>
         <div>

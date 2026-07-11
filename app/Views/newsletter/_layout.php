@@ -1,6 +1,6 @@
 <?php
-$pageTitle = $title ?? 'Newsletter GX Capital';
-$pageDescription = $description ?? 'Briefings curtos e acionáveis sobre câmbio, crédito, economia e consórcio.';
+$pageTitle = $title ?? brandLang('Newsletter.nl_brand_title');
+$pageDescription = $description ?? lang('Newsletter.lay_desc');
 $canonical = $canonical ?? (function_exists('current_url') ? current_url() : '');
 $ogImage = $ogImage ?? null;
 $ogType = $ogType ?? 'website';
@@ -12,10 +12,10 @@ $robots = $robots ?? 'index, follow, max-image-preview:large, max-snippet:-1, ma
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= esc($pageTitle); ?> — GX Capital</title>
+    <title><?= esc($pageTitle); ?> — <?= esc(brand('display_name')); ?></title>
     <meta name="description" content="<?= esc($pageDescription); ?>">
     <meta name="robots" content="<?= esc($robots); ?>">
-    <meta name="author" content="GX Capital">
+    <meta name="author" content="<?= esc(brand('display_name')); ?>">
     <?php if (!empty($canonical)): ?>
     <link rel="canonical" href="<?= esc($canonical); ?>">
     <?php endif; ?>
@@ -23,7 +23,7 @@ $robots = $robots ?? 'index, follow, max-image-preview:large, max-snippet:-1, ma
     <!-- Open Graph -->
     <meta property="og:type" content="<?= esc($ogType); ?>">
     <meta property="og:locale" content="pt_BR">
-    <meta property="og:site_name" content="GX Capital">
+    <meta property="og:site_name" content="<?= esc(brand('display_name')); ?>">
     <meta property="og:title" content="<?= esc($pageTitle); ?>">
     <meta property="og:description" content="<?= esc($pageDescription); ?>">
     <?php if (!empty($canonical)): ?>
@@ -118,13 +118,13 @@ $robots = $robots ?? 'index, follow, max-image-preview:large, max-snippet:-1, ma
     <header class="nl-topbar">
         <div class="gx-container nl-topbar-inner">
             <a href="/" class="logo">
-                <img src="/assets/logo-app-blue.png" alt="GX Capital">
+                <img src="/assets/logo-app-blue.png" alt="<?= esc(brand('display_name')); ?>">
             </a>
             <nav class="nav-links">
-                <a href="/">Início</a>
-                <a href="/wealth">Wealth Manager</a>
-                <a href="/simuladores">Simuladores</a>
-                <a href="/newsletter">Newsletter</a>
+                <a href="/"><?= lang('Newsletter.lay_nav_inicio'); ?></a>
+                <a href="/wealth"><?= lang('Newsletter.lay_nav_wealth'); ?></a>
+                <a href="/simuladores"><?= lang('Newsletter.lay_nav_sim'); ?></a>
+                <a href="/newsletter"><?= lang('Newsletter.lay_nav_nl'); ?></a>
             </nav>
         </div>
     </header>
@@ -136,10 +136,11 @@ $robots = $robots ?? 'index, follow, max-image-preview:large, max-snippet:-1, ma
     <footer class="nl-footer">
         <div class="gx-container nl-footer-inner">
             <div class="footer-brand">
-                <img src="/assets/logo-white.png" alt="GX Capital">
+                <img src="/assets/logo-white.png" alt="<?= esc(brand('display_name')); ?>">
             </div>
             <div class="copyright">
-                &copy; <?= date('Y'); ?> GX Capital · Inteligência Financeira
+                &copy; <?= date('Y'); ?> <?= brandLang('Newsletter.lay_copyright'); ?>
+
             </div>
         </div>
     </footer>
