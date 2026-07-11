@@ -16,7 +16,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= esc($title ?? 'Resumo'); ?></title>
+    <title><?= esc($title ?? lang('Wealth.pdf_title')); ?></title>
     <style>
         /* Margens e fonte padrão (compatível com Dompdf) */
         @page { margin: 18mm 16mm; }
@@ -71,75 +71,75 @@
 <body>
     <div class="brand">
         <div class="brand-row">
-            <div class="brand-left"><div class="title">GX Capital · Resumo Financeiro</div></div>
+            <div class="brand-left"><div class="title"><?= brandLang('Wealth.pdf_brand_title'); ?></div></div>
             <div class="brand-right"><?php if (!empty($logo)): ?><img class="logo" src="<?= esc($logo); ?>" alt="Logo"><?php endif; ?></div>
         </div>
         <div class="brandbar"></div>
     </div>
-    <div class="meta">Gerado em <?= esc($generated_at ?? date('d/m/Y H:i')); ?></div>
+    <div class="meta"><?= lang('Wealth.pdf_gerado'); ?> <?= esc($generated_at ?? date('d/m/Y H:i')); ?></div>
 
     <div class="section">
-        <div class="h2">Visão Geral</div>
+        <div class="h2"><?= lang('Wealth.pdf_visao'); ?></div>
         <div class="kpis">
-            <div class="kpi"><div class="label">Patrimônio Líquido</div><div class="val">R$ <?= number_format($nw, 2, ',', '.'); ?></div></div>
-            <div class="kpi"><div class="label">Renda Mensal</div><div class="val">R$ <?= number_format($income, 2, ',', '.'); ?></div></div>
-            <div class="kpi"><div class="label">Despesas Mensais</div><div class="val">R$ <?= number_format($expense, 2, ',', '.'); ?></div></div>
-            <div class="kpi"><div class="label">Poupança Mensal</div><div class="val">R$ <?= number_format($savings, 2, ',', '.'); ?></div></div>
+            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_patr_liq'); ?></div><div class="val">R$ <?= number_format($nw, 2, ',', '.'); ?></div></div>
+            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_renda'); ?></div><div class="val">R$ <?= number_format($income, 2, ',', '.'); ?></div></div>
+            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_despesas'); ?></div><div class="val">R$ <?= number_format($expense, 2, ',', '.'); ?></div></div>
+            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_poupanca'); ?></div><div class="val">R$ <?= number_format($savings, 2, ',', '.'); ?></div></div>
         </div>
     </div>
 
     <div class="section grid2">
         <div class="card">
-            <div class="h2">Fluxo de Caixa</div>
+            <div class="h2"><?= lang('Wealth.pdf_cashflow'); ?></div>
             <table class="table">
-                <tr><th>Item</th><th>Valor</th></tr>
-                <tr><td>Renda mensal</td><td>R$ <?= number_format($income, 2, ',', '.'); ?></td></tr>
-                <tr><td>Despesas mensais</td><td>R$ <?= number_format($expense, 2, ',', '.'); ?></td></tr>
-                <tr><td class="strong">Poupança potencial</td><td class="strong">R$ <?= number_format($savings, 2, ',', '.'); ?></td></tr>
+                <tr><th><?= lang('Wealth.pdf_th_item'); ?></th><th><?= lang('Wealth.pdf_th_valor'); ?></th></tr>
+                <tr><td><?= lang('Wealth.pdf_renda2'); ?></td><td>R$ <?= number_format($income, 2, ',', '.'); ?></td></tr>
+                <tr><td><?= lang('Wealth.pdf_despesas2'); ?></td><td>R$ <?= number_format($expense, 2, ',', '.'); ?></td></tr>
+                <tr><td class="strong"><?= lang('Wealth.pdf_poupanca2'); ?></td><td class="strong">R$ <?= number_format($savings, 2, ',', '.'); ?></td></tr>
             </table>
         </div>
         <div class="card">
-            <div class="h2">Independência Financeira</div>
+            <div class="h2"><?= lang('Wealth.pdf_fi'); ?></div>
             <table class="table">
-                <tr><td>Retorno real estimado</td><td><?= number_format($expected*100, 2, ',', '.'); ?>% a.a.</td></tr>
-                <tr><td>Patrimônio necessário (estim.)</td><td>R$ <?= number_format($nwNeeded, 2, ',', '.'); ?></td></tr>
+                <tr><td><?= lang('Wealth.pdf_ret'); ?></td><td><?= number_format($expected*100, 2, ',', '.'); ?><?= lang('Wealth.pdf_aa'); ?></td></tr>
+                <tr><td><?= lang('Wealth.pdf_nw_needed'); ?></td><td>R$ <?= number_format($nwNeeded, 2, ',', '.'); ?></td></tr>
                 <tr>
-                    <td>Tempo estimado até FI</td>
+                    <td><?= lang('Wealth.pdf_tempo'); ?></td>
                     <td>
                         <?php if (is_null($months)): ?>
-                            <span class="pill">Indeterminado</span>
+                            <span class="pill"><?= lang('Wealth.pdf_indet'); ?></span>
                         <?php elseif ((int)$months === 0): ?>
-                            <span class="pill">Já atingido</span>
+                            <span class="pill"><?= lang('Wealth.pdf_atingido'); ?></span>
                         <?php else: ?>
-                            <?= (int)$yrs; ?> anos e <?= (int)$rem; ?> meses
+                            <?= (int)$yrs; ?> <?= lang('Wealth.pdf_anos_e'); ?> <?= (int)$rem; ?> <?= lang('Wealth.pdf_meses'); ?>
                         <?php endif; ?>
                     </td>
                 </tr>
             </table>
             <div class="callout" style="margin-top:8px;">
-                <strong>Nota:</strong> projeções em termos reais (descontada a inflação), considerando aportes constantes e retorno esperado.
+                <strong><?= lang('Wealth.pdf_nota'); ?></strong> <?= lang('Wealth.pdf_nota_text'); ?>
             </div>
         </div>
     </div>
 
     <div class="section">
-        <div class="h2">Patrimônio e Alocação</div>
+        <div class="h2"><?= lang('Wealth.pdf_patr_aloc'); ?></div>
         <table class="table">
-            <tr><th>Componente</th><th>Valor</th></tr>
-            <tr><td>Ativos financeiros</td><td>R$ <?= number_format((float)($agg['assets_financial'] ?? 0), 2, ',', '.'); ?></td></tr>
-            <tr><td>Imóveis</td><td>R$ <?= number_format((float)($agg['assets_realestate'] ?? 0), 2, ',', '.'); ?></td></tr>
-            <tr><td>Passivos</td><td>R$ <?= number_format((float)($agg['liabilities'] ?? 0), 2, ',', '.'); ?></td></tr>
-            <tr><td class="strong">Patrimônio líquido</td><td class="strong">R$ <?= number_format($nw, 2, ',', '.'); ?></td></tr>
+            <tr><th><?= lang('Wealth.pdf_th_comp'); ?></th><th><?= lang('Wealth.pdf_th_valor'); ?></th></tr>
+            <tr><td><?= lang('Wealth.pdf_ativos'); ?></td><td>R$ <?= number_format((float)($agg['assets_financial'] ?? 0), 2, ',', '.'); ?></td></tr>
+            <tr><td><?= lang('Wealth.pdf_imoveis'); ?></td><td>R$ <?= number_format((float)($agg['assets_realestate'] ?? 0), 2, ',', '.'); ?></td></tr>
+            <tr><td><?= lang('Wealth.pdf_passivos'); ?></td><td>R$ <?= number_format((float)($agg['liabilities'] ?? 0), 2, ',', '.'); ?></td></tr>
+            <tr><td class="strong"><?= lang('Wealth.pdf_patr_liq2'); ?></td><td class="strong">R$ <?= number_format($nw, 2, ',', '.'); ?></td></tr>
         </table>
         <?php $alloc = $agg['allocation'] ?? []; if (!empty($alloc) && is_array($alloc)): ?>
-            <div class="muted" style="margin-top:6px;">Alocação aproximada (por classe):
+            <div class="muted" style="margin-top:6px;"><?= lang('Wealth.pdf_aloc_aprox'); ?>
                 <?php $total = array_sum($alloc); $out = []; foreach ($alloc as $k=>$v){ $pct = $total>0 ? (100*$v/$total) : 0; $out[] = esc(ucfirst($k)).' '.number_format($pct,1,',','.').'%'; } echo implode(' • ', $out); ?>
             </div>
         <?php endif; ?>
     </div>
 
-    <div class="disclaimer">Este material tem caráter informativo e não constitui recomendação de investimento. Projeções são estimativas sujeitas a variações de mercado.</div>
-    <div class="foot">© GX Capital · Documento gerado automaticamente</div>
+    <div class="disclaimer"><?= lang('Wealth.pdf_disclaimer'); ?></div>
+    <div class="foot"><?= brandLang('Wealth.pdf_foot'); ?></div>
 
 </body>
 </html>
