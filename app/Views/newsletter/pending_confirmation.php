@@ -2,20 +2,20 @@
 $emailDisplay = $email ?? '';
 ob_start();
 echo view('newsletter/_status_partial', [
-    'glyph'    => '[ 01 / 02 ] AGUARDANDO CONFIRMAÇÃO',
-    'eyebrow'  => 'Falta um passo',
-    'headline' => 'Verifique seu email.',
-    'message'  => 'Enviamos um link de confirmação para <strong>' . esc($emailDisplay) . '</strong>. Clique no botão dentro do email para ativar sua inscrição e receber o material exclusivo. Não esqueça de checar a caixa de spam.',
-    'ctaText'  => 'Voltar ao início',
+    'glyph'    => lang('Newsletter.pc_glyph'),
+    'eyebrow'  => lang('Newsletter.pc_eyebrow'),
+    'headline' => lang('Newsletter.pc_headline'),
+    'message'  => strtr(lang('Newsletter.pc_message'), ['{email}' => '<strong>' . esc($emailDisplay) . '</strong>']),
+    'ctaText'  => lang('Newsletter.ty_cta2'),
     'ctaUrl'   => '/',
     'meta' => [
-        ['label' => 'Tempo médio', 'value' => '< 2 min'],
-        ['label' => 'Validade do link', 'value' => '24h'],
+        ['label' => lang('Newsletter.pc_meta1_l'), 'value' => lang('Newsletter.pc_meta1_v')],
+        ['label' => lang('Newsletter.pc_meta2_l'), 'value' => lang('Newsletter.pc_meta2_v')],
     ],
 ]);
 $body = ob_get_clean();
 echo view('newsletter/_layout', [
-    'title' => 'Confirme seu email — GX Capital',
+    'title' => brandLang('Newsletter.pc_title'),
     'bodyContent' => $body,
 ]);
 ?>

@@ -32,4 +32,27 @@ return [
     'ty_meta1_l'  => 'Frequência', 'ty_meta1_v' => '3× / dia',
     'ty_meta2_l'  => 'Cancelar', 'ty_meta2_v' => '1 clique',
     'ty_meta3_l'  => 'Inbox típico', 'ty_meta3_v' => '90s leitura',
+
+    // ===================================================================
+    // newsletter/confirmed.php ('Voltar ao início'=ty_cta2, 'Conhecer...'=ty_cta)
+    // ===================================================================
+    'cf_eyebrow_ativa' => 'Inscrição ativa',
+    'cf_ok_glyph'    => '[ 02 / 02 ] CONFIRMADO', 'cf_ok_headline' => 'Pronto. Seu material está chegando.',
+    'cf_ok_message'  => 'Sua inscrição foi confirmada com sucesso. Em alguns minutos você recebe o email de boas-vindas com o material exclusivo da frente que escolheu.',
+    'cf_already_glyph'   => '[ STATUS ] JÁ CONFIRMADO', 'cf_already_headline' => 'Você já está com a gente.',
+    'cf_already_message' => 'Sua inscrição já estava confirmada. Você continua recebendo a inteligência GX no inbox normalmente.',
+    'cf_err_glyph'   => '[ ERRO ] TOKEN INVÁLIDO', 'cf_err_eyebrow' => 'Não foi possível confirmar', 'cf_err_headline' => 'Link inválido ou expirado.',
+    'cf_err_message' => 'Este link não foi reconhecido. Pode ser que já tenha expirado ou tenha sido usado. Tente se inscrever novamente para receber um novo link.',
+    'cf_err_cta'     => 'Inscrever-me novamente',
+
+    // ===================================================================
+    // newsletter/pending_confirmation.php ('Voltar ao início'=ty_cta2)
+    // ===================================================================
+    'pc_glyph'    => '[ 01 / 02 ] AGUARDANDO CONFIRMAÇÃO',
+    'pc_eyebrow'  => 'Falta um passo',
+    'pc_headline' => 'Verifique seu email.',
+    'pc_message'  => 'Enviamos um link de confirmação para {email}. Clique no botão dentro do email para ativar sua inscrição e receber o material exclusivo. Não esqueça de checar a caixa de spam.',
+    'pc_meta1_l'  => 'Tempo médio', 'pc_meta1_v' => '< 2 min',
+    'pc_meta2_l'  => 'Validade do link', 'pc_meta2_v' => '24h',
+    'pc_title'    => 'Confirme seu email — {brand}',
 ];
