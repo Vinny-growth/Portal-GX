@@ -8,40 +8,40 @@ $categoryId = isset($post->category_id) ? (int) $post->category_id : 0;
 $lineConfig = [
     6 => [  // Cambio
         'slug' => 'cambio',
-        'eyebrow' => 'Inteligência cambial',
-        'headline' => 'Receba o radar do dólar todo dia.',
-        'subhead' => 'Briefings de 90 segundos sobre câmbio, hedge e movimentos do BCB — direto no seu inbox.',
-        'cta' => 'Inscrever na frente Câmbio',
+        'eyebrow' => lang('Newsletter.cta_cambio_eyebrow'),
+        'headline' => lang('Newsletter.cta_cambio_headline'),
+        'subhead' => lang('Newsletter.cta_cambio_subhead'),
+        'cta' => lang('Newsletter.cta_cambio_cta'),
     ],
     7 => [  // Radar Econômico
         'slug' => 'radar-economico',
-        'eyebrow' => 'Radar Econômico',
-        'headline' => 'O Focus decifrado antes do mercado abrir.',
-        'subhead' => 'Selic, IPCA, Copom e balança comercial — traduzidos para a planilha do seu CFO.',
-        'cta' => 'Inscrever no Radar Econômico',
+        'eyebrow' => lang('Newsletter.cta_radar_eyebrow'),
+        'headline' => lang('Newsletter.cta_radar_headline'),
+        'subhead' => lang('Newsletter.cta_radar_subhead'),
+        'cta' => lang('Newsletter.cta_radar_cta'),
     ],
     8 => [  // Crédito Empresarial
         'slug' => 'credito-empresarial',
-        'eyebrow' => 'Crédito empresarial',
-        'headline' => 'Pronampe, BNDES e debêntures sem ruído.',
-        'subhead' => 'Linhas de crédito empresarial explicadas com matemática e prazo — sem letra miúda.',
-        'cta' => 'Inscrever na frente Crédito',
+        'eyebrow' => lang('Newsletter.cta_credito_eyebrow'),
+        'headline' => lang('Newsletter.cta_credito_headline'),
+        'subhead' => lang('Newsletter.cta_credito_subhead'),
+        'cta' => lang('Newsletter.cta_credito_cta'),
     ],
     11 => [ // GX explica
         'slug' => 'gx-explica',
-        'eyebrow' => 'Inteligência GX',
-        'headline' => 'Quer mais conteúdo como este no seu inbox?',
-        'subhead' => 'Câmbio, crédito, economia e consórcio explicados em 90 segundos por edição.',
-        'cta' => 'Inscrever na newsletter',
+        'eyebrow' => lang('Newsletter.cta_gx_eyebrow'),
+        'headline' => lang('Newsletter.cta_gx_headline'),
+        'subhead' => lang('Newsletter.cta_gx_subhead'),
+        'cta' => lang('Newsletter.cta_gx_cta'),
     ],
 ];
 
 $default = [
     'slug' => '',
-    'eyebrow' => 'Newsletter GX Capital',
-    'headline' => 'Inteligência financeira que chega antes do mercado reagir.',
-    'subhead' => 'Briefings curtos sobre câmbio, crédito, economia e consórcio — 3 edições por dia, 90 segundos cada.',
-    'cta' => 'Conhecer a newsletter',
+    'eyebrow' => brandLang('Newsletter.nl_brand_title'),
+    'headline' => lang('Newsletter.cta_def_headline'),
+    'subhead' => lang('Newsletter.cta_def_subhead'),
+    'cta' => lang('Newsletter.cta_def_cta'),
 ];
 
 $cfg = $lineConfig[$categoryId] ?? $default;
@@ -99,12 +99,12 @@ $href = '/newsletter' . (!empty($cfg['slug']) ? '?linha=' . $cfg['slug'] : '');
         letter-spacing: 0.04em;
     }
 </style>
-<aside class="post-nl-cta" aria-label="Newsletter GX Capital">
+<aside class="post-nl-cta" aria-label="<?= esc(brandLang('Newsletter.nl_brand_title')); ?>">
     <p class="eyebrow"><?= esc($cfg['eyebrow']); ?></p>
     <h3><?= esc($cfg['headline']); ?></h3>
     <p><?= esc($cfg['subhead']); ?></p>
     <a href="<?= esc($href); ?>" class="btn-nl">
         <?= esc($cfg['cta']); ?> &rarr;
     </a>
-    <div class="small-print">Gratuita. Cancele com 1 clique. Sem spam.</div>
+    <div class="small-print"><?= lang('Newsletter.cta_smallprint'); ?></div>
 </aside>

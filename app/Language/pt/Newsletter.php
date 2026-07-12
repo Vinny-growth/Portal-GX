@@ -116,4 +116,29 @@ return [
 
     // JSON-LD
     'nll_ld_about' => 'Newsletter financeira {brand}',
+
+    // ===================================================================
+    // common/_newsletter_cta_inline.php (CTA inline nos posts; aria/default
+    // eyebrow reusam nl_brand_title). Categorias 6/7/8/11 = BR.
+    // ===================================================================
+    'cta_cambio_eyebrow'  => 'Inteligência cambial',
+    'cta_cambio_headline' => 'Receba o radar do dólar todo dia.',
+    'cta_cambio_subhead'  => 'Briefings de 90 segundos sobre câmbio, hedge e movimentos do BCB — direto no seu inbox.',
+    'cta_cambio_cta'      => 'Inscrever na frente Câmbio',
+    'cta_radar_eyebrow'   => 'Radar Econômico',
+    'cta_radar_headline'  => 'O Focus decifrado antes do mercado abrir.',
+    'cta_radar_subhead'   => 'Selic, IPCA, Copom e balança comercial — traduzidos para a planilha do seu CFO.',
+    'cta_radar_cta'       => 'Inscrever no Radar Econômico',
+    'cta_credito_eyebrow'  => 'Crédito empresarial',
+    'cta_credito_headline' => 'Pronampe, BNDES e debêntures sem ruído.',
+    'cta_credito_subhead'  => 'Linhas de crédito empresarial explicadas com matemática e prazo — sem letra miúda.',
+    'cta_credito_cta'      => 'Inscrever na frente Crédito',
+    'cta_gx_eyebrow'  => 'Inteligência GX',
+    'cta_gx_headline' => 'Quer mais conteúdo como este no seu inbox?',
+    'cta_gx_subhead'  => 'Câmbio, crédito, economia e consórcio explicados em 90 segundos por edição.',
+    'cta_gx_cta'      => 'Inscrever na newsletter',
+    'cta_def_headline' => 'Inteligência financeira que chega antes do mercado reagir.',
+    'cta_def_subhead'  => 'Briefings curtos sobre câmbio, crédito, economia e consórcio — 3 edições por dia, 90 segundos cada.',
+    'cta_def_cta'      => 'Conhecer a newsletter',
+    'cta_smallprint'   => 'Gratuita. Cancele com 1 clique. Sem spam.',
 ];
