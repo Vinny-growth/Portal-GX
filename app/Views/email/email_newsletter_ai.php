@@ -38,7 +38,7 @@
                                                 </p>
                                             <?php endif; ?>
                                             <a href="<?= esc($item['url']); ?>" style="display:inline-block;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#b08a3a;text-decoration:none;">
-                                                <?= esc($item['cta_label'] ?? 'Leia mais'); ?> &rarr;
+                                                <?= esc($item['cta_label'] ?? lang('Newsletter.em_ai_readmore')); ?> &rarr;
                                             </a>
                                         </td>
                                     </tr>

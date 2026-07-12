@@ -6,7 +6,8 @@
                     <tr>
                         <td>
                             <p style="font-size:11px;line-height:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#b08a3a;margin:0 0 10px;">
-                                GX Capital · Inteligência Financeira
+                                <?= brandLang('Newsletter.lay_copyright'); ?>
+
                             </p>
                             <h1 style="font-size: 26px;line-height: 32px;font-weight: 700;text-align: left;text-transform: none;margin: 0 0 14px;color:#0a1a3a;">
                                 <?= esc($subject); ?>
@@ -17,7 +18,8 @@
 
                             <?php if (!empty($magnets)): ?>
                                 <p style="font-size:11px;line-height:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#0a1a3a;margin:0 0 14px;">
-                                    Seu material exclusivo
+                                    <?= lang('Newsletter.em_welcome_material'); ?>
+
                                 </p>
                                 <?php foreach ($magnets as $m): ?>
                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width:100%;margin:0 0 20px;border:1px solid #ececec;">
@@ -48,12 +50,14 @@
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <p style="font-size:14px;line-height:22px;color:#555;margin:0 0 16px;">
-                                    A primeira edição da nossa newsletter chega em breve à sua caixa.
+                                    <?= lang('Newsletter.em_welcome_first'); ?>
+
                                 </p>
                             <?php endif; ?>
 
                             <p style="font-size:12px;line-height:18px;color:#999;margin:32px 0 0;border-top:1px solid #ececec;padding-top:16px;">
-                                Você está recebendo este email porque se inscreveu na newsletter da GX Capital.
+                                <?= brandLang('Newsletter.em_welcome_footer'); ?>
+
                             </p>
                         </td>
                     </tr>

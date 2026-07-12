@@ -21,11 +21,12 @@
                                 </tr>
                             </table>
                             <p style="font-size:12px;line-height:18px;color:#777;margin:24px 0 0;">
-                                Se o botão não funcionar, copie e cole este link no navegador:<br>
+                                <?= lang('Newsletter.em_confirm_fallback'); ?><br>
                                 <a href="<?= esc($confirmUrl); ?>" style="color:#b08a3a;word-break:break-all;"><?= esc($confirmUrl); ?></a>
                             </p>
                             <p style="font-size:12px;line-height:18px;color:#999;margin:18px 0 0;">
-                                Se você não solicitou esta inscrição, ignore este email — nenhuma ação adicional é necessária.
+                                <?= lang('Newsletter.em_confirm_ignore'); ?>
+
                             </p>
                         </td>
                     </tr>

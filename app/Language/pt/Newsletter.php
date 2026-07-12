@@ -141,4 +141,15 @@ return [
     'cta_def_subhead'  => 'Briefings curtos sobre câmbio, crédito, economia e consórcio — 3 edições por dia, 90 segundos cada.',
     'cta_def_cta'      => 'Conhecer a newsletter',
     'cta_smallprint'   => 'Gratuita. Cancele com 1 clique. Sem spam.',
+
+    // ===================================================================
+    // e-mails (email/email_newsletter_*). Conteúdo é variável (controller);
+    // aqui só as poucas strings fixas. brand line reusa lay_copyright.
+    // ===================================================================
+    'em_welcome_material' => 'Seu material exclusivo',
+    'em_welcome_first'    => 'A primeira edição da nossa newsletter chega em breve à sua caixa.',
+    'em_welcome_footer'   => 'Você está recebendo este email porque se inscreveu na newsletter da {brand}.',
+    'em_confirm_fallback' => 'Se o botão não funcionar, copie e cole este link no navegador:',
+    'em_confirm_ignore'   => 'Se você não solicitou esta inscrição, ignore este email — nenhuma ação adicional é necessária.',
+    'em_ai_readmore'      => 'Leia mais',
 ];
