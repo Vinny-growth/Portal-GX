@@ -55,4 +55,65 @@ return [
     'pc_meta1_l'  => 'Tempo médio', 'pc_meta1_v' => '< 2 min',
     'pc_meta2_l'  => 'Validade do link', 'pc_meta2_v' => '24h',
     'pc_title'    => 'Confirme seu email — {brand}',
+
+    // ===================================================================
+    // newsletter/landing.php ($settings->* são DB, ficam. GXC/GX/emails literais.)
+    // ===================================================================
+    'nll_hero_alt' => 'Inteligência financeira {brand}',
+    'nll_stat1_l' => 'Frequência', 'nll_stat1_s' => 'por dia',
+    'nll_stat2_l' => 'Tempo de leitura', 'nll_stat2_s' => 'por edição',
+    'nll_stat3_l' => 'Cancelar', 'nll_stat3_s' => 'clique',
+    'nll_form_eyebrow' => 'Comece agora',
+    'nll_form_title'   => 'Inscreva-se gratuitamente',
+    'nll_form_email'   => 'Email corporativo',
+    'nll_form_frentes' => 'Quais frentes você acompanha',
+    'nll_form_cta'     => 'Inscrever-me',
+    'nll_proof'        => ' executivos recebem a newsletter da {brand}',
+
+    'nll_val_eyebrow' => 'O que muda para você',
+    'nll_val_title'   => 'Decisão informada antes do mercado reagir.',
+    'nll_val1_t' => 'Câmbio em tempo real', 'nll_val1_x' => 'Movimentações de dólar e juros explicadas em 90 segundos — com a leitura GX por trás dos números.',
+    'nll_val2_t' => 'Crédito acionável', 'nll_val2_x' => 'Linhas Pronampe, ProCred 360, BNDES e debêntures — quando entrar, quanto pagar, como estruturar.',
+    'nll_val3_t' => 'Economia decifrada', 'nll_val3_x' => 'Boletim Focus, IPCA, decisões do Copom e contas externas — traduzidos para a planilha do seu CFO.',
+
+    'nll_mag_eyebrow' => 'Bônus de inscrição',
+    'nll_mag_title'   => 'Materiais exclusivos no seu inbox.',
+    'nll_mag_lead'    => 'Ao se inscrever em uma das frentes acima, você recebe o material correspondente direto no email — gratuito, sem follow-up agressivo.',
+
+    'nll_edit_eyebrow' => 'Como produzimos',
+    'nll_edit_title'   => 'Curadoria editorial assistida por IA.',
+    'nll_edit_p1' => "A newsletter da {brand} combina <strong>jornalismo financeiro tradicional</strong>\n                    com <strong>inteligência artificial proprietária</strong>. Toda edição passa por três\n                    filtros antes de chegar ao seu inbox — seleção temática, redação editorial e revisão humana.",
+    'nll_edit_p2' => "Cobrimos quatro frentes: <strong>câmbio</strong> (dólar, hedge, importação/exportação),\n                    <strong>crédito empresarial</strong> (Pronampe, ProCred 360, linhas BNDES, debêntures),\n                    <strong>economia brasileira</strong> (Selic, IPCA, Focus, balança comercial) e\n                    <strong>consórcio</strong> (matemática, comparação com financiamento, blindagem patrimonial).",
+    'nll_edit_p3' => "Nossa proposta é tirar a barreira entre o noticiário macro e a planilha do seu CFO:\n                    cada edição traz números do dia, contexto e — quando aplicável — uma ação prática\n                    que você pode levar para a reunião da semana.",
+    'nll_meth_eyebrow' => 'Metodologia em 4 etapas',
+    'nll_meth1_t' => 'Captura de sinais', 'nll_meth1_x' => 'Monitoramento de RSS, comunicados oficiais (BCB, IBGE, Fazenda, BNDES), Google Trends financeiros, e feed institucional dos principais agentes do mercado.',
+    'nll_meth2_t' => 'Filtro de relevância', 'nll_meth2_x' => 'Classificador treinado com a linha editorial da {brand} descarta ruído (especulação, clickbait, eventos sem impacto direto) e mantém só o que importa para tesouraria, crédito empresarial e câmbio.',
+    'nll_meth3_t' => 'Redação editorial', 'nll_meth3_x' => 'Cada edição é redigida por modelo de linguagem instruído com o tom GX (executivo, direto, factual) e auditado contra fonte primária — sem invenção de números nem extrapolação.',
+    'nll_meth4_t' => 'Revisão humana', 'nll_meth4_x' => 'Antes do disparo, um analista da GX valida números, contexto e tom. Erro de dado é vetor de credibilidade — preferimos atrasar uma edição a deixar passar.',
+
+    'nll_ed_eyebrow'   => 'Últimas edições publicadas',
+    'nll_ed_title'     => 'O que saiu da redação esta semana.',
+    'nll_ed_lead'      => 'Uma amostra real do que você recebe ao se inscrever — assuntos, gancho e tom editorial.',
+    'nll_ed_editorial' => 'Editorial',
+
+    'nll_faq_eyebrow' => 'Perguntas frequentes',
+    'nll_faq_title'   => 'Tudo que você precisa saber.',
+    'nll_faq1_q' => 'O que eu vou receber na newsletter {brand}?',
+    'nll_faq1_a' => 'Briefings curtos (90 segundos de leitura) sobre câmbio, crédito empresarial, economia brasileira e consórcio. Cada edição traz os destaques mais relevantes do dia para tesoureiros, CFOs e empresários que tomam decisões financeiras — selecionados por IA editorial e validados pelo nosso time.',
+    'nll_faq2_q' => 'Com que frequência os emails são enviados?',
+    'nll_faq2_a' => 'Até 3 envios por dia, distribuídos entre manhã, almoço e fim de tarde. Você escolhe quais frentes editoriais quer acompanhar (Câmbio, Crédito, Economia, Consórcio) e só recebe o conteúdo correspondente. Sem floods.',
+    'nll_faq3_q' => 'A inscrição é gratuita?',
+    'nll_faq3_a' => 'Sim, totalmente gratuita. Além disso, ao se inscrever em uma das frentes, você recebe um material exclusivo (PDF) com análises práticas — como guias de hedge cambial, comparativos de linhas de crédito BNDES/Pronampe, ou matemática completa de consórcio vs financiamento.',
+    'nll_faq4_q' => 'Como posso cancelar a inscrição?',
+    'nll_faq4_a' => 'Todo email da {brand} traz um link de cancelamento ao final. Um clique e você é removido imediatamente da lista — sem perguntas, sem retenção forçada, sem tentativas de "última chance".',
+    'nll_faq5_q' => 'Quem produz o conteúdo?',
+    'nll_faq5_a' => 'A curadoria é feita pelo time editorial da {brand}, com leitura crítica de profissionais de mercado em câmbio, crédito corporativo e investimentos. A redação de cada edição é assistida por IA proprietária treinada com a linha editorial da casa, sempre revisada antes do envio.',
+    'nll_faq6_q' => 'Vocês vão me enviar propaganda ou compartilhar meu email?',
+    'nll_faq6_a' => 'Não. Não vendemos, alugamos nem compartilhamos seu email com terceiros. Você recebe apenas conteúdo editorial e, ocasionalmente, comunicações sobre serviços diretamente relacionados — sempre com opção clara de opt-out.',
+
+    'nll_close_title' => 'Comece a receber a inteligência GX hoje.',
+    'nll_close_btn'   => 'Inscrever-me agora',
+
+    // JSON-LD
+    'nll_ld_about' => 'Newsletter financeira {brand}',
 ];
