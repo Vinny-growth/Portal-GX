@@ -113,4 +113,28 @@ return [
     'cfg_lead_msg_ph'       => 'Ex.: preciso revisar hedge cambial, custo de capital, recebíveis, consórcio, seguros ou carteira de investimentos.',
     'cfg_lead_sim_chip'     => 'Ver simuladores',
     'cfg_lead_blog_chip'    => 'Explorar blog',
+
+    // ===================================================================
+    // 5c-2 — getBusinessVerticals (cards de vertical). accent/URLs literais.
+    // ===================================================================
+    'vert_c1_title'  => 'Crédito Estruturado',
+    'vert_c1_eyebrow' => 'Funding e capital de giro',
+    'vert_c1_desc'   => 'Estruture capital, alongue prazos e compare linhas com mais clareza antes de negociar.',
+    'vert_c1_link'   => 'Ver frente de crédito',
+    'vert_c2_title'  => 'Câmbio e Trade Finance',
+    'vert_c2_eyebrow' => 'Proteção cambial e execução',
+    'vert_c2_desc'   => 'Combine hedge, fluxo internacional e leitura de exposição cambial em uma única frente.',
+    'vert_c2_link'   => 'Explorar câmbio',
+    'vert_c3_title'  => 'Consórcios Estruturados',
+    'vert_c3_eyebrow' => 'Planejamento e alavancagem',
+    'vert_c3_desc'   => 'Avalie fluxo de pagamento, contemplação e custo total antes de escolher a estrutura ideal.',
+    'vert_c3_link'   => 'Abrir simulador',
+    'vert_c4_title'  => 'Seguros',
+    'vert_c4_eyebrow' => 'Proteção patrimonial e operacional',
+    'vert_c4_desc'   => 'Desenhe coberturas aderentes ao risco real da empresa e traga a conversa para a mesa financeira.',
+    'vert_c4_link'   => 'Falar com especialista',
+    'vert_c5_title'  => 'Consultoria de Investimentos',
+    'vert_c5_eyebrow' => 'Patrimônio, liquidez e estratégia',
+    'vert_c5_desc'   => 'Conecte tesouraria, objetivos patrimoniais e alocação com uma leitura mais executável do patrimônio.',
+    'vert_c5_link'   => 'Conhecer wealth',
 ];
