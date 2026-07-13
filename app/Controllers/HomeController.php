@@ -1089,8 +1089,8 @@ class HomeController extends BaseController
     public function simuladorSeguroResgatavel()
     {
         $canonicalUrl = langBaseUrl('simulador-seguro-resgatavel');
-        $title = 'Simulador de Seguro de Vida Resgatável';
-        $description = 'Simule um seguro de vida resgatável (Whole Life) quitado em 10 anos, com correção anual e formação de reserva. Veja o ponto de break-even em que a reserva ultrapassa o que você pagou.';
+        $title = lang('Simuladores.srs_meta_title');
+        $description = lang('Simuladores.srs_meta_description');
 
         // SEO/GEO: imagem social dedicada (1200x630) + schema de ferramenta, trilha e FAQ.
         $ogImage = base_url('uploads/marketing/srs_og.jpg');
@@ -1112,9 +1112,9 @@ class HomeController extends BaseController
             ],
             jsonldSoftwareApplication($canonicalUrl, $title, $description, ['image' => $ogImage]),
             jsonldBreadcrumb([
-                ['name' => 'Início', 'url' => base_url()],
-                ['name' => 'Simuladores', 'url' => langBaseUrl('simuladores')],
-                ['name' => 'Seguro de Vida Resgatável'],
+                ['name' => lang('Simuladores.srs_breadcrumb_home'), 'url' => base_url()],
+                ['name' => lang('Simuladores.srs_breadcrumb_simuladores'), 'url' => langBaseUrl('simuladores')],
+                ['name' => lang('Simuladores.srs_breadcrumb_current')],
             ]),
             jsonldFaqPage($faqItems, $canonicalUrl . '#faq'),
         ]);

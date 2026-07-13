@@ -18,6 +18,13 @@ return [
     // Seguro de Vida Resgatável — simulators/seguro_resgatavel.php
     // ===================================================================
 
+    // meta + breadcrumb do schema (HomeController::simuladorSeguroResgatavel)
+    'srs_meta_title'             => 'Simulador de Seguro de Vida Resgatável',
+    'srs_meta_description'       => 'Simule um seguro de vida resgatável (Whole Life) quitado em 10 anos, com correção anual e formação de reserva. Veja o ponto de break-even em que a reserva ultrapassa o que você pagou.',
+    'srs_breadcrumb_home'        => 'Início',
+    'srs_breadcrumb_simuladores' => 'Simuladores',
+    'srs_breadcrumb_current'     => 'Seguro de Vida Resgatável',
+
     // topbar
     'srs_back' => 'Todos os simuladores',
 
