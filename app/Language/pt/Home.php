@@ -54,6 +54,18 @@ return [
         ['q' => 'O que a {brand} faz de diferente no consórcio?', 'a' => 'A {brand} é uma boutique financeira independente — não é administradora e não tem cota própria para vender. Isso permite recomendar o grupo, a administradora e a estratégia de lance mais eficiente para cada perfil, sem viés comercial. O simulador com IA filtra mais de 20 administradoras e gera um plano de contemplação personalizado que é validado por especialista antes da decisão.'],
     ],
 
+    // Schema JSON-LD dos simuladores servidos pelo CMS (HomeController::buildSimulatorPageSchema).
+    // Chaves de slug são identificadores (literais no controller); só a descrição é traduzida.
+    'sim_page_name_fallback'            => 'Simulador {brand}',
+    'sim_page_breadcrumb_home'          => 'Início',
+    'sim_page_breadcrumb_simuladores'   => 'Simuladores',
+    'sim_page_fallback_descriptions' => [
+        'aurum-simulador-de-custo-de-capital' => 'Simulador de custo de capital (WACC) para empresas avaliarem o custo médio ponderado de suas fontes de financiamento.',
+        'simulador-mercado-de-capitais'       => 'Simulador de operações de mercado de capitais para estruturação de dívida e captação empresarial.',
+        'simulador-de-custo-de-antecipacao'   => 'Simulador do custo de antecipação de recebíveis: estima deságio, taxa e custo efetivo da operação.',
+        'linhas-credito-bndes'                => 'Simulador de linhas de crédito BNDES para empresas compararem condições e enquadramento.',
+    ],
+
     // Simulador de seguro de vida resgatável
     'seguro_wa'             => 'Olá! Fiz a simulação do Seguro de Vida Resgatável na {brand} e quero estruturar meu plano.',
 

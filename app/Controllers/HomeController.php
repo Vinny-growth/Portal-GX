@@ -809,12 +809,7 @@ class HomeController extends BaseController
     private function buildSimulatorPageSchema($page, array $faqItems = []): array
     {
         $slug = (string) ($page->slug ?? '');
-        $fallbackDescriptions = [
-            'aurum-simulador-de-custo-de-capital' => 'Simulador de custo de capital (WACC) para empresas avaliarem o custo médio ponderado de suas fontes de financiamento.',
-            'simulador-mercado-de-capitais'       => 'Simulador de operações de mercado de capitais para estruturação de dívida e captação empresarial.',
-            'simulador-de-custo-de-antecipacao'   => 'Simulador do custo de antecipação de recebíveis: estima deságio, taxa e custo efetivo da operação.',
-            'linhas-credito-bndes'                => 'Simulador de linhas de crédito BNDES para empresas compararem condições e enquadramento.',
-        ];
+        $fallbackDescriptions = lang('Home.sim_page_fallback_descriptions');
         if (!isset($fallbackDescriptions[$slug])) {
             return [];
         }
@@ -822,7 +817,7 @@ class HomeController extends BaseController
         helper('jsonld');
 
         $url  = langBaseUrl($slug);
-        $name = trim((string) ($page->title ?? '')) ?: 'Simulador GX Capital';
+        $name = trim((string) ($page->title ?? '')) ?: brandLang('Home.sim_page_name_fallback');
 
         $description = trim(strip_tags((string) ($page->description ?? '')));
         if ($description !== '') {
@@ -834,8 +829,8 @@ class HomeController extends BaseController
         $nodes = [
             jsonldSoftwareApplication($url, $name, $description),
             jsonldBreadcrumb([
-                ['name' => 'Início', 'url' => langBaseUrl()],
-                ['name' => 'Simuladores', 'url' => langBaseUrl('simuladores')],
+                ['name' => lang('Home.sim_page_breadcrumb_home'), 'url' => langBaseUrl()],
+                ['name' => lang('Home.sim_page_breadcrumb_simuladores'), 'url' => langBaseUrl('simuladores')],
                 ['name' => $name, 'url' => $url],
             ]),
         ];
