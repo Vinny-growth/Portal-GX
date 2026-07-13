@@ -171,4 +171,24 @@ return [
     'sim_vida_title'   => 'Simulador de Seguro de Vida Resgatável',
     'sim_vida_desc'    => 'Veja a projeção de um seguro de vida resgatável quitado em 10 anos: o ponto em que a reserva acumulada ultrapassa tudo que você pagou.',
     'sim_vida_cta'     => 'Projetar reserva',
+
+    // ===================================================================
+    // 5c-4 — getSimulatorTopics (frentes do hub /simuladores). label (FX/CONS/CAP)
+    // e path/url (âncoras) ficam literais no library.
+    // ===================================================================
+    'topic_fx_badge'   => 'Frente dedicada',
+    'topic_fx_eyebrow' => 'Câmbio e trade finance',
+    'topic_fx_title'   => 'Hub de simuladores de câmbio',
+    'topic_fx_desc'    => 'Reúne estudos para importação, exportação, hedge, trade finance e 4131 em uma jornada única de decisão.',
+    'topic_fx_cta'     => 'Explorar câmbio',
+    'topic_cons_badge'   => 'Página dedicada',
+    'topic_cons_eyebrow' => 'Consórcio estruturado',
+    'topic_cons_title'   => 'Frente de consórcio estratégico',
+    'topic_cons_desc'    => 'Acesse a jornada dedicada de consórcio para comparar contemplação, fluxo e diferença frente ao financiamento.',
+    'topic_cons_cta'     => 'Abrir consórcio',
+    'topic_cap_badge'   => 'Catálogo aberto',
+    'topic_cap_eyebrow' => 'Crédito, mercado e recebíveis',
+    'topic_cap_title'   => 'Ferramentas de funding e capital',
+    'topic_cap_desc'    => 'Explore ferramentas de custo de capital, mercado de capitais e antecipação para amadurecer a conversa financeira.',
+    'topic_cap_cta'     => 'Ver catálogo',
 ];
