@@ -48,7 +48,7 @@ class HomeController extends BaseController
         $socialImage = $this->resolveHomeSocialImage($homeConfig, $latestPosts);
 
         $data = [
-            'title' => 'Câmbio estruturado, crédito e consultoria para empresas',
+            'title' => lang('Home.home_meta_title'),
             'description' => $homeDescription,
             'keywords' => $this->settings->keywords,
             'bodyClass' => 'gx-marketing-home',
@@ -62,9 +62,9 @@ class HomeController extends BaseController
             'wealthUrl' => base_url('wealth'),
             'quickLinks' => $visibleQuickLinks,
             'heroStats' => [
-                ['value' => count($simulators), 'label' => $heroStatLabels['simulators'] ?? 'simuladores disponíveis'],
-                ['value' => count($visibleBusinessVerticals), 'label' => $heroStatLabels['verticals'] ?? 'frentes de atuação'],
-                ['value' => count($latestPosts), 'label' => $heroStatLabels['insights'] ?? 'análises recentes'],
+                ['value' => count($simulators), 'label' => $heroStatLabels['simulators'] ?? lang('Home.home_stat_simulators')],
+                ['value' => count($visibleBusinessVerticals), 'label' => $heroStatLabels['verticals'] ?? lang('Home.home_stat_verticals')],
+                ['value' => count($latestPosts), 'label' => $heroStatLabels['insights'] ?? lang('Home.home_stat_insights')],
             ],
             'businessVerticals' => $visibleBusinessVerticals,
             'simulators' => $simulators,
@@ -633,7 +633,7 @@ class HomeController extends BaseController
             return characterLimiter($description, 160, '');
         }
 
-        return 'GX Capital oferece soluções em câmbio estruturado, crédito, proteção patrimonial, seguros, wealth e consultoria estratégica para empresas e famílias.';
+        return brandLang('Home.home_description_fallback');
     }
 
     private function resolveHomeSocialImage(array $homeConfig, array $latestPosts)
@@ -720,13 +720,7 @@ class HomeController extends BaseController
         }
 
         // FAQPage schema — perguntas frequentes sobre câmbio e serviços
-        $homeFaqItems = [
-            ['q' => 'O que é câmbio estruturado?', 'a' => 'Câmbio estruturado é uma operação financeira que combina contratos de câmbio com instrumentos de proteção (hedge), permitindo que empresas importadoras e exportadoras travem taxas, reduzam exposição cambial e planejem fluxo de caixa com previsibilidade. A GX Capital estrutura essas operações sob medida para cada perfil de empresa.'],
-            ['q' => 'Como funciona hedge cambial?', 'a' => 'Hedge cambial é uma estratégia de proteção contra variações na taxa de câmbio. Funciona por meio de contratos a termo (NDF), opções de câmbio ou swaps que permitem fixar uma taxa futura. Empresas que importam ou exportam usam hedge para eliminar o risco de oscilação do dólar sobre suas margens operacionais.'],
-            ['q' => 'Quais serviços a GX Capital oferece para empresas?', 'a' => 'A GX Capital oferece câmbio estruturado, hedge cambial, trade finance, crédito corporativo, operações 4131 (funding internacional), consultoria em mercado de capitais e wealth advisory para patrimônio de famílias e empresários.'],
-            ['q' => 'O que é uma operação 4131?', 'a' => 'A operação 4131 é um empréstimo internacional regulado pela Resolução 4131 do Banco Central, que permite a captação de recursos no exterior com taxas potencialmente mais competitivas. É indicada para empresas com exposição em moeda estrangeira ou que buscam diversificação de fontes de financiamento.'],
-            ['q' => 'Como funciona a consultoria de wealth advisory da GX Capital?', 'a' => 'O wealth advisory da GX Capital oferece diagnóstico patrimonial, leitura de liquidez, tese de alocação e plano executivo de próximos passos para famílias, executivos e empresários. O processo começa com um mapeamento do patrimônio e fluxo de caixa, seguido de recomendações consultivas integradas.'],
-        ];
+        $homeFaqItems = $this->brandInterp(lang('Home.home_faq'));
 
         $faqEntities = [];
         foreach ($homeFaqItems as $i => $faq) {

@@ -18,6 +18,20 @@ return [
     'sim_hub_stat_fronts'  => 'frentes organizadas',
     'sim_hub_stat_studies' => 'estudos cambiais em destaque',
 
+    // Home institucional (HomeController::index + buildHomeDescription + buildHomeMarketingSchema)
+    'home_meta_title'           => 'Câmbio estruturado, crédito e consultoria para empresas',
+    'home_stat_simulators'      => 'simuladores disponíveis',
+    'home_stat_verticals'       => 'frentes de atuação',
+    'home_stat_insights'        => 'análises recentes',
+    'home_description_fallback' => '{brand} oferece soluções em câmbio estruturado, crédito, proteção patrimonial, seguros, wealth e consultoria estratégica para empresas e famílias.',
+    'home_faq' => [
+        ['q' => 'O que é câmbio estruturado?', 'a' => 'Câmbio estruturado é uma operação financeira que combina contratos de câmbio com instrumentos de proteção (hedge), permitindo que empresas importadoras e exportadoras travem taxas, reduzam exposição cambial e planejem fluxo de caixa com previsibilidade. A {brand} estrutura essas operações sob medida para cada perfil de empresa.'],
+        ['q' => 'Como funciona hedge cambial?', 'a' => 'Hedge cambial é uma estratégia de proteção contra variações na taxa de câmbio. Funciona por meio de contratos a termo (NDF), opções de câmbio ou swaps que permitem fixar uma taxa futura. Empresas que importam ou exportam usam hedge para eliminar o risco de oscilação do dólar sobre suas margens operacionais.'],
+        ['q' => 'Quais serviços a {brand} oferece para empresas?', 'a' => 'A {brand} oferece câmbio estruturado, hedge cambial, trade finance, crédito corporativo, operações 4131 (funding internacional), consultoria em mercado de capitais e wealth advisory para patrimônio de famílias e empresários.'],
+        ['q' => 'O que é uma operação 4131?', 'a' => 'A operação 4131 é um empréstimo internacional regulado pela Resolução 4131 do Banco Central, que permite a captação de recursos no exterior com taxas potencialmente mais competitivas. É indicada para empresas com exposição em moeda estrangeira ou que buscam diversificação de fontes de financiamento.'],
+        ['q' => 'Como funciona a consultoria de wealth advisory da {brand}?', 'a' => 'O wealth advisory da {brand} oferece diagnóstico patrimonial, leitura de liquidez, tese de alocação e plano executivo de próximos passos para famílias, executivos e empresários. O processo começa com um mapeamento do patrimônio e fluxo de caixa, seguido de recomendações consultivas integradas.'],
+    ],
+
     // Blog institucional (HomeController::blog + buildEditorialHomeData default)
     'blog_title'            => 'Blog {brand}',
     'blog_description'      => 'Conteúdo técnico sobre câmbio, crédito estruturado, mercado de capitais, consórcios e investimentos.',
