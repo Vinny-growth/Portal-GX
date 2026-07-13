@@ -88,6 +88,17 @@ return [
     'testi_label' => 'Quem já simulou',
     'testi_title' => 'Quem já simulou, aprovou',
     'testi_stars' => '5 estrelas',
+    // itens default (MarketingConsorcioDefaults::getPageConfigDefaults). Nomes/cidades
+    // são conteúdo locale-específico; texto com marca via {brand} (brandLang).
+    'testi_i1_name' => 'Maria S.',
+    'testi_i1_city' => 'São Paulo',
+    'testi_i1_text' => 'Com a simulação da {brand}, descobri que economizaria mais de R$ 40 mil comparado ao financiamento. Fechei meu consórcio com confiança.',
+    'testi_i2_name' => 'Carlos R.',
+    'testi_i2_city' => 'Porto Alegre',
+    'testi_i2_text' => 'O simulador mostrou exatamente o lance que eu precisava dar para ser contemplado em 8 meses. Estratégia certeira.',
+    'testi_i3_name' => 'Ana L.',
+    'testi_i3_city' => 'Belo Horizonte',
+    'testi_i3_text' => 'Achava que financiamento era minha única opção. A {brand} me mostrou um caminho que cabe no meu bolso.',
 
     // seção estratégias
     'estr_label' => 'Escolha sua jornada',
