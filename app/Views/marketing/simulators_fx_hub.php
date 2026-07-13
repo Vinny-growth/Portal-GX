@@ -663,7 +663,7 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                         <span class="gx-fx-live-eyebrow"><?= lang('Fx.lead_live_eyebrow'); ?></span>
                         <strong data-gx-live-title><?= lang('Fx.lead_live_title'); ?></strong>
                         <div class="gx-fx-live-metric">
-                            <span data-gx-live-value>R$ 0</span>
+                            <span data-gx-live-value><?= brandCurrencySymbol(); ?> 0</span>
                             <small data-gx-live-label><?= lang('Fx.lead_live_label'); ?></small>
                         </div>
                         <p data-gx-live-copy><?= lang('Fx.lead_live_copy'); ?></p>
@@ -926,9 +926,9 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
     var activeTool = 'import';
     var hasToolInteraction = false;
     var results = {};
-    var currencyFormatter = new Intl.NumberFormat('pt-BR', {style: 'currency', currency: 'BRL'});
-    var numberFormatter = new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-    var ratioFormatter = new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 1, maximumFractionDigits: 1});
+    var currencyFormatter = new Intl.NumberFormat('<?= brandLocaleFull(); ?>', {style: 'currency', currency: '<?= brandCurrency(); ?>'});
+    var numberFormatter = new Intl.NumberFormat('<?= brandLocaleFull(); ?>', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    var ratioFormatter = new Intl.NumberFormat('<?= brandLocaleFull(); ?>', {minimumFractionDigits: 1, maximumFractionDigits: 1});
 
     function normalizeNumeric(value) {
         var input = String(value == null ? '' : value).trim();
@@ -962,7 +962,7 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
 
     function num(value, digits) {
         if (digits === 4) {
-            return new Intl.NumberFormat('pt-BR', {minimumFractionDigits: 4, maximumFractionDigits: 4}).format(Number.isFinite(value) ? value : 0);
+            return new Intl.NumberFormat('<?= brandLocaleFull(); ?>', {minimumFractionDigits: 4, maximumFractionDigits: 4}).format(Number.isFinite(value) ? value : 0);
         }
         return numberFormatter.format(Number.isFinite(value) ? value : 0);
     }
