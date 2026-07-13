@@ -749,28 +749,7 @@ class HomeController extends BaseController
 
     private function buildConsorcioSimulatorSchema(string $canonicalUrl, string $title, string $description)
     {
-        $consorcioFaqItems = [
-            [
-                'q' => 'O que é consórcio estruturado?',
-                'a' => 'Consórcio estruturado é uma estratégia que vai além de simplesmente aderir a um grupo. Envolve comparar dezenas de administradoras, analisar taxa administrativa, fundo de reserva, frequência de assembleias e definir uma estratégia de lance calculada para contemplar no prazo desejado. A GX Capital cruza mais de 20 administradoras e 1.000+ grupos com IA para encontrar a combinação mais eficiente.',
-            ],
-            [
-                'q' => 'Consórcio ou financiamento: qual é mais vantajoso?',
-                'a' => 'Depende de entrada disponível, urgência, custo total e capacidade de lance. O consórcio não cobra juros, mas tem taxa administrativa e fundo de reserva. O financiamento libera o crédito imediatamente, mas o custo total com juros compostos costuma ser significativamente maior. O simulador da GX Capital coloca os dois cenários lado a lado com números reais para que a decisão seja técnica.',
-            ],
-            [
-                'q' => 'Como funciona a contemplação por lance?',
-                'a' => 'Contemplação por lance é quando o consorciado oferece um valor antecipado (lance) na assembleia para antecipar a liberação da carta de crédito. O lance pode ser livre (valor que o participante define), fixo (pré-determinado pela administradora) ou embutido (usando parte da própria carta). A estratégia de lance ideal depende do grupo, da concorrência média e do caixa disponível.',
-            ],
-            [
-                'q' => 'Consórcio serve como investimento?',
-                'a' => 'Sim. A tese de investimento com consórcio funciona quando o consorciado contempla a carta de crédito, adquire o bem (geralmente imóvel) com desconto e revende com margem. O retorno líquido depende do custo de carregamento (parcelas até a contemplação), do tempo até a revenda e da margem de valorização. O simulador da GX Capital projeta ROI, break-even e custo real da operação.',
-            ],
-            [
-                'q' => 'O que a GX Capital faz de diferente no consórcio?',
-                'a' => 'A GX Capital é uma boutique financeira independente — não é administradora e não tem cota própria para vender. Isso permite recomendar o grupo, a administradora e a estratégia de lance mais eficiente para cada perfil, sem viés comercial. O simulador com IA filtra mais de 20 administradoras e gera um plano de contemplação personalizado que é validado por especialista antes da decisão.',
-            ],
-        ];
+        $consorcioFaqItems = $this->brandInterp(lang('Home.consorcio_faq'));
 
         $faqEntities = [];
         foreach ($consorcioFaqItems as $i => $faq) {
@@ -801,8 +780,8 @@ class HomeController extends BaseController
                 [
                     '@type' => 'FinancialService',
                     '@id' => $canonicalUrl . '#service',
-                    'name' => 'Simulação e planejamento estratégico de consórcio',
-                    'description' => 'Boutique financeira independente que compara mais de 20 administradoras e 1.000+ grupos de consórcio com IA para encontrar a rota de contemplação mais eficiente para cada perfil.',
+                    'name' => lang('Home.consorcio_schema_service_name'),
+                    'description' => lang('Home.consorcio_schema_service_description'),
                     'serviceType' => [
                         'Consórcio para investimento com revenda',
                         'Compra planejada de imóvel com consórcio',
@@ -1059,7 +1038,7 @@ class HomeController extends BaseController
     private function renderConsorcioSimulatorPage($page)
     {
         $canonicalUrl = langBaseUrl($page->slug ?? 'simulador-consorcio');
-        $title = 'Simulador de Consórcio Inteligente';
+        $title = lang('Home.consorcio_title');
         $description = brandLang('Home.consorcio_description');
         $contactChannels = $this->getMarketingContactChannels();
         $defaultWhatsAppMessage = brandLang('Home.consorcio_wa');
@@ -1079,14 +1058,14 @@ class HomeController extends BaseController
         $data = [
             'title' => $title,
             'description' => $description,
-            'keywords' => trim($this->settings->keywords . ', simulador de consorcio, consorcio estruturado, comparativo consorcio financiamento, planejamento de contemplacao', ' ,'),
+            'keywords' => trim($this->settings->keywords . lang('Home.consorcio_keywords_extra'), ' ,'),
             'bodyClass' => 'gx-marketing-home gx-consorcio-simulator-page',
             'pageHeadView' => 'simulators/_consorcio_head',
             'canonicalUrl' => $canonicalUrl,
             'socialImage' => $socialImage,
             'socialImageWidth' => $socialImageWidth,
             'socialImageHeight' => $socialImageHeight,
-            'ogDescription' => 'Descubra quanto você pode economizar. Compare consórcio vs financiamento em minutos com IA.',
+            'ogDescription' => lang('Home.consorcio_og_description'),
             'consorcioConfig' => $consorcioConfig,
             'blogUrl' => langBaseUrl('blog'),
             'simulatorsHubUrl' => langBaseUrl('simuladores'),

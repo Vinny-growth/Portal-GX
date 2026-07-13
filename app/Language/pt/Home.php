@@ -39,6 +39,20 @@ return [
     // Simulador de consórcio (HomeController::simuladorConsorcio)
     'consorcio_description' => 'Simule seu consórcio grátis. Compare com financiamento, planeje sua compra e descubra a rota de contemplação mais rápida com IA. 20+ administradoras analisadas pela {brand}.',
     'consorcio_wa'          => 'Olá! Vim pelo simulador de consórcio da {brand} e quero validar a melhor estratégia para o meu caso.',
+    // Página + schema do simulador de consórcio (renderConsorcioSimulatorPage + buildConsorcioSimulatorSchema).
+    // serviceType técnico do schema fica literal no controller.
+    'consorcio_title'                      => 'Simulador de Consórcio Inteligente',
+    'consorcio_keywords_extra'             => ', simulador de consorcio, consorcio estruturado, comparativo consorcio financiamento, planejamento de contemplacao',
+    'consorcio_og_description'             => 'Descubra quanto você pode economizar. Compare consórcio vs financiamento em minutos com IA.',
+    'consorcio_schema_service_name'        => 'Simulação e planejamento estratégico de consórcio',
+    'consorcio_schema_service_description' => 'Boutique financeira independente que compara mais de 20 administradoras e 1.000+ grupos de consórcio com IA para encontrar a rota de contemplação mais eficiente para cada perfil.',
+    'consorcio_faq' => [
+        ['q' => 'O que é consórcio estruturado?', 'a' => 'Consórcio estruturado é uma estratégia que vai além de simplesmente aderir a um grupo. Envolve comparar dezenas de administradoras, analisar taxa administrativa, fundo de reserva, frequência de assembleias e definir uma estratégia de lance calculada para contemplar no prazo desejado. A {brand} cruza mais de 20 administradoras e 1.000+ grupos com IA para encontrar a combinação mais eficiente.'],
+        ['q' => 'Consórcio ou financiamento: qual é mais vantajoso?', 'a' => 'Depende de entrada disponível, urgência, custo total e capacidade de lance. O consórcio não cobra juros, mas tem taxa administrativa e fundo de reserva. O financiamento libera o crédito imediatamente, mas o custo total com juros compostos costuma ser significativamente maior. O simulador da {brand} coloca os dois cenários lado a lado com números reais para que a decisão seja técnica.'],
+        ['q' => 'Como funciona a contemplação por lance?', 'a' => 'Contemplação por lance é quando o consorciado oferece um valor antecipado (lance) na assembleia para antecipar a liberação da carta de crédito. O lance pode ser livre (valor que o participante define), fixo (pré-determinado pela administradora) ou embutido (usando parte da própria carta). A estratégia de lance ideal depende do grupo, da concorrência média e do caixa disponível.'],
+        ['q' => 'Consórcio serve como investimento?', 'a' => 'Sim. A tese de investimento com consórcio funciona quando o consorciado contempla a carta de crédito, adquire o bem (geralmente imóvel) com desconto e revende com margem. O retorno líquido depende do custo de carregamento (parcelas até a contemplação), do tempo até a revenda e da margem de valorização. O simulador da {brand} projeta ROI, break-even e custo real da operação.'],
+        ['q' => 'O que a {brand} faz de diferente no consórcio?', 'a' => 'A {brand} é uma boutique financeira independente — não é administradora e não tem cota própria para vender. Isso permite recomendar o grupo, a administradora e a estratégia de lance mais eficiente para cada perfil, sem viés comercial. O simulador com IA filtra mais de 20 administradoras e gera um plano de contemplação personalizado que é validado por especialista antes da decisão.'],
+    ],
 
     // Simulador de seguro de vida resgatável
     'seguro_wa'             => 'Olá! Fiz a simulação do Seguro de Vida Resgatável na {brand} e quero estruturar meu plano.',
