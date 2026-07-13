@@ -137,4 +137,38 @@ return [
     'vert_c5_eyebrow' => 'Patrimônio, liquidez e estratégia',
     'vert_c5_desc'   => 'Conecte tesouraria, objetivos patrimoniais e alocação com uma leitura mais executável do patrimônio.',
     'vert_c5_link'   => 'Conhecer wealth',
+
+    // ===================================================================
+    // 5c-3 — getSimulatorCatalog (definições de simulador). Códigos de badge
+    // (FX/4131/CAP/MKT/FIDC/CONS/VIDA) e slugs ficam literais no library.
+    // title/description de alguns slugs podem ser sobrescritos pela página CMS.
+    // ===================================================================
+    'sim_fx_eyebrow'   => 'Câmbio e trade finance',
+    'sim_fx_title'     => 'Estudo de risco cambial',
+    'sim_fx_desc'      => 'Avalie exposição, pressão sobre margem e necessidade de proteção em operações de importação e exportação.',
+    'sim_fx_cta'       => 'Abrir estudo',
+    'sim_loan_eyebrow' => 'Funding internacional',
+    'sim_loan_title'   => 'Estrutura 4131 e FX Loan',
+    'sim_loan_desc'    => 'Compare custo local e internacional para entender quando uma captação em moeda forte merece aprofundamento.',
+    'sim_loan_cta'     => 'Avaliar estrutura',
+    'sim_cap_eyebrow'  => 'Crédito estruturado',
+    'sim_cap_title'    => 'Simulador de Custo de Capital',
+    'sim_cap_desc'     => 'Compare custos de funding e entenda qual estrutura de crédito faz mais sentido para a operação.',
+    'sim_cap_cta'      => 'Calcular custo',
+    'sim_mkt_eyebrow'  => 'Mercado de capitais',
+    'sim_mkt_title'    => 'Simulador de Mercado de Capitais',
+    'sim_mkt_desc'     => 'Teste cenários para debentures, CRA, CRI e outras estruturas de captação fora do crédito bancário.',
+    'sim_mkt_cta'      => 'Explorar estrutura',
+    'sim_fidc_eyebrow' => 'Recebíveis e antecipação',
+    'sim_fidc_title'   => 'Simulador de Custo de Antecipação',
+    'sim_fidc_desc'    => 'Compare desconto bancário e FIDC para decidir a alternativa mais eficiente de antecipação de recebíveis.',
+    'sim_fidc_cta'     => 'Comparar custos',
+    'sim_cons_eyebrow' => 'Consórcio estruturado',
+    'sim_cons_title'   => 'Simulador de Consórcio Estratégico',
+    'sim_cons_desc'    => 'Teste cenários para investimento, compra planejada e comparação com financiamento antes de falar com o especialista.',
+    'sim_cons_cta'     => 'Simular consórcio',
+    'sim_vida_eyebrow' => 'Proteção e patrimônio',
+    'sim_vida_title'   => 'Simulador de Seguro de Vida Resgatável',
+    'sim_vida_desc'    => 'Veja a projeção de um seguro de vida resgatável quitado em 10 anos: o ponto em que a reserva acumulada ultrapassa tudo que você pagou.',
+    'sim_vida_cta'     => 'Projetar reserva',
 ];
