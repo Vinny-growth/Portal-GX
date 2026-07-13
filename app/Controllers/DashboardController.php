@@ -11,6 +11,7 @@ class DashboardController extends BaseAdminController
     private const GA4_SNAPSHOT_CACHE_TTL = 300;
     private const GA4_PROPERTIES_CACHE_TTL = 300;
     private const GA4_REALTIME_CACHE_TTL = 20;
+    private const GSC_SNAPSHOT_CACHE_TTL = 1800; // 30 min — GSC atualiza devagar (lag de 2-3 dias)
 
     protected $dashboardModel;
     protected $dashboardIntegrationModel;
@@ -534,12 +535,14 @@ class DashboardController extends BaseAdminController
         $internalDailyVisitors = $this->dashboardModel->getDailyVisitors($days);
         $internalTrafficSources = $this->dashboardModel->getTrafficSources($days);
         $internalDeviceAnalytics = $this->dashboardModel->getDeviceAnalytics($days);
+        $internalRetention = $this->dashboardModel->getRetentionMetrics($days);
 
         $analyticsSource = !empty($ga4Payload['snapshot']['success']) ? 'ga4' : 'internal';
         $primaryOverview = $this->buildPrimaryOverview($analyticsSource, $internalOverview, $ga4Payload['snapshot']);
         $primaryDailyVisitors = $this->buildPrimaryDailyVisitors($analyticsSource, $internalDailyVisitors, $ga4Payload['snapshot'], $days);
         $primaryTrafficSources = $this->buildPrimaryTrafficSources($analyticsSource, $internalTrafficSources, $ga4Payload['snapshot']);
         $primaryDeviceAnalytics = $this->buildPrimaryDeviceAnalytics($analyticsSource, $internalDeviceAnalytics, $ga4Payload['snapshot']);
+        $primaryRetention = $this->buildPrimaryRetention($analyticsSource, $internalRetention, $ga4Payload['snapshot']);
 
         return [
             'days' => $days,
@@ -558,7 +561,10 @@ class DashboardController extends BaseAdminController
             'conversions' => $this->dashboardModel->getConversionMetrics($days),
             'dailyVisitors' => $primaryDailyVisitors,
             'visitorSegments' => $this->dashboardModel->getVisitorSegments($days),
-            'retention' => $this->dashboardModel->getRetentionMetrics($days),
+            'retention' => $primaryRetention,
+            'retentionInternal' => $internalRetention,
+            'searchConsole' => $this->getSearchConsolePayload($days),
+            'widgetSources' => $this->buildWidgetSources($analyticsSource),
             'trackingAvailability' => $this->dashboardModel->getTrackingAvailability(),
             'widgetDefinitions' => $this->dashboardModel->getWidgetDefinitions(),
             'widgetConfig' => $this->dashboardModel->getUserWidgetConfig($this->getDashboardUserId()),
@@ -713,6 +719,131 @@ class DashboardController extends BaseAdminController
             'coverage_pct' => 100,
             'devices' => $devicesPayload,
             'browsers' => $browsersPayload,
+        ];
+    }
+
+    /**
+     * Retenção "primária": quando o GA4 é a fonte, Recorrentes/Novos passam a vir
+     * do GA4 (site inteiro, base usuário) — coerente com os cards do topo. Repetição
+     * e stickiness NÃO existem no GA4 (são comportamento do contador interno), então
+     * mantemos os valores internos; a view rotula a origem mista.
+     */
+    private function buildPrimaryRetention($source, array $internal, array $ga4Snapshot)
+    {
+        if ($source !== 'ga4') {
+            return array_merge($internal, ['source' => 'internal']);
+        }
+
+        $ga4Overview = $ga4Snapshot['overview'] ?? [];
+        $activeUsers = (int) ($ga4Overview['active_users'] ?? 0);
+        $returningVisitors = (int) ($ga4Overview['returning_users'] ?? 0);
+        $newVisitors = max(0, $activeUsers - $returningVisitors);
+
+        return array_merge($internal, [
+            'source'             => 'ga4',
+            'total_visitors'     => $activeUsers,
+            'returning_visitors' => $returningVisitors,
+            'new_visitors'       => $newVisitors,
+            'returning_rate'     => $activeUsers > 0 ? round(($returningVisitors / $activeUsers) * 100, 2) : 0,
+        ]);
+    }
+
+    /**
+     * Snapshot do Google Search Console para o dashboard: total do site por dia
+     * (cliques/impressões/CTR/posição). Degrade suave se o GSC não estiver
+     * configurado ou a API falhar (nunca derruba a página). Cacheado 30 min.
+     */
+    private function getSearchConsolePayload($days)
+    {
+        $days   = $this->dashboardModel->normalizeDays($days);
+        $client = new \App\Libraries\GscClient();
+
+        $emptyTotals = ['clicks' => 0, 'impressions' => 0, 'ctr' => 0, 'position' => 0];
+
+        if (!$client->isConfigured()) {
+            return [
+                'configured' => false,
+                'site'       => $client->getSiteUrl(),
+                'error'      => $client->getLastError(),
+                'daily'      => [],
+                'totals'     => $emptyTotals,
+            ];
+        }
+
+        $cacheKey = 'gsc_dash_totals_' . $days;
+        $cached   = cache($cacheKey);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
+        $end   = date('Y-m-d');
+        $start = date('Y-m-d', strtotime('-' . ($days - 1) . ' days'));
+        $daily = $client->queryTotalsByDate($start, $end);
+
+        if (empty($daily)) {
+            // não cacheia falha — deixa tentar de novo no próximo load
+            return [
+                'configured' => true,
+                'site'       => $client->getSiteUrl(),
+                'error'      => $client->getLastError(),
+                'daily'      => [],
+                'totals'     => $emptyTotals,
+            ];
+        }
+
+        $clicks = 0;
+        $impressions = 0;
+        $weightedPosition = 0.0;
+        foreach ($daily as $row) {
+            $clicks           += (int) $row['clicks'];
+            $impressions      += (int) $row['impressions'];
+            $weightedPosition += ((float) $row['position']) * (int) $row['impressions'];
+        }
+
+        $payload = [
+            'configured' => true,
+            'site'       => $client->getSiteUrl(),
+            'error'      => null,
+            'daily'      => $daily,
+            'totals'     => [
+                'clicks'      => $clicks,
+                'impressions' => $impressions,
+                'ctr'         => $impressions > 0 ? round(($clicks / $impressions) * 100, 2) : 0,
+                'position'    => $impressions > 0 ? round($weightedPosition / $impressions, 2) : 0,
+            ],
+        ];
+
+        cache()->save($cacheKey, $payload, self::GSC_SNAPSHOT_CACHE_TTL);
+        return $payload;
+    }
+
+    /**
+     * Mapa "widget → fonte de dado" para o selo de origem em cada card.
+     * Evita a confusão de comparar GA4 (site), interno (só blog) e GSC (busca).
+     */
+    private function buildWidgetSources($analyticsSource)
+    {
+        $ga4 = ($analyticsSource === 'ga4');
+
+        $GA4 = ['label' => 'GA4', 'variant' => 'ga4', 'hint' => 'Google Analytics 4 — site inteiro, base usuário/cookie.'];
+        $INT = ['label' => 'Interno · blog', 'variant' => 'internal', 'hint' => 'Contador interno (post_pageviews_month) — só posts do blog, deduplicado por IP.'];
+        $GSC = ['label' => 'GSC', 'variant' => 'gsc', 'hint' => 'Google Search Console — cliques orgânicos vindos da busca do Google.'];
+
+        return [
+            'visitors_chart'       => $ga4 ? $GA4 : $INT,
+            'retention'            => $ga4
+                ? ['label' => 'GA4 + Interno', 'variant' => 'mixed', 'hint' => 'Recorrentes/Novos via GA4 (site). Repetição/Stickiness e a série diária via contador interno (blog).']
+                : $INT,
+            'traffic_sources'      => $ga4 ? $GA4 : $INT,
+            'device_analytics'     => $ga4 ? $GA4 : $INT,
+            'top_posts'            => $INT,
+            'engagement'           => $INT,
+            'category_performance' => $INT,
+            'content_summary'      => $INT,
+            'real_time'            => $INT,
+            'user_stats'           => ['label' => 'Base de usuários', 'variant' => 'crm', 'hint' => 'Tabela de usuários cadastrados (não é tráfego).'],
+            'conversions'          => ['label' => 'Leads / CRM', 'variant' => 'crm', 'hint' => 'Leads de simuladores (sim_leads) + contatos (contacts).'],
+            'search_console'       => $GSC,
         ];
     }
 

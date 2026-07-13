@@ -109,6 +109,56 @@ class GscClient
         return $out;
     }
 
+    /**
+     * Query Search Analytics aggregated by DATE (site-wide daily totals).
+     *
+     * Diferente de queryByKeyword (dimensão 'query'), aqui a dimensão é 'date',
+     * então cada linha é o total do site inteiro naquele dia — é exatamente o
+     * número de "cliques" que aparece no Search Console por dia.
+     *
+     * @return array<int, array{date:string, clicks:int, impressions:int, ctr:float, position:float}>
+     */
+    public function queryTotalsByDate(string $startDate, string $endDate, int $rowLimit = 1000): array
+    {
+        if (!$this->isConfigured()) {
+            $this->lastError = 'Google Search Console não configurado.';
+            return [];
+        }
+
+        $token = $this->getAccessToken();
+        if ($token === null) {
+            return [];
+        }
+
+        $endpoint = 'https://searchconsole.googleapis.com/webmasters/v3/sites/'
+            . rawurlencode($this->siteUrl) . '/searchAnalytics/query';
+
+        $payload = [
+            'startDate'  => $startDate,
+            'endDate'    => $endDate,
+            'dimensions' => ['date'],
+            'rowLimit'   => $rowLimit,
+            'dataState'  => 'all',
+        ];
+
+        $response = $this->httpJson($endpoint, $payload, $token);
+        if ($response === null) {
+            return [];
+        }
+
+        $out = [];
+        foreach (($response['rows'] ?? []) as $row) {
+            $out[] = [
+                'date'        => (string) ($row['keys'][0] ?? ''),
+                'clicks'      => (int) round($row['clicks'] ?? 0),
+                'impressions' => (int) round($row['impressions'] ?? 0),
+                'ctr'         => round(((float) ($row['ctr'] ?? 0)) * 100, 2),
+                'position'    => round((float) ($row['position'] ?? 0), 2),
+            ];
+        }
+        return $out;
+    }
+
     /** Build a JWT, exchange it for an access token (cached for the request). */
     private function getAccessToken(): ?string
     {

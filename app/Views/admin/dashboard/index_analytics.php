@@ -12,6 +12,15 @@ $ga4Connection = $ga4Connection ?? [];
 $ga4Data = $ga4Data ?? ['success' => false];
 $analyticsSource = $analyticsSource ?? 'internal';
 $overviewInternal = $overviewInternal ?? $overview;
+$searchConsole = $searchConsole ?? ['configured' => false, 'daily' => [], 'totals' => ['clicks' => 0, 'impressions' => 0, 'ctr' => 0, 'position' => 0], 'error' => null, 'site' => ''];
+$widgetSources = $widgetSources ?? [];
+$srcBadge = static function ($key) use ($widgetSources) {
+    if (empty($widgetSources[$key])) {
+        return '';
+    }
+    $s = $widgetSources[$key];
+    return ' <span class="gx-src-badge gx-src-' . esc($s['variant'], 'attr') . '" title="' . esc($s['hint'], 'attr') . '">' . esc($s['label']) . '</span>';
+};
 $isGa4Primary = ($analyticsSource === 'ga4');
 $availableWindows = $availableWindows ?? [7, 30, 90, 365];
 $availableDays = (int) ($trackingAvailability['available_days'] ?? 0);
@@ -104,6 +113,19 @@ if (!empty($ga4Connection['is_ready'])) {
     $exportLinks[] = ['label' => 'GA4 Páginas (CSV)', 'url' => adminUrl('dashboard/export-data?type=ga4_pages&format=csv&days=' . $days)];
 }
 ?>
+
+<style>
+.gx-src-badge{display:inline-block;vertical-align:middle;margin-left:8px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;line-height:1.5;border:1px solid transparent;cursor:help;}
+.gx-src-ga4{background:#e8f0fe;color:#1a56db;border-color:#c3d4fb;}
+.gx-src-internal{background:#eef2f6;color:#475569;border-color:#d7dee6;}
+.gx-src-gsc{background:#fef3e2;color:#b45309;border-color:#f6ddb0;}
+.gx-src-mixed{background:#f3e8ff;color:#7e22ce;border-color:#e3ccf7;}
+.gx-src-crm{background:#e7f8ef;color:#047857;border-color:#c2ead4;}
+.gx-src-note{margin:10px 0 0;font-size:11px;line-height:1.5;color:#6b7280;}
+.gx-gsc-totals{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;}
+.gx-gsc-totals .dashboard-stat-card{flex:1 1 120px;}
+.gx-gsc-empty{padding:16px;border:1px dashed #d7dee6;border-radius:8px;color:#6b7280;font-size:13px;line-height:1.55;background:#fafbfc;}
+</style>
 
 <div class="row">
     <div class="col-sm-12">
@@ -372,7 +394,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'visitors_chart': ?>
                     <div class="box dashboard-widget" id="visitors-chart-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                         </div>
                         <div class="box-body">
@@ -400,7 +422,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'retention': ?>
                     <div class="box dashboard-widget" id="retention-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                         </div>
                         <div class="box-body">
@@ -426,6 +448,9 @@ if (!empty($ga4Connection['is_ready'])) {
                                     <small><?= number_format((int) ($retention['loyal_visitors'] ?? 0)); ?> visitantes com 3+ dias ativos</small>
                                 </div>
                             </div>
+                            <?php if (($retention['source'] ?? '') === 'ga4'): ?>
+                                <p class="gx-src-note"><i class="fa fa-info-circle"></i> Recorrentes e Novos vêm do <strong>GA4</strong> (site inteiro, base usuário). Repetição, Stickiness e a série diária abaixo são do <strong>contador interno</strong> (só posts do blog, por IP).</p>
+                            <?php endif; ?>
                             <div class="dashboard-chart-shell dashboard-chart-shell-sm">
                                 <canvas id="retentionChart" height="110"></canvas>
                             </div>
@@ -436,7 +461,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'top_posts': ?>
                     <div class="box dashboard-widget" id="top-posts-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                         </div>
                         <div class="box-body">
@@ -482,7 +507,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'engagement': ?>
                     <div class="box dashboard-widget" id="engagement-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                         </div>
                         <div class="box-body">
@@ -528,7 +553,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'traffic_sources': ?>
                     <div class="box dashboard-widget" id="traffic-sources-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                             <?php if (!empty($trafficSources['tracked'])): ?>
                                 <span class="dashboard-coverage">Cobertura rastreada: <?= number_format((float) ($trafficSources['coverage_pct'] ?? 0), 2, ',', '.'); ?>%</span>
@@ -569,7 +594,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'category_performance': ?>
                     <div class="box dashboard-widget" id="category-performance-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                         </div>
                         <div class="box-body">
@@ -611,7 +636,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'user_stats': ?>
                     <div class="box dashboard-widget" id="user-stats-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                         </div>
                         <div class="box-body">
@@ -644,7 +669,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'content_summary': ?>
                     <div class="box dashboard-widget" id="content-summary-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                         </div>
                         <div class="box-body">
@@ -677,7 +702,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'device_analytics': ?>
                     <div class="box dashboard-widget" id="device-analytics-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                             <?php if (!empty($deviceAnalytics['tracked'])): ?>
                                 <span class="dashboard-coverage">Cobertura rastreada: <?= number_format((float) ($deviceAnalytics['coverage_pct'] ?? 0), 2, ',', '.'); ?>%</span>
@@ -712,7 +737,7 @@ if (!empty($ga4Connection['is_ready'])) {
                     <?php $conversions['leads_by_source'] = $conversions['leads_by_source'] ?? []; ?>
                     <div class="box dashboard-widget" id="conversions-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                         </div>
                         <div class="box-body">
@@ -848,7 +873,7 @@ if (!empty($ga4Connection['is_ready'])) {
                 case 'real_time': ?>
                     <div class="box dashboard-widget" id="realtime-widget">
                         <div class="box-header with-border">
-                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?></h3>
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
                             <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
                             <span class="dashboard-live-badge" id="live-indicator">LIVE</span>
                         </div>
@@ -897,6 +922,64 @@ if (!empty($ga4Connection['is_ready'])) {
                                     <?php endif; ?>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <?php break;
+
+                case 'search_console': ?>
+                    <div class="box dashboard-widget" id="search-console-widget">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"><i class="fa <?= esc($widget['icon']); ?>"></i> <?= esc($widget['name']); ?><?= $srcBadge($widget['key']); ?></h3>
+                            <span class="dashboard-widget-description"><?= esc($widget['description']); ?></span>
+                        </div>
+                        <div class="box-body">
+                            <?php if (empty($searchConsole['configured'])): ?>
+                                <div class="gx-gsc-empty">
+                                    <i class="fa fa-plug"></i> Search Console não configurado. Defina <code>GSC_SITE_URL</code> e <code>GSC_SERVICE_ACCOUNT_JSON</code> no <code>.env</code> para ver os cliques orgânicos do Google aqui.
+                                    <?php if (!empty($searchConsole['error'])): ?><br><small><?= esc($searchConsole['error']); ?></small><?php endif; ?>
+                                </div>
+                            <?php elseif (empty($searchConsole['daily'])): ?>
+                                <div class="gx-gsc-empty">
+                                    <i class="fa fa-clock-o"></i> Sem dados do Search Console no período (o GSC tem atraso de 2–3 dias).
+                                    <?php if (!empty($searchConsole['error'])): ?><br><small><?= esc($searchConsole['error']); ?></small><?php endif; ?>
+                                </div>
+                            <?php else: $gscTotals = $searchConsole['totals']; ?>
+                                <div class="gx-gsc-totals dashboard-stat-grid">
+                                    <div class="dashboard-stat-card">
+                                        <span>Cliques</span>
+                                        <strong><?= number_format((int) $gscTotals['clicks']); ?></strong>
+                                        <small>no período</small>
+                                    </div>
+                                    <div class="dashboard-stat-card">
+                                        <span>Impressões</span>
+                                        <strong><?= number_format((int) $gscTotals['impressions']); ?></strong>
+                                        <small>aparições na busca</small>
+                                    </div>
+                                    <div class="dashboard-stat-card">
+                                        <span>CTR</span>
+                                        <strong><?= number_format((float) $gscTotals['ctr'], 2, ',', '.'); ?>%</strong>
+                                        <small>cliques / impressões</small>
+                                    </div>
+                                    <div class="dashboard-stat-card">
+                                        <span>Posição média</span>
+                                        <strong><?= number_format((float) $gscTotals['position'], 1, ',', '.'); ?></strong>
+                                        <small>ponderada por impressão</small>
+                                    </div>
+                                </div>
+                                <div class="dashboard-list">
+                                    <h5>Cliques por dia</h5>
+                                    <?php foreach (array_reverse($searchConsole['daily']) as $row): ?>
+                                        <div class="dashboard-list-row">
+                                            <div>
+                                                <strong><?= esc(date('d/m', strtotime($row['date']))); ?></strong>
+                                                <small><?= number_format((int) $row['impressions']); ?> impressões · pos <?= number_format((float) $row['position'], 1, ',', '.'); ?></small>
+                                            </div>
+                                            <span><?= number_format((int) $row['clicks']); ?> cliques</span>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <p class="gx-src-note"><i class="fa fa-info-circle"></i> Só <strong>cliques orgânicos do Google</strong> (<?= esc($searchConsole['site']); ?>) — um subconjunto do tráfego total. Não inclui Bing, direto, social ou WhatsApp.</p>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <?php break;

@@ -91,6 +91,12 @@ class DashboardModel extends BaseModel
                 'column_class' => 'col-lg-12 col-md-12',
                 'icon' => 'fa-bullseye',
             ],
+            'search_console' => [
+                'name' => 'Busca orgânica (Search Console)',
+                'description' => 'Cliques, impressões, CTR e posição vindos da busca do Google.',
+                'column_class' => 'col-lg-6 col-md-12',
+                'icon' => 'fa-google',
+            ],
         ];
     }
 
