@@ -105,9 +105,9 @@
     var selectedObjective = objectiveButtons.length ? objectiveButtons[0].getAttribute('data-wealth-objective') : '';
 
     function formatCurrency(value) {
-        return value.toLocaleString('pt-BR', {
+        return value.toLocaleString('<?= brandLocaleFull(); ?>', {
             style: 'currency',
-            currency: 'BRL',
+            currency: '<?= brandCurrency(); ?>',
             maximumFractionDigits: 0
         });
     }

@@ -12,7 +12,7 @@
     $rem = is_null($months) ? null : ((int)$months % 12);
 ?>
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="<?= brandLocaleFull(); ?>">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -81,10 +81,10 @@
     <div class="section">
         <div class="h2"><?= lang('Wealth.pdf_visao'); ?></div>
         <div class="kpis">
-            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_patr_liq'); ?></div><div class="val">R$ <?= number_format($nw, 2, ',', '.'); ?></div></div>
-            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_renda'); ?></div><div class="val">R$ <?= number_format($income, 2, ',', '.'); ?></div></div>
-            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_despesas'); ?></div><div class="val">R$ <?= number_format($expense, 2, ',', '.'); ?></div></div>
-            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_poupanca'); ?></div><div class="val">R$ <?= number_format($savings, 2, ',', '.'); ?></div></div>
+            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_patr_liq'); ?></div><div class="val"><?= brandMoney($nw, 2); ?></div></div>
+            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_renda'); ?></div><div class="val"><?= brandMoney($income, 2); ?></div></div>
+            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_despesas'); ?></div><div class="val"><?= brandMoney($expense, 2); ?></div></div>
+            <div class="kpi"><div class="label"><?= lang('Wealth.pdf_poupanca'); ?></div><div class="val"><?= brandMoney($savings, 2); ?></div></div>
         </div>
     </div>
 
@@ -93,16 +93,16 @@
             <div class="h2"><?= lang('Wealth.pdf_cashflow'); ?></div>
             <table class="table">
                 <tr><th><?= lang('Wealth.pdf_th_item'); ?></th><th><?= lang('Wealth.pdf_th_valor'); ?></th></tr>
-                <tr><td><?= lang('Wealth.pdf_renda2'); ?></td><td>R$ <?= number_format($income, 2, ',', '.'); ?></td></tr>
-                <tr><td><?= lang('Wealth.pdf_despesas2'); ?></td><td>R$ <?= number_format($expense, 2, ',', '.'); ?></td></tr>
-                <tr><td class="strong"><?= lang('Wealth.pdf_poupanca2'); ?></td><td class="strong">R$ <?= number_format($savings, 2, ',', '.'); ?></td></tr>
+                <tr><td><?= lang('Wealth.pdf_renda2'); ?></td><td><?= brandMoney($income, 2); ?></td></tr>
+                <tr><td><?= lang('Wealth.pdf_despesas2'); ?></td><td><?= brandMoney($expense, 2); ?></td></tr>
+                <tr><td class="strong"><?= lang('Wealth.pdf_poupanca2'); ?></td><td class="strong"><?= brandMoney($savings, 2); ?></td></tr>
             </table>
         </div>
         <div class="card">
             <div class="h2"><?= lang('Wealth.pdf_fi'); ?></div>
             <table class="table">
-                <tr><td><?= lang('Wealth.pdf_ret'); ?></td><td><?= number_format($expected*100, 2, ',', '.'); ?><?= lang('Wealth.pdf_aa'); ?></td></tr>
-                <tr><td><?= lang('Wealth.pdf_nw_needed'); ?></td><td>R$ <?= number_format($nwNeeded, 2, ',', '.'); ?></td></tr>
+                <tr><td><?= lang('Wealth.pdf_ret'); ?></td><td><?= brandNumberFormat($expected*100, 2); ?><?= lang('Wealth.pdf_aa'); ?></td></tr>
+                <tr><td><?= lang('Wealth.pdf_nw_needed'); ?></td><td><?= brandMoney($nwNeeded, 2); ?></td></tr>
                 <tr>
                     <td><?= lang('Wealth.pdf_tempo'); ?></td>
                     <td>
@@ -126,14 +126,14 @@
         <div class="h2"><?= lang('Wealth.pdf_patr_aloc'); ?></div>
         <table class="table">
             <tr><th><?= lang('Wealth.pdf_th_comp'); ?></th><th><?= lang('Wealth.pdf_th_valor'); ?></th></tr>
-            <tr><td><?= lang('Wealth.pdf_ativos'); ?></td><td>R$ <?= number_format((float)($agg['assets_financial'] ?? 0), 2, ',', '.'); ?></td></tr>
-            <tr><td><?= lang('Wealth.pdf_imoveis'); ?></td><td>R$ <?= number_format((float)($agg['assets_realestate'] ?? 0), 2, ',', '.'); ?></td></tr>
-            <tr><td><?= lang('Wealth.pdf_passivos'); ?></td><td>R$ <?= number_format((float)($agg['liabilities'] ?? 0), 2, ',', '.'); ?></td></tr>
-            <tr><td class="strong"><?= lang('Wealth.pdf_patr_liq2'); ?></td><td class="strong">R$ <?= number_format($nw, 2, ',', '.'); ?></td></tr>
+            <tr><td><?= lang('Wealth.pdf_ativos'); ?></td><td><?= brandMoney((float)($agg['assets_financial'] ?? 0), 2); ?></td></tr>
+            <tr><td><?= lang('Wealth.pdf_imoveis'); ?></td><td><?= brandMoney((float)($agg['assets_realestate'] ?? 0), 2); ?></td></tr>
+            <tr><td><?= lang('Wealth.pdf_passivos'); ?></td><td><?= brandMoney((float)($agg['liabilities'] ?? 0), 2); ?></td></tr>
+            <tr><td class="strong"><?= lang('Wealth.pdf_patr_liq2'); ?></td><td class="strong"><?= brandMoney($nw, 2); ?></td></tr>
         </table>
         <?php $alloc = $agg['allocation'] ?? []; if (!empty($alloc) && is_array($alloc)): ?>
             <div class="muted" style="margin-top:6px;"><?= lang('Wealth.pdf_aloc_aprox'); ?>
-                <?php $total = array_sum($alloc); $out = []; foreach ($alloc as $k=>$v){ $pct = $total>0 ? (100*$v/$total) : 0; $out[] = esc(ucfirst($k)).' '.number_format($pct,1,',','.').'%'; } echo implode(' • ', $out); ?>
+                <?php $total = array_sum($alloc); $out = []; foreach ($alloc as $k=>$v){ $pct = $total>0 ? (100*$v/$total) : 0; $out[] = esc(ucfirst($k)).' '.brandNumberFormat($pct,1).'%'; } echo implode(' • ', $out); ?>
             </div>
         <?php endif; ?>
     </div>

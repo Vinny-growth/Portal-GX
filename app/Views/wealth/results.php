@@ -31,19 +31,19 @@
                         <div class="wm-card">
                             <h4><?= lang('Wealth.res_summary'); ?></h4>
                             <ul>
-                                <li><?= lang('Wealth.res_patr_fin'); ?> R$ <?= number_format($agg['assets_financial'] ?? 0, 2, ',', '.'); ?></li>
-                                <li><?= lang('Wealth.res_patr_imob'); ?> R$ <?= number_format($agg['assets_realestate'] ?? 0, 2, ',', '.'); ?></li>
-                                <li><?= lang('Wealth.res_passivos'); ?> R$ <?= number_format($agg['liabilities'] ?? 0, 2, ',', '.'); ?></li>
-                                <li><strong><?= lang('Wealth.res_patr_liq'); ?> R$ <?= number_format($agg['net_worth'] ?? 0, 2, ',', '.'); ?></strong></li>
+                                <li><?= lang('Wealth.res_patr_fin'); ?> <?= brandMoney($agg['assets_financial'] ?? 0, 2); ?></li>
+                                <li><?= lang('Wealth.res_patr_imob'); ?> <?= brandMoney($agg['assets_realestate'] ?? 0, 2); ?></li>
+                                <li><?= lang('Wealth.res_passivos'); ?> <?= brandMoney($agg['liabilities'] ?? 0, 2); ?></li>
+                                <li><strong><?= lang('Wealth.res_patr_liq'); ?> <?= brandMoney($agg['net_worth'] ?? 0, 2); ?></strong></li>
                             </ul>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
                         <div class="wm-card">
                             <h4><?= lang('Wealth.res_cashflow'); ?></h4>
-                            <div class="wm-kpi"><span class="dot" style="background:#3366ff"></span><div><div class="text-muted"><?= lang('Wealth.res_renda'); ?></div><div class="val">R$ <?= number_format($agg['income'] ?? 0, 2, ',', '.'); ?></div></div></div>
-                            <div class="wm-kpi" style="margin-top:8px;"><span class="dot" style="background:#ff3366"></span><div><div class="text-muted"><?= lang('Wealth.res_despesas'); ?></div><div class="val">R$ <?= number_format($agg['expense'] ?? 0, 2, ',', '.'); ?></div></div></div>
-                            <div class="wm-kpi" style="margin-top:8px;"><span class="dot" style="background:#2fb344"></span><div><div class="text-muted"><?= lang('Wealth.res_poupanca'); ?></div><div class="val">R$ <?= number_format($agg['savings'] ?? 0, 2, ',', '.'); ?></div></div></div>
+                            <div class="wm-kpi"><span class="dot" style="background:#3366ff"></span><div><div class="text-muted"><?= lang('Wealth.res_renda'); ?></div><div class="val"><?= brandMoney($agg['income'] ?? 0, 2); ?></div></div></div>
+                            <div class="wm-kpi" style="margin-top:8px;"><span class="dot" style="background:#ff3366"></span><div><div class="text-muted"><?= lang('Wealth.res_despesas'); ?></div><div class="val"><?= brandMoney($agg['expense'] ?? 0, 2); ?></div></div></div>
+                            <div class="wm-kpi" style="margin-top:8px;"><span class="dot" style="background:#2fb344"></span><div><div class="text-muted"><?= lang('Wealth.res_poupanca'); ?></div><div class="val"><?= brandMoney($agg['savings'] ?? 0, 2); ?></div></div></div>
                         </div>
                     </div>
                 </div>
@@ -64,7 +64,7 @@
                         <div class="wm-card">
                             <h4><?= lang('Wealth.res_evol'); ?></h4>
                             <canvas id="projChart" height="220"></canvas>
-                            <small class="text-muted"><?= lang('Wealth.res_ret_real'); ?> <span id="wm-expected-return"></span> | <?= lang('Wealth.res_nw_needed'); ?> R$ <span id="wm-nw-needed"></span></small>
+                            <small class="text-muted"><?= lang('Wealth.res_ret_real'); ?> <span id="wm-expected-return"></span> | <?= lang('Wealth.res_nw_needed'); ?> <?= brandCurrencySymbol(); ?> <span id="wm-nw-needed"></span></small>
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                     <h4><?= lang('Wealth.res_metas'); ?></h4>
                     <?php if (!empty($goals)): foreach ($goals as $g): ?>
                         <div class="mb-2">
-                            <strong><?= esc($g->nome_meta); ?></strong> — <?= lang('Wealth.res_obj'); ?> R$ <?= number_format($g->valor_objetivo, 2, ',', '.'); ?> <?= lang('Wealth.res_em'); ?> <?= (int)$g->prazo_meses; ?> <?= lang('Wealth.res_meses'); ?>
+                            <strong><?= esc($g->nome_meta); ?></strong> — <?= lang('Wealth.res_obj'); ?> <?= brandMoney($g->valor_objetivo, 2); ?> <?= lang('Wealth.res_em'); ?> <?= (int)$g->prazo_meses; ?> <?= lang('Wealth.res_meses'); ?>
                         </div>
                     <?php endforeach; else: ?>
                         <p><?= lang('Wealth.res_no_meta'); ?></p>
@@ -191,14 +191,14 @@
         if (proj.length && years.length && proj.length !== years.length) { var n = Math.min(proj.length, years.length); proj = proj.slice(0,n); years = years.slice(0,n); threshold = (threshold||[]).slice(0,n); }
         var nwNeeded = fi.nw_needed || 0;
         var elEr = document.getElementById('wm-expected-return'); if (elEr) { elEr.textContent = (expectedRealAnnual*100).toFixed(2) + L.aa; }
-        var elNw = document.getElementById('wm-nw-needed'); if (elNw) { elNw.textContent = (nwNeeded||0).toLocaleString('pt-BR', {minimumFractionDigits:2}); }
+        var elNw = document.getElementById('wm-nw-needed'); if (elNw) { elNw.textContent = (nwNeeded||0).toLocaleString('<?= brandLocaleFull(); ?>', {minimumFractionDigits:2}); }
         var labelsY = years.map(function(y){ return y + L.anos; });
         var ctx2 = document.getElementById('projChart');
         if (ctx2 && proj.length) {
             new Chart(ctx2, {type:'line', data:{labels: labelsY, datasets:[
                 {label: L.chart_patr, data: proj, borderColor:'#3366ff', backgroundColor:'rgba(51,102,255,0.15)', tension:0.2, fill:true},
                 {label: L.chart_fi, data: threshold, borderColor:'#ff6b6b', backgroundColor:'rgba(255,107,107,0.08)', borderDash:[6,6], tension:0.0, fill:false}
-            ]}, options:{plugins:{legend:{display:true}}, scales:{y:{ticks:{callback: function(value){return value.toLocaleString('pt-BR');}}}}});
+            ]}, options:{plugins:{legend:{display:true}}, scales:{y:{ticks:{callback: function(value){return value.toLocaleString('<?= brandLocaleFull(); ?>');}}}}});
         } else {
             if (ctx2) { ctx2.outerHTML = '<p class="text-muted">' + L.nodata + '</p>'; }
         }
