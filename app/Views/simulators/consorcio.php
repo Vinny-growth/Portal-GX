@@ -164,9 +164,9 @@ $aiSteps = [
                     <div class="gx-mini-sim-body">
                         <div class="gx-mini-sim-field">
                             <label for="gx-mini-sim-credit"><?= lang('Consorcio.mini_credit_label'); ?></label>
-                            <output id="gx-mini-sim-credit-value" class="gx-mini-sim-output">R$ 450.000</output>
+                            <output id="gx-mini-sim-credit-value" class="gx-mini-sim-output"><?= brandCurrencySymbol(); ?> 450.000</output>
                             <input type="range" id="gx-mini-sim-credit" min="50000" max="1500000" step="50000" value="450000" class="gx-mini-sim-range">
-                            <div class="gx-mini-sim-range-labels"><span>R$ 50 mil</span><span>R$ 1,5 mi</span></div>
+                            <div class="gx-mini-sim-range-labels"><span><?= brandCurrencySymbol(); ?> 50 mil</span><span><?= brandCurrencySymbol(); ?> 1,5 mi</span></div>
                         </div>
                         <div class="gx-mini-sim-field">
                             <label for="gx-mini-sim-months"><?= lang('Consorcio.mini_months_label'); ?></label>
@@ -177,7 +177,7 @@ $aiSteps = [
                         <button type="button" id="gx-mini-sim-btn" class="gx-btn gx-btn-primary gx-btn-lg gx-mini-sim-btn"><?= lang('Consorcio.mini_btn'); ?></button>
                     </div>
                     <div id="gx-mini-sim-result" class="gx-mini-sim-result" hidden>
-                        <strong id="gx-mini-sim-result-text">Você pode economizar até R$ 0</strong>
+                        <strong id="gx-mini-sim-result-text">Você pode economizar até <?= brandCurrencySymbol(); ?> 0</strong>
                         <p><?= lang('Consorcio.mini_result_suffix'); ?></p>
                         <a href="#fale-especialista" class="gx-text-link"><?= lang('Consorcio.mini_result_link'); ?></a>
                     </div>
@@ -383,7 +383,7 @@ $aiSteps = [
                                 <label class="gx-consorcio-field">
                                     <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_credit'); ?></span>
                                     <div class="gx-consorcio-input-shell">
-                                        <span class="gx-consorcio-input-prefix">R$</span>
+                                        <span class="gx-consorcio-input-prefix"><?= brandCurrencySymbol(); ?></span>
                                         <input type="number" name="credit_value" min="50000" step="1000" value="450000" inputmode="decimal">
                                     </div>
                                     <small><?= lang('Consorcio.f_credit_h'); ?></small>
@@ -440,7 +440,7 @@ $aiSteps = [
                                 <label class="gx-consorcio-field">
                                     <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_entry'); ?></span>
                                     <div class="gx-consorcio-input-shell">
-                                        <span class="gx-consorcio-input-prefix">R$</span>
+                                        <span class="gx-consorcio-input-prefix"><?= brandCurrencySymbol(); ?></span>
                                         <input type="number" name="entry_value" min="0" step="1000" value="90000" inputmode="decimal">
                                     </div>
                                     <small><?= lang('Consorcio.f_entry_h'); ?></small>
@@ -487,7 +487,7 @@ $aiSteps = [
                                 <label class="gx-consorcio-field">
                                     <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_avail'); ?></span>
                                     <div class="gx-consorcio-input-shell">
-                                        <span class="gx-consorcio-input-prefix">R$</span>
+                                        <span class="gx-consorcio-input-prefix"><?= brandCurrencySymbol(); ?></span>
                                         <input type="number" name="available_bid" min="0" step="1000" value="60000" inputmode="decimal">
                                     </div>
                                     <small><?= lang('Consorcio.f_avail_h'); ?></small>
@@ -496,7 +496,7 @@ $aiSteps = [
                                 <label class="gx-consorcio-field">
                                     <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_mreserve'); ?></span>
                                     <div class="gx-consorcio-input-shell">
-                                        <span class="gx-consorcio-input-prefix">R$</span>
+                                        <span class="gx-consorcio-input-prefix"><?= brandCurrencySymbol(); ?></span>
                                         <input type="number" name="monthly_reserve" min="0" step="100" value="3500" inputmode="decimal">
                                     </div>
                                     <small><?= lang('Consorcio.f_mreserve_h'); ?></small>
@@ -505,7 +505,7 @@ $aiSteps = [
                                 <label class="gx-consorcio-field">
                                     <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_mbudget'); ?></span>
                                     <div class="gx-consorcio-input-shell">
-                                        <span class="gx-consorcio-input-prefix">R$</span>
+                                        <span class="gx-consorcio-input-prefix"><?= brandCurrencySymbol(); ?></span>
                                         <input type="number" name="monthly_budget" min="0" step="100" value="7000" inputmode="decimal">
                                     </div>
                                     <small><?= lang('Consorcio.f_mbudget_h'); ?></small>
@@ -532,7 +532,7 @@ $aiSteps = [
                                 <label class="gx-consorcio-field">
                                     <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_bidcash'); ?></span>
                                     <div class="gx-consorcio-input-shell">
-                                        <span class="gx-consorcio-input-prefix">R$</span>
+                                        <span class="gx-consorcio-input-prefix"><?= brandCurrencySymbol(); ?></span>
                                         <input type="number" name="bid_cash" min="0" step="1000" value="120000" inputmode="decimal">
                                     </div>
                                     <small><?= lang('Consorcio.f_bidcash_h'); ?></small>
@@ -571,7 +571,7 @@ $aiSteps = [
                                 <label class="gx-consorcio-field">
                                     <span class="gx-consorcio-field-label"><?= lang('Consorcio.f_holdcost'); ?></span>
                                     <div class="gx-consorcio-input-shell">
-                                        <span class="gx-consorcio-input-prefix">R$</span>
+                                        <span class="gx-consorcio-input-prefix"><?= brandCurrencySymbol(); ?></span>
                                         <input type="number" name="holding_cost_monthly" min="0" step="100" value="900" inputmode="decimal">
                                     </div>
                                     <small><?= lang('Consorcio.f_holdcost_h'); ?></small>
@@ -1107,9 +1107,9 @@ $aiSteps = [
     }
 
     function currency(value) {
-        return new Intl.NumberFormat('pt-BR', {
+        return new Intl.NumberFormat('<?= brandLocaleFull(); ?>', {
             style: 'currency',
-            currency: 'BRL',
+            currency: '<?= brandCurrency(); ?>',
             maximumFractionDigits: 0
         }).format(Number.isFinite(value) ? value : 0);
     }
@@ -1120,7 +1120,7 @@ $aiSteps = [
     }
 
     function percent(value, fractionDigits) {
-        return new Intl.NumberFormat('pt-BR', {
+        return new Intl.NumberFormat('<?= brandLocaleFull(); ?>', {
             minimumFractionDigits: fractionDigits || 0,
             maximumFractionDigits: fractionDigits || 0
         }).format(Number.isFinite(value) ? value : 0) + '%';
@@ -1746,7 +1746,7 @@ $aiSteps = [
 
     if (miniCredit && miniMonths) {
         var formatMiniCurrency = function(v) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(v);
+            return new Intl.NumberFormat('<?= brandLocaleFull(); ?>', { style: 'currency', currency: '<?= brandCurrency(); ?>', maximumFractionDigits: 0 }).format(v);
         };
 
         miniCredit.addEventListener('input', function() {

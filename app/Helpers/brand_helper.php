@@ -94,3 +94,69 @@ if (!function_exists('brandCssVars')) {
             . '}</style>';
     }
 }
+
+if (!function_exists('brandLocaleFull')) {
+    /**
+     * Locale COMPLETO do install (ex.: 'pt-BR'), para Intl.NumberFormat /
+     * toLocaleString / number_format. Diferente de brandLocale() (subtag curta 'pt'
+     * usada para resolver arquivos lang()). Default GX 'pt-BR'.
+     */
+    function brandLocaleFull(): string
+    {
+        $locale = trim((string) brand('locale', 'pt-BR'));
+        return $locale !== '' ? $locale : 'pt-BR';
+    }
+}
+
+if (!function_exists('brandCurrency')) {
+    /** Código ISO da moeda do install (ex.: 'BRL'), p/ Intl.NumberFormat de exibição. */
+    function brandCurrency(): string
+    {
+        $code = strtoupper(trim((string) brand('currency', 'BRL')));
+        return $code !== '' ? $code : 'BRL';
+    }
+}
+
+if (!function_exists('brandCurrencySymbol')) {
+    /** Símbolo de exibição da moeda derivado de brand('currency'). Default 'R$' (BRL). */
+    function brandCurrencySymbol(): string
+    {
+        $map = [
+            'BRL' => 'R$',
+            'MXN' => '$',
+            'USD' => 'US$',
+            'EUR' => '€',
+        ];
+        return $map[brandCurrency()] ?? 'R$';
+    }
+}
+
+if (!function_exists('brandNumberSeparators')) {
+    /** [decimal, milhar] derivados de brand('locale'). Default pt-BR [',', '.']. */
+    function brandNumberSeparators(): array
+    {
+        $map = [
+            'pt-BR' => [',', '.'],
+            'es-MX' => ['.', ','],
+            'en-US' => ['.', ','],
+        ];
+        return $map[brandLocaleFull()] ?? [',', '.'];
+    }
+}
+
+if (!function_exists('brandNumberFormat')) {
+    /** number_format com separadores do locale da marca (SEM símbolo). Default pt-BR. */
+    function brandNumberFormat($value, int $decimals = 2): string
+    {
+        [$dec, $thou] = brandNumberSeparators();
+        return number_format((float) $value, $decimals, $dec, $thou);
+    }
+}
+
+if (!function_exists('brandMoney')) {
+    /** Valor com símbolo + separadores da marca (ex.: 'R$ 1.234,56'). */
+    function brandMoney($value, int $decimals = 2): string
+    {
+        return brandCurrencySymbol() . ' ' . brandNumberFormat($value, $decimals);
+    }
+}
