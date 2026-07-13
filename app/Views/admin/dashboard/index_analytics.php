@@ -165,6 +165,9 @@ if (!empty($ga4Connection['is_ready'])) {
                             <?php endforeach; ?>
                         </ul>
                     </div>
+                    <a href="<?= adminUrl('dashboard/simuladores'); ?>?days=<?= $days; ?>" class="btn btn-default btn-sm">
+                        <i class="fa fa-flask"></i> Simuladores
+                    </a>
                     <a href="<?= adminUrl('dashboard/widgets'); ?>" class="btn btn-primary btn-sm">
                         <i class="fa fa-sliders"></i> Personalizar
                     </a>

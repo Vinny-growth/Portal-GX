@@ -874,6 +874,28 @@ class DashboardModel extends BaseModel
         ];
     }
 
+    /**
+     * Leads de simuladores por dia e por origem (para o painel de simuladores).
+     * A origem identifica o simulador; o bucketing é feito no controller.
+     *
+     * @return array<int, array{event_date:string, origem:string, leads:int}>
+     */
+    public function getSimulatorLeadsDaily($days = 30)
+    {
+        $period = $this->getPeriodBounds($days);
+
+        return $this->db->query("
+            SELECT
+                DATE(created_at) AS event_date,
+                COALESCE(origem, '') AS origem,
+                COUNT(*) AS leads
+            FROM sim_leads
+            WHERE created_at >= ?
+            GROUP BY DATE(created_at), origem
+            ORDER BY event_date ASC
+        ", [$period['start_datetime']])->getResultArray();
+    }
+
     private function getPeriodBounds($days)
     {
         $days = $this->normalizeDays($days);

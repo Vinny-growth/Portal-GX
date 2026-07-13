@@ -162,6 +162,8 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->post('content-ai/trends/update', 'ContentAIController::updateTrendFlagsPost');
     $routes->post('content-ai/trends/add', 'ContentAIController::addSelectedTrendsToCalendarPost');
     $routes->post('content-ai/x-pulse/run', 'ContentAIController::runXPulseNowPost');
+    $routes->post('content-ai/popular/block', 'ContentAIController::blockPopularPostPost');
+    $routes->post('content-ai/popular/unblock', 'ContentAIController::unblockPopularPostPost');
     //SEO analysis (keyword ranking tracker)
     $routes->get('seo-analysis', 'SeoAnalysisController::index');
     $routes->get('seo-analysis/keywords', 'SeoAnalysisController::keywords');
@@ -280,6 +282,7 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->get('dashboard/widgets', 'DashboardController::widgets');
     $routes->post('dashboard/save-widget-config', 'DashboardController::saveWidgetConfig');
     $routes->get('dashboard/live-data', 'DashboardController::liveData');
+    $routes->get('dashboard/simuladores', 'DashboardController::simuladores');
     $routes->post('dashboard/get-analytics-data', 'DashboardController::getAnalyticsData');
     $routes->get('dashboard/export-data', 'DashboardController::exportData');
     //language

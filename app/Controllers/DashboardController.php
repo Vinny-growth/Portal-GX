@@ -847,6 +847,232 @@ class DashboardController extends BaseAdminController
         ];
     }
 
+    // ===================================================================
+    // Painel de simuladores (/admin/dashboard/simuladores)
+    // Visitantes/tempo por simulador vêm do GA4 (só ele rastreia as páginas
+    // dos simuladores); leads vêm de sim_leads por origem. Registry casa
+    // pagePath (GA4) <-> origem (leads) <-> nome amigável.
+    // ===================================================================
+
+    public function simuladores()
+    {
+        checkPermission('admin_panel');
+        $days = $this->dashboardModel->normalizeDays(inputGet('days'));
+
+        $data = [
+            'title'           => 'Analytics · Simuladores',
+            'panelSettings'   => (object) ['theme' => 'default'],
+            'days'            => $days,
+            'availableWindows' => $this->dashboardModel->getAllowedWindows(),
+            'sim'             => $this->getSimulatorAnalytics($days),
+            'ga4Connection'   => $this->dashboardIntegrationModel->getGoogleAnalyticsStatus(),
+        ];
+
+        echo view('admin/includes/_header', $data);
+        echo view('admin/dashboard/simulators', $data);
+        echo view('admin/includes/_footer');
+    }
+
+    private function buildSimulatorRegistry()
+    {
+        // paths = prefixos de pagePath (casados por prefixo-mais-longo);
+        // origem = substrings casadas (case-insensitive) em sim_leads.origem.
+        return [
+            ['key' => 'cambio',      'label' => 'Câmbio · Mesa FX',            'paths' => ['/simuladores/cambio', '/simulador-de-risco-cambial', '/simuladores-cambio'], 'origem' => ['câmbio', 'cambio', 'cambial', 'fx loan', 'risco cambial']],
+            ['key' => 'consorcio',   'label' => 'Consórcio',                   'paths' => ['/simulador-consorcio'], 'origem' => ['consórcio', 'consorcio']],
+            ['key' => 'seguro',      'label' => 'Seguro Resgatável',           'paths' => ['/simulador-seguro-resgatavel'], 'origem' => ['seguro resgatável', 'seguro resgatavel']],
+            ['key' => 'wealth',      'label' => 'Wealth Advisory',             'paths' => ['/wealth'], 'origem' => ['wealth']],
+            ['key' => 'aurum',       'label' => 'Aurum · custo de capital',    'paths' => ['/simulador-aurum', '/aurum-simulador-de-custo-de-capital'], 'origem' => ['aurum', 'custo de capital']],
+            ['key' => 'capitais',    'label' => 'Mercado de Capitais',         'paths' => ['/simulador-mercado-de-capitais'], 'origem' => ['mercado de capitais']],
+            ['key' => 'antecipacao', 'label' => 'Antecipação de Recebíveis',   'paths' => ['/simulador-de-custo-de-antecipacao', '/simulador-antecipacao'], 'origem' => ['antecipação', 'antecipacao', 'recebíveis', 'recebiveis']],
+            ['key' => 'bndes',       'label' => 'Linhas BNDES',                'paths' => ['/linhas-credito-bndes', '/simulador-bndes'], 'origem' => ['bndes']],
+            ['key' => 'credito',     'label' => 'Crédito Empresarial',         'paths' => ['/simulador-credito-empresarial'], 'origem' => ['crédito empresarial', 'credito empresarial']],
+            ['key' => 'hub',         'label' => 'Central de Simuladores',      'paths' => ['/simuladores'], 'origem' => []],
+        ];
+    }
+
+    /** Casa um pagePath do GA4 com um simulador (prefixo mais longo) ou 'outros'. */
+    private function matchSimulatorByPath(array $registry, string $path)
+    {
+        $p = (string) strtok($path, '?');
+        $p = rtrim($p, '/');
+        if ($p === '') {
+            $p = '/';
+        }
+        $bestKey = 'outros';
+        $bestLen = -1;
+        foreach ($registry as $r) {
+            foreach ($r['paths'] as $prefix) {
+                $prefix = rtrim($prefix, '/');
+                if ($p === $prefix || strpos($p, $prefix . '/') === 0) {
+                    if (strlen($prefix) > $bestLen) {
+                        $bestLen = strlen($prefix);
+                        $bestKey = $r['key'];
+                    }
+                }
+            }
+        }
+        return $bestKey;
+    }
+
+    /** Casa a origem de um lead com um simulador ou 'outros'. */
+    private function matchSimulatorByOrigin(array $registry, string $origem)
+    {
+        $o = mb_strtolower(trim($origem));
+        if ($o === '') {
+            return 'outros';
+        }
+        foreach ($registry as $r) {
+            foreach ($r['origem'] as $needle) {
+                if ($needle !== '' && mb_strpos($o, mb_strtolower($needle)) !== false) {
+                    return $r['key'];
+                }
+            }
+        }
+        return 'outros';
+    }
+
+    private function isoDateFromGa4(string $raw)
+    {
+        if (strlen($raw) === 8 && ctype_digit($raw)) {
+            return substr($raw, 0, 4) . '-' . substr($raw, 4, 2) . '-' . substr($raw, 6, 2);
+        }
+        return $raw;
+    }
+
+    /** Reports GA4 dos simuladores (cacheado, filtrado por regex de path). */
+    private function getSimulatorGa4Payload($days)
+    {
+        $days = $this->dashboardModel->normalizeDays($days);
+        $status = $this->dashboardIntegrationModel->getGoogleAnalyticsStatus();
+        if (empty($status['is_ready'])) {
+            return ['success' => false, 'error' => 'GA4 não conectado.'];
+        }
+
+        $fullConnection = $this->dashboardIntegrationModel->getGoogleAnalyticsConnection();
+        $cacheKey = $this->buildGoogleAnalyticsCacheKey('sim_' . (int) $days, $fullConnection);
+        $cached = cache($cacheKey);
+        if (is_array($cached) && !empty($cached['success'])) {
+            return $cached;
+        }
+
+        // pagePaths de simulador (não pega posts do blog). RE2 (GA4).
+        $regex = '^/(simulador|wealth|aurum-simulador|linhas-credito-bndes)';
+        $result = $this->getGoogleAnalyticsClient()->getSimulatorReports($fullConnection, $days, $regex, 5000);
+        $this->syncGoogleAnalyticsTokenState($result);
+
+        if (!empty($result['success'])) {
+            cache()->save($cacheKey, $this->stripGoogleAnalyticsTokenFromPayload($result), self::GA4_SNAPSHOT_CACHE_TTL);
+            $this->dashboardIntegrationModel->clearGoogleAnalyticsLastError();
+        } elseif (!empty($result['error'])) {
+            $this->dashboardIntegrationModel->setGoogleAnalyticsLastError($result['error']);
+        }
+
+        return $result;
+    }
+
+    private function getSimulatorAnalytics($days)
+    {
+        $days = $this->dashboardModel->normalizeDays($days);
+        $registry = $this->buildSimulatorRegistry();
+        $today = date('Y-m-d');
+
+        $blank = static function () {
+            return ['visitors' => 0, 'views' => 0, 'engagement' => 0.0, 'leads' => 0];
+        };
+        $sims = [];
+        foreach ($registry as $r) {
+            $sims[$r['key']] = ['key' => $r['key'], 'label' => $r['label'], 'today' => $blank(), 'period' => $blank(), 'daily' => []];
+        }
+        $sims['outros'] = ['key' => 'outros', 'label' => 'Outros / não atribuído', 'today' => $blank(), 'period' => $blank(), 'daily' => []];
+
+        // --- GA4: visitantes + tempo por página ---
+        $status = $this->dashboardIntegrationModel->getGoogleAnalyticsStatus();
+        $ga4Ready = !empty($status['is_ready']);
+        $ga4Used = false;
+        $ga4Error = null;
+
+        if ($ga4Ready) {
+            $ga4 = $this->getSimulatorGa4Payload($days);
+            if (!empty($ga4['success'])) {
+                $ga4Used = true;
+                foreach (($ga4['period'] ?? []) as $row) {
+                    $k = $this->matchSimulatorByPath($registry, (string) ($row['pagePath'] ?? ''));
+                    $sims[$k]['period']['visitors']   += (int) round((float) ($row['activeUsers'] ?? 0));
+                    $sims[$k]['period']['views']      += (int) round((float) ($row['screenPageViews'] ?? 0));
+                    $sims[$k]['period']['engagement'] += (float) ($row['userEngagementDuration'] ?? 0);
+                }
+                foreach (($ga4['daily'] ?? []) as $row) {
+                    $k = $this->matchSimulatorByPath($registry, (string) ($row['pagePath'] ?? ''));
+                    $iso = $this->isoDateFromGa4((string) ($row['date'] ?? ''));
+                    $vis = (int) round((float) ($row['activeUsers'] ?? 0));
+                    if (!isset($sims[$k]['daily'][$iso])) {
+                        $sims[$k]['daily'][$iso] = ['visitors' => 0, 'leads' => 0];
+                    }
+                    $sims[$k]['daily'][$iso]['visitors'] += $vis;
+                    if ($iso === $today) {
+                        $sims[$k]['today']['visitors']   += $vis;
+                        $sims[$k]['today']['views']      += (int) round((float) ($row['screenPageViews'] ?? 0));
+                        $sims[$k]['today']['engagement'] += (float) ($row['userEngagementDuration'] ?? 0);
+                    }
+                }
+            } else {
+                $ga4Error = $ga4['error'] ?? 'Falha ao consultar o GA4.';
+            }
+        }
+
+        // --- Leads (sim_leads por origem) ---
+        $leadRows = $this->dashboardModel->getSimulatorLeadsDaily($days);
+        foreach ($leadRows as $row) {
+            $k = $this->matchSimulatorByOrigin($registry, (string) ($row['origem'] ?? ''));
+            $leads = (int) $row['leads'];
+            $iso = (string) $row['event_date'];
+            $sims[$k]['period']['leads'] += $leads;
+            if (!isset($sims[$k]['daily'][$iso])) {
+                $sims[$k]['daily'][$iso] = ['visitors' => 0, 'leads' => 0];
+            }
+            $sims[$k]['daily'][$iso]['leads'] += $leads;
+            if ($iso === $today) {
+                $sims[$k]['today']['leads'] += $leads;
+            }
+        }
+
+        // --- Finaliza: tempo médio, conversão, ordena, remove vazios ---
+        $out = [];
+        $allDates = [];
+        foreach ($sims as $s) {
+            foreach (['today', 'period'] as $scope) {
+                $v = $s[$scope]['visitors'];
+                $s[$scope]['avg_time'] = $v > 0 ? (int) round($s[$scope]['engagement'] / $v) : 0;
+                $s[$scope]['conversion'] = $v > 0 ? round(($s[$scope]['leads'] / $v) * 100, 1) : 0;
+            }
+            if ($s['period']['visitors'] === 0 && $s['period']['leads'] === 0 && $s['today']['visitors'] === 0 && $s['today']['leads'] === 0) {
+                continue;
+            }
+            ksort($s['daily']);
+            foreach (array_keys($s['daily']) as $d) {
+                $allDates[$d] = true;
+            }
+            $out[] = $s;
+        }
+        usort($out, static function ($a, $b) {
+            return ($b['period']['visitors'] <=> $a['period']['visitors']) ?: ($b['period']['leads'] <=> $a['period']['leads']);
+        });
+
+        ksort($allDates);
+
+        return [
+            'days'          => $days,
+            'today'         => $today,
+            'ga4_available' => $ga4Ready,
+            'ga4_used'      => $ga4Used,
+            'ga4_error'     => $ga4Error,
+            'simulators'    => $out,
+            'dates'         => array_keys($allDates),
+            'has_leads'     => !empty($leadRows),
+        ];
+    }
+
     private function getDashboardUserId()
     {
         $currentUser = user();

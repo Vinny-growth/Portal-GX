@@ -592,7 +592,67 @@ class GoogleAnalyticsDashboardClient
         }
     }
 
-    private function runReport(string $accessToken, string $propertyId, array $dimensions, array $metrics, string $startDate, string $endDate, int $limit = 10, ?string $orderMetric = null)
+    /**
+     * Relatórios de página para o painel de simuladores. Dois reports numa auth:
+     *  - 'daily'  = [date, pagePath] → visitantes/views por dia (inclui "hoje")
+     *  - 'period' = [pagePath]       → visitantes únicos do período (dedupados
+     *               pelo GA4) + userEngagementDuration p/ tempo médio por visitante
+     * Filtrado por regex de pagePath (PARTIAL_REGEXP) para não trazer o site todo.
+     *
+     * @return array{success:bool, daily?:array, period?:array, error?:string, token?:array}
+     */
+    public function getSimulatorReports(array $connection, int $days, string $pathRegex, int $limit = 5000)
+    {
+        $auth = $this->ensureAuthorizedToken($connection);
+        if (!$auth['success']) {
+            return $auth;
+        }
+
+        $propertyId = trim((string) ($connection['property_id'] ?? ''));
+        if ($propertyId === '') {
+            return ['success' => false, 'error' => 'Nenhuma propriedade do GA4 foi selecionada.', 'token' => $auth['token']];
+        }
+
+        $startDate = date('Y-m-d', strtotime('-' . max(0, $days - 1) . ' days'));
+        $endDate   = date('Y-m-d');
+        $token     = $auth['token']['access_token'];
+
+        $filter = $pathRegex !== '' ? [
+            'filter' => [
+                'fieldName'    => 'pagePath',
+                'stringFilter' => ['matchType' => 'PARTIAL_REGEXP', 'value' => $pathRegex, 'caseSensitive' => false],
+            ],
+        ] : null;
+
+        $dailyReport = $this->runReport(
+            $token, $propertyId,
+            ['date', 'pagePath'],
+            ['activeUsers', 'screenPageViews', 'userEngagementDuration'],
+            $startDate, $endDate, $limit, null, $filter
+        );
+        if (!$dailyReport['success']) {
+            return ['success' => false, 'error' => $dailyReport['error'], 'token' => $auth['token']];
+        }
+
+        $periodReport = $this->runReport(
+            $token, $propertyId,
+            ['pagePath'],
+            ['activeUsers', 'screenPageViews', 'userEngagementDuration'],
+            $startDate, $endDate, $limit, 'activeUsers', $filter
+        );
+        if (!$periodReport['success']) {
+            return ['success' => false, 'error' => $periodReport['error'], 'token' => $auth['token']];
+        }
+
+        return [
+            'success' => true,
+            'daily'   => $this->extractRows($dailyReport['data'] ?? []),
+            'period'  => $this->extractRows($periodReport['data'] ?? []),
+            'token'   => $auth['token'],
+        ];
+    }
+
+    private function runReport(string $accessToken, string $propertyId, array $dimensions, array $metrics, string $startDate, string $endDate, int $limit = 10, ?string $orderMetric = null, ?array $dimensionFilter = null)
     {
         $payload = [
             'dateRanges' => [
@@ -620,6 +680,10 @@ class GoogleAnalyticsDashboardClient
                     'desc' => true,
                 ],
             ];
+        }
+
+        if (!empty($dimensionFilter)) {
+            $payload['dimensionFilter'] = $dimensionFilter;
         }
 
         return $this->apiRequest(
