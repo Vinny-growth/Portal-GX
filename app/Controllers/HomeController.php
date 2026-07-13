@@ -170,7 +170,7 @@ class HomeController extends BaseController
         $pageConfig = $marketingHomeModel->getSimulatorsHubConfig($this->activeLang->id, $this->getSimulatorsConfigDefaults());
         $description = trim((string)($pageConfig['hero']['subtitle'] ?? ''));
         if ($description === '') {
-            $description = 'Simuladores de câmbio, hedge, trade finance e operações 4131 para importadores e exportadores, com leitura consultiva da mesa GX Capital.';
+            $description = brandLang('Home.fx_hub_description_fallback');
         }
         $canonicalUrl = langBaseUrl('simuladores/cambio');
         $contactChannels = $this->getMarketingContactChannels();
@@ -187,10 +187,22 @@ class HomeController extends BaseController
             $whatsAppBaseUrl = 'https://wa.me/' . $contactChannels['whatsapp_digits'];
         }
 
+        $brandName = brand('display_name', 'GX Capital');
+        $fxFaqEntities = array_map(static function (array $item) use ($brandName) {
+            return [
+                '@type' => 'Question',
+                'name' => strtr($item['q'], ['{brand}' => $brandName]),
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => strtr($item['a'], ['{brand}' => $brandName]),
+                ],
+            ];
+        }, lang('Home.fx_hub_faq'));
+
         $data = [
-            'title' => 'Simuladores de câmbio para importadores e exportadores',
+            'title' => lang('Home.fx_hub_title'),
             'description' => characterLimiter(preg_replace('/\s+/', ' ', $description), 160, ''),
-            'keywords' => trim($this->settings->keywords . ', simuladores de câmbio, hedge cambial, trade finance, operação 4131, importação, exportação', ' ,'),
+            'keywords' => trim($this->settings->keywords . lang('Home.fx_hub_keywords_extra'), ' ,'),
             'pageHeadView' => 'marketing/_shared_styles',
             'canonicalUrl' => $canonicalUrl,
             'socialImage' => getLogo(),
@@ -216,7 +228,7 @@ class HomeController extends BaseController
                         '@type' => 'WebPage',
                         '@id' => $canonicalUrl . '#webpage',
                         'url' => $canonicalUrl,
-                        'name' => trim((string)($pageConfig['hero']['title'] ?? 'Simuladores de câmbio GX Capital')),
+                        'name' => trim((string)($pageConfig['hero']['title'] ?? brandLang('Home.fx_hub_schema_webpage_name'))),
                         'description' => characterLimiter(preg_replace('/\s+/', ' ', $description), 160, ''),
                         'inLanguage' => $this->activeLang->language_code,
                         'isPartOf' => ['@id' => base_url() . '/#website'],
@@ -225,7 +237,7 @@ class HomeController extends BaseController
                     [
                         '@type' => 'FinancialService',
                         '@id' => $canonicalUrl . '#service',
-                        'name' => 'Mesa de câmbio e trade finance GX Capital',
+                        'name' => brandLang('Home.fx_hub_schema_service_name'),
                         'provider' => ['@id' => base_url() . '/#organization'],
                         'employee' => ['@id' => base_url() . '/#person-vinicius-teixeira'],
                         'serviceType' => [
@@ -235,53 +247,12 @@ class HomeController extends BaseController
                             'Operações 4131',
                         ],
                         'areaServed' => 'BR',
-                        'description' => 'Boutique financeira especializada em câmbio estruturado para importadores e exportadores. A mesa compara cotações entre mais de 10 instituições financeiras e recomenda a estrutura mais eficiente para cada operação.',
+                        'description' => lang('Home.fx_hub_schema_service_description'),
                     ],
                     [
                         '@type' => 'FAQPage',
                         '@id' => $canonicalUrl . '#faq',
-                        'mainEntity' => [
-                            [
-                                '@type' => 'Question',
-                                'name' => 'O que é câmbio estruturado para importadores e exportadores?',
-                                'acceptedAnswer' => [
-                                    '@type' => 'Answer',
-                                    'text' => 'Câmbio estruturado é uma operação que combina contratos de câmbio com instrumentos de proteção (hedge), permitindo que empresas importadoras e exportadoras travem taxas, reduzam exposição cambial e planejem fluxo de caixa com previsibilidade. A GX Capital estrutura operações sob medida comparando cotações entre mais de 10 instituições financeiras.',
-                                ],
-                            ],
-                            [
-                                '@type' => 'Question',
-                                'name' => 'Como funciona hedge cambial para empresas?',
-                                'acceptedAnswer' => [
-                                    '@type' => 'Answer',
-                                    'text' => 'Hedge cambial é uma estratégia de proteção contra variações na taxa de câmbio. Funciona por meio de contratos a termo (NDF), opções ou swaps que permitem fixar uma taxa futura. A mesa da GX Capital avalia exposição real, prazo de liquidação e margem da operação antes de propor a estrutura de proteção mais eficiente.',
-                                ],
-                            ],
-                            [
-                                '@type' => 'Question',
-                                'name' => 'Qual a diferença entre ACC, ACE e FINIMP?',
-                                'acceptedAnswer' => [
-                                    '@type' => 'Answer',
-                                    'text' => 'ACC (Adiantamento sobre Contrato de Câmbio) antecipa recursos ao exportador antes do embarque. ACE (Adiantamento sobre Cambiais Entregues) antecipa após o embarque. FINIMP (Financiamento à Importação) financia a compra de mercadorias do exterior. A escolha depende da etapa do fluxo internacional, pressão de caixa e custo comparado.',
-                                ],
-                            ],
-                            [
-                                '@type' => 'Question',
-                                'name' => 'O que é uma operação 4131 e quando vale a pena?',
-                                'acceptedAnswer' => [
-                                    '@type' => 'Answer',
-                                    'text' => 'A operação 4131 é um empréstimo internacional que permite captar recursos no exterior com taxas potencialmente mais competitivas que o crédito local. Vale a pena quando o custo all-in (taxa base SOFR + spread offshore + hedge cambial + fees) é inferior ao custo equivalente onshore (CDI + spread local). O simulador da GX Capital ajuda a filtrar a viabilidade antes de aprofundar a estrutura.',
-                                ],
-                            ],
-                            [
-                                '@type' => 'Question',
-                                'name' => 'O que é uma boutique financeira de câmbio?',
-                                'acceptedAnswer' => [
-                                    '@type' => 'Answer',
-                                    'text' => 'Uma boutique financeira de câmbio é uma empresa independente que não tem produto próprio para distribuir. Isso permite recomendar a instituição e a estrutura mais aderente ao momento do cliente, sem conflito de interesse. A GX Capital compara cotações de bancos de câmbio e corretoras para encontrar a operação mais eficiente para cada perfil de empresa.',
-                                ],
-                            ],
-                        ],
+                        'mainEntity' => $fxFaqEntities,
                     ],
                 ],
             ],
