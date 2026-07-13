@@ -105,4 +105,51 @@ return [
             'a' => 'Maio e Junho. Em julho a janela começa a fechar conforme o mercado precifica o estresse eleitoral. Q3 (agosto a outubro) é o pico de risco. A recomendação da mesa {brand} para importadores é estruturar hedge defensivo em camadas começando agora, com prazo de 60 a 180 dias.',
         ],
     ],
+
+    // Playbook Exportação Premium (HomeController::playbookExportacaoPremium).
+    'pb_exp_wa'                => 'Olá! Vim pelo playbook Exportação Premium da {brand} e quero falar com a mesa de câmbio para travar receita em moeda forte em 2026.',
+    'pb_exp_description'       => 'Playbook {brand} · Exportação Premium 2026: hedge de venda em camadas, ACC/ACE, Drawback e conta offshore para capturar o pico do dólar eleitoral em receita extra.',
+    'pb_exp_title'            => 'Exportação Premium · Playbook 2026',
+    'pb_exp_section'          => 'Câmbio · Exportação',
+    'pb_exp_keywords'         => 'exportação, câmbio, hedge cambial, NDF venda, ACC, ACE, dólar eleitoral, trade finance, drawback, conta offshore, exportadores, {brand}',
+    'pb_exp_breadcrumb_current' => 'Exportação Premium',
+    'pb_exp_chapters' => [
+        'Cenário de Oportunidade 2026',
+        'Balança Comercial em Números',
+        'O Pico do Dólar Eleitoral',
+        'Setores Exportadores em Foco',
+        'Simulações de Receita',
+        'Hedge de Venda em Camadas',
+        'ACC, ACE & Antecipação',
+        'Drawback & Conta Offshore',
+        'Ferramentas {brand}',
+        'Checklist de Ação Imediata',
+        'Conclusão e Próximos Passos',
+    ],
+    'pb_exp_faq' => [
+        [
+            'q' => 'Por que o "dólar eleitoral" é uma oportunidade para exportadores brasileiros em 2026?',
+            'a' => 'Em anos eleitorais, o USD/BRL costuma atingir picos de estresse no Q3 — projeções da mesa {brand} apontam R$ 5,45 a R$ 5,55 entre agosto e outubro. Para exportadores que estruturam hedge de venda em camadas antes do pico, isso vira receita extra de até 13% por embarque versus liquidar no spot atual de R$ 4,91.',
+        ],
+        [
+            'q' => 'Qual a diferença entre NDF Venda, Termo de Venda e ACC para exportadores?',
+            'a' => 'NDF Venda fixa a taxa de venda futura sem entrega física da moeda — bom para 30 a 180 dias. Termo de Venda é com entrega da moeda na liquidação, exige DUE ou invoice. ACC (Adiantamento sobre Contrato de Câmbio) antecipa até 100% do valor em USD antes do embarque, com taxa SOFR + spread e hedge embutido. Cada um cobre uma necessidade diferente do pipeline.',
+        ],
+        [
+            'q' => 'O que é hedge em camadas e por que é melhor que tentar acertar o pico do dólar?',
+            'a' => 'Hedge em camadas é dividir o pipeline em 30/30/40% e travar cada parte em momentos diferentes da curva — primeira em junho, segunda no primeiro repique de julho/agosto, terceira no pico Q3. Captura ~85% do prêmio máximo sem o risco de perder a janela tentando cravar o topo exato.',
+        ],
+        [
+            'q' => 'O que é Drawback e quanto economiza em uma operação de exportação?',
+            'a' => 'Drawback é o regime aduaneiro que suspende II, IPI, PIS, COFINS e ICMS sobre insumos importados que serão usados na fabricação de produto exportado. Em insumos de US$ 200 mil a R$ 5,10, com tributos normais de ~30%, a economia direta chega a R$ 306 mil por lote.',
+        ],
+        [
+            'q' => 'Vale a pena manter parte da receita em conta offshore (Bradesco Miami, BTG Cayman)?',
+            'a' => 'Para volumes médios e altos, sim. Manter parte dos USD em conta offshore reduz dependência da liquidação no spot do dia, permite repatriar quando o câmbio for favorável e funciona como reserva estratégica em cenários fiscais adversos. Contas mais usadas: NCC no Brasil, Bradesco Miami / BB Americas para volume médio, BTG Cayman / Itaú BBA Nassau para reserva sofisticada.',
+        ],
+        [
+            'q' => 'Empilhar hedge, ACC e Drawback eleva a receita em quanto?',
+            'a' => 'Em uma operação real de US$ 1 milhão, o empilhamento de NDF Venda no pico Q3 (R$ 5,30 médio), Drawback sobre insumos (US$ 200k) e 30% mantido em conta offshore com timing favorável eleva a receita de R$ 4,91 mi (liquidando no spot Q2) para R$ 5,89 mi — ganho líquido de +R$ 981 mil ou +20%.',
+        ],
+    ],
 ];
