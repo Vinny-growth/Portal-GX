@@ -36,7 +36,7 @@ class HomeController extends BaseController
         $marketingHomeModel = new MarketingHomeModel();
         $homeConfig = $marketingHomeModel->getHomeConfig($this->activeLang->id, $this->getHomeConfigDefaults());
         $contactChannels = $this->getMarketingContactChannels();
-        $homeWhatsAppMessage = 'Olá! Vim pela home institucional da GX Capital e quero falar com um especialista para entender a solução mais adequada para a minha empresa.';
+        $homeWhatsAppMessage = brandLang('Home.home_wa');
         $visibleQuickLinks = array_values(array_filter($homeConfig['nav']['quick_links'] ?? [], function ($item) {
             return !empty($item['enabled']) && (!empty($item['label']) || !empty($item['href']));
         }));
@@ -174,13 +174,13 @@ class HomeController extends BaseController
         }
         $canonicalUrl = langBaseUrl('simuladores/cambio');
         $contactChannels = $this->getMarketingContactChannels();
-        $defaultWhatsAppMessage = 'Olá! Vim pela página de simuladores de câmbio da GX Capital e tenho interesse em fazer um estudo para minhas operações de câmbio.';
+        $defaultWhatsAppMessage = brandLang('Home.fx_wa_default');
         $whatsAppMessagesByTool = [
-            'import' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e quero estudar a exposição das minhas operações de importação.',
-            'export' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e quero estudar a proteção de receita das minhas operações de exportação.',
-            'hedge' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e tenho interesse em estudar uma estratégia de hedge cambial para minha empresa.',
-            'funding4131' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e tenho interesse em avaliar uma operação 4131 ou funding internacional.',
-            'trade' => 'Olá! Vim pela página de simuladores de câmbio da GX Capital e tenho interesse em avaliar uma estrutura de trade finance para minha operação.',
+            'import' => brandLang('Home.fx_wa_import'),
+            'export' => brandLang('Home.fx_wa_export'),
+            'hedge' => brandLang('Home.fx_wa_hedge'),
+            'funding4131' => brandLang('Home.fx_wa_funding4131'),
+            'trade' => brandLang('Home.fx_wa_trade'),
         ];
         $whatsAppBaseUrl = '';
         if (!empty($contactChannels['whatsapp_digits'])) {
