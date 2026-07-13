@@ -345,66 +345,29 @@ class HomeController extends BaseController
     {
         $canonicalUrl = base_url('playbook/importacao-blindada');
         $contactChannels = $this->getMarketingContactChannels();
-        $whatsAppMessage = 'Olá! Vim pelo playbook Importação Blindada da GX Capital e quero falar com a mesa de câmbio para proteger minhas operações em 2026.';
+        $whatsAppMessage = brandLang('Home.pb_imp_wa');
 
-        $description = 'Playbook GX Capital · Importação Blindada 2026: hedge cambial, antecipação de estoque e Ex-Tarifário para atravessar o "dólar eleitoral" com a margem intacta.';
+        $description = brandLang('Home.pb_imp_description');
 
         $playbookConfig = [
             'id' => 'importacao-blindada',
-            'title' => 'Importação Blindada · Playbook 2026',
+            'title' => lang('Home.pb_imp_title'),
             'description' => $description,
             'canonicalUrl' => $canonicalUrl,
-            'section' => 'Câmbio · Importação',
-            'keywords' => 'importação, câmbio, hedge cambial, NDF, FINIMP, dólar eleitoral, trade finance, ex-tarifário, importadores, GX Capital',
+            'section' => lang('Home.pb_imp_section'),
+            'keywords' => brandLang('Home.pb_imp_keywords'),
             'datePublished' => '2026-05-08T08:00:00-03:00',
             'dateModified'  => '2026-05-08T08:00:00-03:00',
             'readingTimeMin' => 18,
             'wordCount' => 4200,
             'image' => getLogo(),
             'breadcrumb' => [
-                ['name' => 'Início',     'url' => base_url()],
-                ['name' => 'Playbooks',  'url' => base_url('playbook')],
-                ['name' => 'Importação Blindada', 'url' => $canonicalUrl],
+                ['name' => lang('Home.pb_breadcrumb_home'),     'url' => base_url()],
+                ['name' => lang('Home.pb_breadcrumb_playbooks'),  'url' => base_url('playbook')],
+                ['name' => lang('Home.pb_imp_breadcrumb_current'), 'url' => $canonicalUrl],
             ],
-            'chapters' => [
-                'Cenário de Risco 2026',
-                'Balança Comercial em Números',
-                'O Dólar Eleitoral',
-                'Análise Setorial',
-                'Simulações de Impacto',
-                'Hedge Cambial Defensivo',
-                'Antecipação Tática de Estoque',
-                'Ex-Tarifário & Benefícios Estaduais',
-                'Ferramentas GX Capital',
-                'Checklist de Ação Imediata',
-                'Conclusão e Próximos Passos',
-            ],
-            'faq' => [
-                [
-                    'q' => 'O que é o "dólar eleitoral" e por que ele afeta importadores em 2026?',
-                    'a' => 'É o padrão recorrente de alta volatilidade cambial em anos de eleição presidencial brasileira. Em 2026, projeções da mesa GX Capital indicam pico do USD/BRL entre R$ 5,45 e R$ 5,55 no Q3 (agosto a outubro), pressionando importadores que liquidem operações sem hedge — o custo do dólar contratado em agosto pode ser até 13% maior que o de maio.',
-                ],
-                [
-                    'q' => 'Qual a melhor estrutura de hedge cambial para importação?',
-                    'a' => 'Depende do perfil. NDF (Non-Deliverable Forward) é simples e funciona para 30 a 180 dias. Termo é mais barato quando há fatura/Incoterm definido. Swap migra dívida CDI para USD. Collar protege com piso e teto, mantendo parte do upside. A mesa GX Capital compara custo entre 10+ instituições antes de recomendar a estrutura.',
-                ],
-                [
-                    'q' => 'Vale a pena antecipar estoque em maio para evitar o pico de Q3?',
-                    'a' => 'Para importações de bens de capital com lead time longo, sim. Simulações mostram que antecipar 3 meses de estoque a R$ 5,10 (maio) versus R$ 5,50 (agosto) economiza ~R$ 600 mil em uma operação de US$ 500 mil/mês — sem contar economia adicional de frete e prêmio de hedge evitado.',
-                ],
-                [
-                    'q' => 'Como funciona o Ex-Tarifário e quanto economiza?',
-                    'a' => 'Ex-Tarifário é a redução ou eliminação do Imposto de Importação (II) para produtos sem similar nacional, aprovado pela SECEX/MDIC. Em uma máquina de embalagem de US$ 100 mil, com II normal de 14%, o Ex-Tarifário aprovado zera o II e economiza R$ 71.400 a R$ 5,10. Validade de 2 anos, renovável.',
-                ],
-                [
-                    'q' => 'Empilhar Ex-Tarifário, benefício estadual e hedge dá quanto de economia?',
-                    'a' => 'Em uma operação real de US$ 100 mil de máquina de embalagem, o empilhamento de Ex-Tarifário (-14% II), benefício estadual SUDENE/SUDAM (-75% impostos federais e estaduais) e hedge cambial reduz o custo total em até 44,7% — de R$ 637.500 para R$ 352.525.',
-                ],
-                [
-                    'q' => 'Quando é a janela ideal para travar câmbio em 2026?',
-                    'a' => 'Maio e Junho. Em julho a janela começa a fechar conforme o mercado precifica o estresse eleitoral. Q3 (agosto a outubro) é o pico de risco. A recomendação da mesa GX Capital para importadores é estruturar hedge defensivo em camadas começando agora, com prazo de 60 a 180 dias.',
-                ],
-            ],
+            'chapters' => $this->brandInterp(lang('Home.pb_imp_chapters')),
+            'faq' => $this->brandInterp(lang('Home.pb_imp_faq')),
         ];
 
         $data = [
@@ -678,6 +641,25 @@ class HomeController extends BaseController
             return '';
         }
         return 'https://wa.me/' . $digits . '?text=' . rawurlencode((string)$message);
+    }
+
+    /**
+     * Substitui o token {brand} pelo nome da marca em strings ou arrays (recursivo).
+     * Complementa brandLang() (que só trata strings escalares) para os arrays de
+     * conteúdo i18n (capítulos, FAQ) dos playbooks/schema. Byte-safe (só strtr).
+     */
+    private function brandInterp($value)
+    {
+        $brandName = brand('display_name', 'GX Capital');
+        if (is_array($value)) {
+            array_walk_recursive($value, static function (&$v) use ($brandName) {
+                if (is_string($v)) {
+                    $v = strtr($v, ['{brand}' => $brandName]);
+                }
+            });
+            return $value;
+        }
+        return is_string($value) ? strtr($value, ['{brand}' => $brandName]) : $value;
     }
 
     private function buildHomeDescription(array $homeConfig)
