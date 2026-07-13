@@ -438,7 +438,7 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
     return isFinite(n) && n > 0 ? n : 0;
   }
   function moneyFmt0(n) {
-    return Math.round(Number(n) || 0).toLocaleString('pt-BR');
+    return Math.round(Number(n) || 0).toLocaleString('<?= brandLocaleFull(); ?>');
   }
   function intVal(id) { var v = parseInt((document.getElementById(id) || {}).value || '0', 10); return isFinite(v) ? v : 0; }
 
@@ -522,7 +522,7 @@ $ufPadrao = \App\Libraries\QuotationGate::UF_PADRAO;
   document.querySelectorAll('.gx-srs-money').forEach(function (el) {
     el.addEventListener('input', function () {
       var digits = el.value.replace(/\D/g, '');
-      el.value = digits ? Number(digits).toLocaleString('pt-BR') : '';
+      el.value = digits ? Number(digits).toLocaleString('<?= brandLocaleFull(); ?>') : '';
       if (el.id === 'gx-srs-cap-vida') { capitalUserEdited = true; updateDg(); }
     });
   });
