@@ -350,4 +350,41 @@ return [
     'js_send_fail'     => 'Falha ao enviar a simulação.',
     'js_send_err'      => 'Não foi possível enviar o cenário agora.',
     'js_success'       => 'Recebemos o seu cenário. A mesa de câmbio da {brand} vai avaliar o melhor caminho para a sua operação.',
+
+    // ===================================================================
+    // LOTE 5b — defaults de config da página (MarketingSimulatorsDefaults).
+    // Camada INDEPENDENTE dos fallbacks da view acima (mesmo valor em alguns
+    // casos, mas seed de config != fallback). URLs de âncora, valores de stat
+    // e tickers numéricos ficam literais no library.
+    // ===================================================================
+    'def_hero_badge'         => 'Mesa de câmbio com tecnologia e leitura consultiva',
+    'def_hero_title'         => 'Simuladores de câmbio para importar, exportar, proteger margem e estruturar funding com mais clareza.',
+    'def_hero_subtitle'      => 'Use cenários para importação, exportação, hedge, trade finance e operações 4131. Depois, a {brand} compara sua operação em mais de 10 instituições financeiras e apresenta a alternativa mais aderente ao seu momento.',
+    'def_hero_primary_cta'   => 'Agendar com especialista',
+    'def_hero_secondary_cta' => 'Abrir simuladores',
+    'def_hero_proof' => [
+        ['text' => 'Mais de 10 instituições financeiras entre bancos de câmbio e corretoras no processo de cotação.'],
+        ['text' => 'Mais de 16 anos de experiência do time no mercado financeiro e em operações internacionais.'],
+        ['text' => 'Leitura integrada de preço, prazo, proteção, funding e execução operacional.'],
+    ],
+    'def_tech_label'       => 'Mesa {brand}',
+    'def_tech_title'       => 'Tecnologia para comparar. Experiência para fechar a operação certa.',
+    'def_tech_desc'        => 'A mesa usa agente de IA para cruzar cotação, spread, prazo, documentação e aderência operacional entre múltiplas instituições. O foco não é a menor taxa isolada. É a estrutura mais eficiente para a necessidade real do cliente.',
+    'def_tech_stat1_label' => 'instituições financeiras monitoradas',
+    'def_tech_stat2_label' => 'anos de experiência no mercado financeiro',
+    'def_tech_stat3_label' => 'visão sobre câmbio, hedge, trade finance e funding',
+    'def_tech_signals' => [
+        ['text' => 'Cotação comparativa entre bancos de câmbio e corretoras, com leitura de custo total e não só de taxa nominal.'],
+        ['text' => 'Estruturação para importadores e exportadores com foco em margem, previsibilidade de caixa e timing operacional.'],
+        ['text' => 'Diagnóstico consultivo para hedge, ACC, ACE, FINIMP, supplier credit e alternativas 4131.'],
+    ],
+    'def_ind_ref_label' => 'Indicadores de referência',
+    'def_ind_note'      => 'Os resultados usam referências de mercado atualizadas periodicamente. O fechamento final depende da leitura da mesa, das instituições consultadas e das condições da operação.',
+    'def_lead_label'     => 'Leve o cenário para a mesa',
+    'def_lead_title'     => 'Agende uma conversa com a mesa de câmbio {brand}.',
+    'def_lead_desc'      => 'Preencha os dados abaixo e nossa mesa entra em contato para agendar a conversa. O retorno considera cotação, hedge, trade finance e melhor janela de execução.',
+    'def_lead_form_title' => 'Agende sua reunião com a mesa',
+    'def_lead_form_desc'  => 'Preencha os dados para reservar sua conversa. Retorno em até 1 dia útil.',
+    'def_lead_button'    => 'Quero falar com um especialista',
+    'def_lead_success'   => 'Recebemos o seu cenário. A mesa de câmbio da {brand} vai entrar em contato para agendar a conversa.',
 ];
