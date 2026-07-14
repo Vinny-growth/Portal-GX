@@ -44,6 +44,8 @@ class Autoload extends AutoloadConfig
         // Módulos white-label (Fase 0). Cada módulo registra seu namespace para que o
         // CI4 auto-descubra seu Config/Routes.php. A Fase 3 automatiza este registro.
         'Modules\\Hello' => ROOTPATH . 'modules/Hello',
+        // Fase 3 — retrofit de módulos reais (rotas gated por feature flag).
+        'Modules\\Wealth' => ROOTPATH . 'modules/Wealth',
     ];
 
     /**

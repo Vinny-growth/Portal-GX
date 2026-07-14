@@ -76,25 +76,9 @@ $routes->get('web-stories/story/(:num)', 'WebStoriesController::story/$1');
 $routes->get('web-stories/click/(:num)', 'WebStoriesController::click/$1');
 $routes->get('api/web-stories', 'WebStoriesController::apiGetStories');
 
-// Wealth Manager (public)
-$routes->get('wealth', 'WealthManagerController::index');
-$routes->get('wealth/conversa', 'WealthManagerController::conversa', ['filter' => 'auth']);
-$routes->post('wealth/lead', 'WealthManagerController::leadCapture');
-$routes->post('WealthManager/sendMessage', 'WealthManagerController::sendMessage', ['filter' => 'auth']);
-$routes->post('WealthManager/acceptConsent', 'WealthManagerController::acceptConsent', ['filter' => 'auth']);
-$routes->post('WealthManager/saveProfileBasic', 'WealthManagerController::saveProfileBasic', ['filter' => 'auth']);
-$routes->post('WealthManager/saveIncomeForm', 'WealthManagerController::saveIncomeForm', ['filter' => 'auth']);
-$routes->post('WealthManager/saveExpenseForm', 'WealthManagerController::saveExpenseForm', ['filter' => 'auth']);
-$routes->post('WealthManager/saveDependentsForm', 'WealthManagerController::saveDependentsForm', ['filter' => 'auth']);
-$routes->post('WealthManager/saveAllocationForm', 'WealthManagerController::saveAllocationForm', ['filter' => 'auth']);
-$routes->post('WealthManager/saveRealEstateForm', 'WealthManagerController::saveRealEstateForm', ['filter' => 'auth']);
-$routes->post('WealthManager/saveLiabilitiesForm', 'WealthManagerController::saveLiabilitiesForm', ['filter' => 'auth']);
-$routes->post('WealthManager/saveGoalsForm', 'WealthManagerController::saveGoalsForm', ['filter' => 'auth']);
-$routes->get('wealth/resultado', 'WealthManagerController::resultado', ['filter' => 'auth']);
-$routes->get('wealth/resultado/pdf', 'WealthManagerController::resumoPdf', ['filter' => 'auth']);
-$routes->get('wealth/agendar', 'WealthManagerController::agendar');
-$routes->post('wealth/agendar', 'WealthManagerController::agendarPost');
-$routes->post('WealthManager/trackEvent', 'WealthManagerController::trackEvent');
+// Wealth Manager (public) — Fase 3: rotas migradas para o módulo Wealth
+// (modules/Wealth/Config/Routes.php), carregado no topo deste arquivo via
+// ModuleRegistry::enabledRouteFiles() e gated pelo flag do módulo `wealth`.
 
 // CMS Pages (public)
 $routes->get('p/(:any)', 'CmsController::view/$1');
