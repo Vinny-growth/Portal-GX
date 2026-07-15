@@ -20,20 +20,11 @@ foreach (service('moduleRegistry')->enabledRouteFiles() as $__moduleRoutesFile) 
 
 $routes->get('/', 'HomeController::index');
 $routes->get('blog', 'HomeController::blog');
-$routes->get('simuladores', 'HomeController::simulatorsHub');
-$routes->get('simuladores/cambio', 'HomeController::simulatorsFxHub');
-$routes->get('simuladores-cambio', 'HomeController::simulatorsFxLegacyRedirect');
-$routes->get('simulador-de-risco-cambial', 'HomeController::simulatorsFxLegacyRedirect');
-$routes->get('fx-loan', 'HomeController::simulatorsFxLegacyRedirect');
-// Slugs de simulador legados/quebrados -> 301 para o slug canônico (Fase 6 GEO/SEO).
-// Precisam ser rotas GET (não addRedirect): getRoutes() casa o verbo GET antes do
-// wildcard `*`, então o catch-all `(:any)` -> HomeController::any interceptaria o
-// addRedirect e devolveria 404. Mapa: HomeController::LEGACY_SIMULATOR_REDIRECTS.
-foreach (array_keys(\App\Controllers\HomeController::LEGACY_SIMULATOR_REDIRECTS) as $legacySlug) {
-    $routes->get($legacySlug, 'HomeController::legacyRedirect');
-}
-// Conteúdo duplicado (site audit Ubersuggest) -> 301 para o canônico. Mesma razão de
-// ser rota GET. Mapa: HomeController::DUPLICATE_CONTENT_REDIRECTS.
+// Simuladores (hub/câmbio/aurum/seguro/playbooks/api) + 301 de slugs legados
+// (LEGACY_SIMULATOR_REDIRECTS) — Fase 3: migrados para o módulo Simulators
+// (modules/Simulators/Config/Routes.php), gated pelo flag do módulo `simulators`.
+// Conteúdo duplicado (site audit Ubersuggest) -> 301 para o canônico. Precisa ser rota
+// GET (mesma razão dos legados). Mapa: HomeController::DUPLICATE_CONTENT_REDIRECTS.
 foreach (array_keys(\App\Controllers\HomeController::DUPLICATE_CONTENT_REDIRECTS) as $dupSlug) {
     $routes->get($dupSlug, 'HomeController::duplicateRedirect');
 }
@@ -57,13 +48,8 @@ $routes->get('facebook-callback', 'AuthController::facebookCallback');
 $routes->get('connect-with-google', 'AuthController::connectWithGoogle');
 $routes->get('connect-with-vk', 'AuthController::connectWithVK');
 $routes->get('gnews/feed', 'HomeController::googleNewsFeeds');
-$routes->get('simulador-aurum', 'HomeController::simuladorAurum');
-$routes->get('simulador-seguro-resgatavel', 'HomeController::simuladorSeguroResgatavel');
-$routes->get('playbook/importacao-blindada', 'HomeController::playbookImportacaoBlindada');
-$routes->get('playbook/exportacao-premium', 'HomeController::playbookExportacaoPremium');
-$routes->post('api/save-simulator-lead', 'ApiController::saveSimulatorLead');
-$routes->match(['post', 'options'], 'api/quotation/preview', 'ApiController::quotationPreview');
-$routes->match(['post', 'options'], 'api/quotation/unlock', 'ApiController::quotationUnlock');
+// simulador-aurum / simulador-seguro-resgatavel / playbooks / api de simulador —
+// Fase 3: migrados para o módulo Simulators (gated pelo flag `simulators`).
 
 // Bio Links Routes
 $routes->get('bio', 'BioLinksController::index');
@@ -591,12 +577,16 @@ if (!empty($languages)) {
             $key = $language->short_form . '/';
             $routes->get($language->short_form, 'HomeController::index');
             $routes->get($key . 'blog', 'HomeController::blog');
-            $routes->get($key . 'simuladores', 'HomeController::simulatorsHub');
-            $routes->get($key . 'simuladores/cambio', 'HomeController::simulatorsFxHub');
-            $routes->get($key . 'simuladores-cambio', 'HomeController::simulatorsFxLegacyRedirect');
-            $routes->get($key . 'simulador-de-risco-cambial', 'HomeController::simulatorsFxLegacyRedirect');
-            $routes->get($key . 'fx-loan', 'HomeController::simulatorsFxLegacyRedirect');
-            $routes->get($key . 'simulador-seguro-resgatavel', 'HomeController::simuladorSeguroResgatavel');
+            // Simuladores (por-idioma): gated pelo flag do módulo `simulators` (Fase 3).
+            // Ficam aqui (não no módulo) por dependerem do $key do foreach de idiomas.
+            if (service('moduleRegistry')->enabled('simulators')) {
+                $routes->get($key . 'simuladores', 'HomeController::simulatorsHub');
+                $routes->get($key . 'simuladores/cambio', 'HomeController::simulatorsFxHub');
+                $routes->get($key . 'simuladores-cambio', 'HomeController::simulatorsFxLegacyRedirect');
+                $routes->get($key . 'simulador-de-risco-cambial', 'HomeController::simulatorsFxLegacyRedirect');
+                $routes->get($key . 'fx-loan', 'HomeController::simulatorsFxLegacyRedirect');
+                $routes->get($key . 'simulador-seguro-resgatavel', 'HomeController::simuladorSeguroResgatavel');
+            }
         }
         $routes->get($key . $customRoutes->register, 'AuthController::register');
         $routes->get($key . $customRoutes->forgot_password, 'AuthController::forgotPassword');

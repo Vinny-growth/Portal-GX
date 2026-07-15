@@ -46,6 +46,7 @@ class Autoload extends AutoloadConfig
         'Modules\\Hello' => ROOTPATH . 'modules/Hello',
         // Fase 3 — retrofit de módulos reais (rotas gated por feature flag).
         'Modules\\Wealth' => ROOTPATH . 'modules/Wealth',
+        'Modules\\Simulators' => ROOTPATH . 'modules/Simulators',
     ];
 
     /**
