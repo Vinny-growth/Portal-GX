@@ -37,8 +37,12 @@ $contactPhoneHref = !empty($baseSettings->contact_phone) ? preg_replace('/[^0-9+
                         <?php endforeach;
                     else: ?>
                         <a href="<?= esc($blogUrl ?? langBaseUrl('blog')); ?>" class="gx-footer-link">Blog</a>
+<?php if (service('moduleRegistry')->enabled('simulators')): ?>
                         <a href="<?= esc($simulatorsHubUrl ?? langBaseUrl('simuladores')); ?>" class="gx-footer-link">Simuladores</a>
+<?php endif; ?>
+<?php if (service('moduleRegistry')->enabled('wealth')): ?>
                         <a href="<?= esc($wealthUrl ?? base_url('wealth')); ?>" class="gx-footer-link">Wealth</a>
+<?php endif; ?>
                     <?php endif; ?>
                 </div>
             </section>

@@ -73,7 +73,9 @@ $navLinks = array_values(array_filter($navLinks, static function ($item) use ($s
     }
     return !empty($item['label']) && $href !== '';
 }));
-$navLinks[] = ['label' => 'Wealth', 'href' => $wealthUrl];
+if (service('moduleRegistry')->enabled('wealth')) {
+    $navLinks[] = ['label' => 'Wealth', 'href' => $wealthUrl];
+}
 $navLinks[] = ['label' => 'Newsletter', 'href' => langBaseUrl('newsletter')];
 $navLinks[] = ['label' => 'Histórias', 'href' => langBaseUrl('web-stories')];
 
