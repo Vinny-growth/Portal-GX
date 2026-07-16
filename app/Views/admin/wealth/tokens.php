@@ -19,7 +19,7 @@
                     <table class="table table-bordered">
                         <thead><tr><th>Usuário</th><th>Email</th><th>Tokens</th><th>Ajuste</th></tr></thead>
                         <tbody>
-                        <?php $wm = new \App\Models\WealthModel(); foreach ($users as $u): ?>
+                        <?php $wm = new \Modules\Wealth\Models\WealthModel(); foreach ($users as $u): ?>
                             <tr>
                                 <td><?= esc($u->username); ?></td>
                                 <td><?= esc($u->email); ?></td>

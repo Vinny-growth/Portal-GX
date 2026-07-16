@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Controllers;
+namespace Modules\Wealth\Controllers;
 
+use App\Controllers\BaseAdminController;
 use App\Models\AuthModel;
-use App\Models\WealthModel;
+use Modules\Wealth\Models\WealthModel;
 
 class WealthAdminController extends BaseAdminController
 {

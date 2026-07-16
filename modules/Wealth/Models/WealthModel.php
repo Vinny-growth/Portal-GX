@@ -1,6 +1,7 @@
-<?php namespace App\Models;
+<?php namespace Modules\Wealth\Models;
 
 use CodeIgniter\Model;
+use App\Models\BaseModel;
 
 class WealthModel extends BaseModel
 {

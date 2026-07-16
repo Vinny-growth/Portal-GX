@@ -287,23 +287,23 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->get('web-stories/toggle/(:num)', 'WebStoriesController::adminToggle/$1');
     // wealth manager (admin) — Fase 3b: gated pelo flag do módulo `wealth`
     if (service('moduleRegistry')->enabled('wealth')) {
-        $routes->get('wealth', 'WealthAdminController::index');
-        $routes->get('wealth/settings', 'WealthAdminController::settings');
-        $routes->post('WealthManager/adminSettingsPost', 'WealthAdminController::settingsPost');
-        $routes->get('wealth/tokens', 'WealthAdminController::tokens');
-        $routes->post('WealthManager/adminTokensPost', 'WealthAdminController::tokensPost');
-        $routes->get('wealth/appointments', 'WealthAdminController::appointments');
-        $routes->post('WealthManager/adminAppointmentStatusPost', 'WealthAdminController::appointmentStatusPost');
-        $routes->get('wealth/cms', 'WealthAdminController::cms');
-        $routes->post('WealthManager/adminCMSPost', 'WealthAdminController::cmsPost');
-        $routes->get('wealth/export', 'WealthAdminController::export');
-        $routes->post('WealthManager/adminExportCsv', 'WealthAdminController::exportCsv');
-        $routes->get('wealth/view-result/(:num)', 'WealthAdminController::viewResult/$1');
-        $routes->get('wealth/logs', 'WealthAdminController::logs');
-        $routes->get('wealth/run-setup', 'WealthAdminController::runSetup');
-        $routes->get('wealth/diagnostics', 'WealthAdminController::diagnostics');
-        $routes->get('wealth/sessions', 'WealthAdminController::sessions');
-        $routes->get('wealth/session/(:num)', 'WealthAdminController::session/$1');
+        $routes->get('wealth', '\Modules\Wealth\Controllers\WealthAdminController::index');
+        $routes->get('wealth/settings', '\Modules\Wealth\Controllers\WealthAdminController::settings');
+        $routes->post('WealthManager/adminSettingsPost', '\Modules\Wealth\Controllers\WealthAdminController::settingsPost');
+        $routes->get('wealth/tokens', '\Modules\Wealth\Controllers\WealthAdminController::tokens');
+        $routes->post('WealthManager/adminTokensPost', '\Modules\Wealth\Controllers\WealthAdminController::tokensPost');
+        $routes->get('wealth/appointments', '\Modules\Wealth\Controllers\WealthAdminController::appointments');
+        $routes->post('WealthManager/adminAppointmentStatusPost', '\Modules\Wealth\Controllers\WealthAdminController::appointmentStatusPost');
+        $routes->get('wealth/cms', '\Modules\Wealth\Controllers\WealthAdminController::cms');
+        $routes->post('WealthManager/adminCMSPost', '\Modules\Wealth\Controllers\WealthAdminController::cmsPost');
+        $routes->get('wealth/export', '\Modules\Wealth\Controllers\WealthAdminController::export');
+        $routes->post('WealthManager/adminExportCsv', '\Modules\Wealth\Controllers\WealthAdminController::exportCsv');
+        $routes->get('wealth/view-result/(:num)', '\Modules\Wealth\Controllers\WealthAdminController::viewResult/$1');
+        $routes->get('wealth/logs', '\Modules\Wealth\Controllers\WealthAdminController::logs');
+        $routes->get('wealth/run-setup', '\Modules\Wealth\Controllers\WealthAdminController::runSetup');
+        $routes->get('wealth/diagnostics', '\Modules\Wealth\Controllers\WealthAdminController::diagnostics');
+        $routes->get('wealth/sessions', '\Modules\Wealth\Controllers\WealthAdminController::sessions');
+        $routes->get('wealth/session/(:num)', '\Modules\Wealth\Controllers\WealthAdminController::session/$1');
     }
 
     // marketing home cms
@@ -630,4 +630,4 @@ $routes->get('(:any)/(:any)', 'HomeController::subCategory/$1/$2');
 $routes->get('(:any)', 'HomeController::any/$1');
 
 // CLI utility for Wealth Manager setup (unified under WealthAdminController)
-$routes->cli($customRoutes->admin . '/wealth/run-setup', 'WealthAdminController::runSetup');
+$routes->cli($customRoutes->admin . '/wealth/run-setup', '\Modules\Wealth\Controllers\WealthAdminController::runSetup');

@@ -3,10 +3,15 @@
 /**
  * Manifesto do módulo Wealth Manager (white-label — Fase 3, retrofit de módulo real).
  *
- * Primeiro módulo REAL da plataforma (o Hello é só prova de contrato). Nesta fase o
- * módulo é dono das ROTAS públicas do wealth (gating por feature flag); os controllers
- * (App\Controllers\WealthManagerController / WealthAdminController), models e views
- * seguem em app/ por enquanto — a realocação física é uma sub-fase posterior.
+ * Primeiro módulo REAL da plataforma (o Hello é só prova de contrato). Fase 3c concluída:
+ * o módulo é dono das ROTAS públicas + dos CONTROLLERS/MODELS/LIBRARIES, fisicamente
+ * residentes em modules/Wealth/ (Modules\Wealth\Controllers|Models|Libraries, via PSR-4
+ * em app/Config/Autoload.php). As VIEWS seguem em app/Views/ de propósito: as telas admin
+ * usam includes compartilhados (admin/includes/_header|_footer) e as views públicas do
+ * wealth são reusadas pelo painel admin — view('wealth/...') resolve contra o namespace
+ * APP independente de onde o controller mora. As rotas ADMIN ficam no grupo admin do core
+ * (app/Config/Routes.php, gated por enabled('wealth')) por dependerem do prefixo/filtro do
+ * grupo; só o handler aponta para Modules\Wealth\Controllers\WealthAdminController.
  *
  * enabled_default = true → a GX Brasil mantém o wealth LIGADO sem precisar de linha na
  * tabela `modules` (behavior-preserving). Um install que não queira wealth desliga o

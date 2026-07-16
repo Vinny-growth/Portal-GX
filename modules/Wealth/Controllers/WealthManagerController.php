@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Controllers;
+namespace Modules\Wealth\Controllers;
 
-use App\Models\WealthModel;
-use App\Libraries\WealthAgent;
+use App\Controllers\BaseController;
 use App\Models\SimLeadModel;
+use Modules\Wealth\Models\WealthModel;
+use Modules\Wealth\Libraries\WealthAgent;
 
 class WealthManagerController extends BaseController
 {

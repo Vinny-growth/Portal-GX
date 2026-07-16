@@ -8,8 +8,8 @@
  * caso o CI4 também auto-descubra este arquivo pelo namespace PSR-4.
  *
  * Só registram se o módulo `wealth` estiver habilitado (enabled_default=true → GX on).
- * Os handlers apontam para os controllers ainda em App\Controllers (realocação física
- * é sub-fase posterior).
+ * Os handlers apontam para os controllers do próprio módulo (Modules\Wealth\Controllers),
+ * fisicamente residentes em modules/Wealth/ (Fase 3c — realocação física concluída).
  */
 if (defined('MOD_ROUTES_WEALTH')) {
     return;
@@ -17,22 +17,22 @@ if (defined('MOD_ROUTES_WEALTH')) {
 define('MOD_ROUTES_WEALTH', 1);
 
 if (service('moduleRegistry')->enabled('wealth')) {
-    $routes->get('wealth', '\App\Controllers\WealthManagerController::index');
-    $routes->get('wealth/conversa', '\App\Controllers\WealthManagerController::conversa', ['filter' => 'auth']);
-    $routes->post('wealth/lead', '\App\Controllers\WealthManagerController::leadCapture');
-    $routes->post('WealthManager/sendMessage', '\App\Controllers\WealthManagerController::sendMessage', ['filter' => 'auth']);
-    $routes->post('WealthManager/acceptConsent', '\App\Controllers\WealthManagerController::acceptConsent', ['filter' => 'auth']);
-    $routes->post('WealthManager/saveProfileBasic', '\App\Controllers\WealthManagerController::saveProfileBasic', ['filter' => 'auth']);
-    $routes->post('WealthManager/saveIncomeForm', '\App\Controllers\WealthManagerController::saveIncomeForm', ['filter' => 'auth']);
-    $routes->post('WealthManager/saveExpenseForm', '\App\Controllers\WealthManagerController::saveExpenseForm', ['filter' => 'auth']);
-    $routes->post('WealthManager/saveDependentsForm', '\App\Controllers\WealthManagerController::saveDependentsForm', ['filter' => 'auth']);
-    $routes->post('WealthManager/saveAllocationForm', '\App\Controllers\WealthManagerController::saveAllocationForm', ['filter' => 'auth']);
-    $routes->post('WealthManager/saveRealEstateForm', '\App\Controllers\WealthManagerController::saveRealEstateForm', ['filter' => 'auth']);
-    $routes->post('WealthManager/saveLiabilitiesForm', '\App\Controllers\WealthManagerController::saveLiabilitiesForm', ['filter' => 'auth']);
-    $routes->post('WealthManager/saveGoalsForm', '\App\Controllers\WealthManagerController::saveGoalsForm', ['filter' => 'auth']);
-    $routes->get('wealth/resultado', '\App\Controllers\WealthManagerController::resultado', ['filter' => 'auth']);
-    $routes->get('wealth/resultado/pdf', '\App\Controllers\WealthManagerController::resumoPdf', ['filter' => 'auth']);
-    $routes->get('wealth/agendar', '\App\Controllers\WealthManagerController::agendar');
-    $routes->post('wealth/agendar', '\App\Controllers\WealthManagerController::agendarPost');
-    $routes->post('WealthManager/trackEvent', '\App\Controllers\WealthManagerController::trackEvent');
+    $routes->get('wealth', '\Modules\Wealth\Controllers\WealthManagerController::index');
+    $routes->get('wealth/conversa', '\Modules\Wealth\Controllers\WealthManagerController::conversa', ['filter' => 'auth']);
+    $routes->post('wealth/lead', '\Modules\Wealth\Controllers\WealthManagerController::leadCapture');
+    $routes->post('WealthManager/sendMessage', '\Modules\Wealth\Controllers\WealthManagerController::sendMessage', ['filter' => 'auth']);
+    $routes->post('WealthManager/acceptConsent', '\Modules\Wealth\Controllers\WealthManagerController::acceptConsent', ['filter' => 'auth']);
+    $routes->post('WealthManager/saveProfileBasic', '\Modules\Wealth\Controllers\WealthManagerController::saveProfileBasic', ['filter' => 'auth']);
+    $routes->post('WealthManager/saveIncomeForm', '\Modules\Wealth\Controllers\WealthManagerController::saveIncomeForm', ['filter' => 'auth']);
+    $routes->post('WealthManager/saveExpenseForm', '\Modules\Wealth\Controllers\WealthManagerController::saveExpenseForm', ['filter' => 'auth']);
+    $routes->post('WealthManager/saveDependentsForm', '\Modules\Wealth\Controllers\WealthManagerController::saveDependentsForm', ['filter' => 'auth']);
+    $routes->post('WealthManager/saveAllocationForm', '\Modules\Wealth\Controllers\WealthManagerController::saveAllocationForm', ['filter' => 'auth']);
+    $routes->post('WealthManager/saveRealEstateForm', '\Modules\Wealth\Controllers\WealthManagerController::saveRealEstateForm', ['filter' => 'auth']);
+    $routes->post('WealthManager/saveLiabilitiesForm', '\Modules\Wealth\Controllers\WealthManagerController::saveLiabilitiesForm', ['filter' => 'auth']);
+    $routes->post('WealthManager/saveGoalsForm', '\Modules\Wealth\Controllers\WealthManagerController::saveGoalsForm', ['filter' => 'auth']);
+    $routes->get('wealth/resultado', '\Modules\Wealth\Controllers\WealthManagerController::resultado', ['filter' => 'auth']);
+    $routes->get('wealth/resultado/pdf', '\Modules\Wealth\Controllers\WealthManagerController::resumoPdf', ['filter' => 'auth']);
+    $routes->get('wealth/agendar', '\Modules\Wealth\Controllers\WealthManagerController::agendar');
+    $routes->post('wealth/agendar', '\Modules\Wealth\Controllers\WealthManagerController::agendarPost');
+    $routes->post('WealthManager/trackEvent', '\Modules\Wealth\Controllers\WealthManagerController::trackEvent');
 }

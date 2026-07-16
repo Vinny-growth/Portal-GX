@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Libraries;
+namespace Modules\Wealth\Libraries;
 
-use App\Models\WealthModel;
+use Modules\Wealth\Models\WealthModel;
 
 class WealthAgent
 {
