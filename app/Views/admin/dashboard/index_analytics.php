@@ -165,9 +165,11 @@ if (!empty($ga4Connection['is_ready'])) {
                             <?php endforeach; ?>
                         </ul>
                     </div>
+                    <?php if (service('moduleRegistry')->enabled('simulators')): ?>
                     <a href="<?= adminUrl('dashboard/simuladores'); ?>?days=<?= $days; ?>" class="btn btn-default btn-sm">
                         <i class="fa fa-flask"></i> Simuladores
                     </a>
+                    <?php endif; ?>
                     <a href="<?= adminUrl('dashboard/widgets'); ?>" class="btn btn-primary btn-sm">
                         <i class="fa fa-sliders"></i> Personalizar
                     </a>

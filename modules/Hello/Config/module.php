@@ -16,5 +16,8 @@ return [
     'admin_nav'       => [],
     'permissions'     => [],
     'settings'        => [],
+    // Convenção do manifesto: módulos NOVOS declaram aqui o namespace das suas
+    // migrations (ex.: 'Modules\Courses'); retrofit/prova = null (sem migrations próprias).
+    'migrations_ns'   => null,
     'enabled_default' => false,
 ];

@@ -20,8 +20,13 @@ return [
     'menu'            => [
         ['label' => 'Wealth Manager', 'url' => 'wealth'],
     ],
-    'admin_nav'       => [],
+    'admin_nav'       => [
+        ['label' => 'Wealth Manager', 'url' => 'wealth'],
+    ],
     'permissions'     => [],
     'settings'        => [],
+    // Retrofit: as tabelas do wealth já vivem em app/Database/Migrations (já aplicadas
+    // em prod). Módulos NOVOS (ex.: Courses) declaram aqui o namespace das suas migrations.
+    'migrations_ns'   => null,
     'enabled_default' => true,
 ];

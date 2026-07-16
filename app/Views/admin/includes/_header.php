@@ -138,12 +138,14 @@
                         <li class="nav-marketing-home<?php isAdminNavActive(['marketing']); ?>">
                             <a href="<?= adminUrl('marketing/home-cms'); ?>"><i class="fa fa-desktop"></i><span>Home Institucional</span></a>
                         </li>
+                        <?php if (service('moduleRegistry')->enabled('simulators')): ?>
                         <li class="nav-marketing-simulators<?php isAdminNavActive(['marketing']); ?>">
                             <a href="<?= adminUrl('marketing/simulators-cms'); ?>"><i class="fa fa-line-chart"></i><span>Simuladores de Câmbio</span></a>
                         </li>
                         <li class="nav-marketing-consorcio<?php isAdminNavActive(['marketing']); ?>">
                             <a href="<?= adminUrl('marketing/consorcio-cms'); ?>"><i class="fa fa-handshake-o"></i><span>Simulador de Consórcio</span></a>
                         </li>
+                        <?php endif; ?>
                         <li class="nav-cms-pages">
                             <a href="<?= adminUrl('cms-pages'); ?>"><i class="fa fa-magic"></i><span>Páginas (CMS Visual)</span></a>
                         </li>
@@ -152,12 +154,14 @@
                         <li class="nav-marketing-home<?php isAdminNavActive(['marketing']); ?>">
                             <a href="<?= adminUrl('marketing/home-cms'); ?>"><i class="fa fa-desktop"></i><span>Home Institucional</span></a>
                         </li>
+                        <?php if (service('moduleRegistry')->enabled('simulators')): ?>
                         <li class="nav-marketing-simulators<?php isAdminNavActive(['marketing']); ?>">
                             <a href="<?= adminUrl('marketing/simulators-cms'); ?>"><i class="fa fa-line-chart"></i><span>Simuladores de Câmbio</span></a>
                         </li>
                         <li class="nav-marketing-consorcio<?php isAdminNavActive(['marketing']); ?>">
                             <a href="<?= adminUrl('marketing/consorcio-cms'); ?>"><i class="fa fa-handshake-o"></i><span>Simulador de Consórcio</span></a>
                         </li>
+                        <?php endif; ?>
                         <li class="nav-cms-pages">
                             <a href="<?= adminUrl('cms-pages'); ?>"><i class="fa fa-magic"></i><span>Páginas (CMS Visual)</span></a>
                         </li>
@@ -219,6 +223,7 @@
                         <li class="nav-web-stories">
                             <a href="<?= adminUrl('web-stories'); ?>"><i class="fa fa-images" aria-hidden="true"></i><span>Web Stories</span></a>
                         </li>
+                        <?php if (service('moduleRegistry')->enabled('wealth')): ?>
                         <li class="treeview<?php isAdminNavActive(['wealth','wealth-settings','wealth-tokens','wealth-appointments','wealth-cms','wealth-export']); ?>">
                             <a href="#"><i class="fa fa-line-chart"></i> <span>Wealth Manager</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
                             <ul class="treeview-menu">
@@ -231,6 +236,7 @@
                                 <li class="nav-wealth-logs"><a href="<?= adminUrl('wealth/logs'); ?>">Logs/Auditoria</a></li>
                             </ul>
                         </li>
+                        <?php endif; ?>
                     <?php endif;
                     if (hasPermission('gallery')): ?>
                         <li class="treeview<?php isAdminNavActive(['gallery-images', 'gallery-albums', 'gallery-categories', 'update-gallery-image', 'update-gallery-album', 'update-gallery-category', 'gallery-add-image']); ?>">

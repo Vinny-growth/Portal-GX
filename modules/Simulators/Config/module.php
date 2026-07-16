@@ -22,8 +22,12 @@ return [
     'menu'            => [
         ['label' => 'Simuladores', 'url' => 'simuladores'],
     ],
-    'admin_nav'       => [],
+    'admin_nav'       => [
+        ['label' => 'Simuladores (CMS)', 'url' => 'marketing/simulators-cms'],
+    ],
     'permissions'     => [],
     'settings'        => [],
+    // Retrofit: sem migrations próprias (páginas servidas pelo CMS + leads em app/).
+    'migrations_ns'   => null,
     'enabled_default' => true,
 ];

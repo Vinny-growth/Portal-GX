@@ -252,7 +252,10 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->get('dashboard/widgets', 'DashboardController::widgets');
     $routes->post('dashboard/save-widget-config', 'DashboardController::saveWidgetConfig');
     $routes->get('dashboard/live-data', 'DashboardController::liveData');
-    $routes->get('dashboard/simuladores', 'DashboardController::simuladores');
+    // Fase 3b: analytics por simulador gated pelo flag do módulo `simulators`
+    if (service('moduleRegistry')->enabled('simulators')) {
+        $routes->get('dashboard/simuladores', 'DashboardController::simuladores');
+    }
     $routes->post('dashboard/get-analytics-data', 'DashboardController::getAnalyticsData');
     $routes->get('dashboard/export-data', 'DashboardController::exportData');
     //language
@@ -282,32 +285,37 @@ $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
     $routes->get('web-stories/delete/(:num)', 'WebStoriesController::adminDelete/$1');
     $routes->post('web-stories/delete/(:num)', 'WebStoriesController::adminDelete/$1');
     $routes->get('web-stories/toggle/(:num)', 'WebStoriesController::adminToggle/$1');
-    // wealth manager (admin)
-    $routes->get('wealth', 'WealthAdminController::index');
-    $routes->get('wealth/settings', 'WealthAdminController::settings');
-    $routes->post('WealthManager/adminSettingsPost', 'WealthAdminController::settingsPost');
-    $routes->get('wealth/tokens', 'WealthAdminController::tokens');
-    $routes->post('WealthManager/adminTokensPost', 'WealthAdminController::tokensPost');
-    $routes->get('wealth/appointments', 'WealthAdminController::appointments');
-    $routes->post('WealthManager/adminAppointmentStatusPost', 'WealthAdminController::appointmentStatusPost');
-    $routes->get('wealth/cms', 'WealthAdminController::cms');
-    $routes->post('WealthManager/adminCMSPost', 'WealthAdminController::cmsPost');
-    $routes->get('wealth/export', 'WealthAdminController::export');
-    $routes->post('WealthManager/adminExportCsv', 'WealthAdminController::exportCsv');
-    $routes->get('wealth/view-result/(:num)', 'WealthAdminController::viewResult/$1');
-    $routes->get('wealth/logs', 'WealthAdminController::logs');
-    $routes->get('wealth/run-setup', 'WealthAdminController::runSetup');
-    $routes->get('wealth/diagnostics', 'WealthAdminController::diagnostics');
-    $routes->get('wealth/sessions', 'WealthAdminController::sessions');
-    $routes->get('wealth/session/(:num)', 'WealthAdminController::session/$1');
+    // wealth manager (admin) — Fase 3b: gated pelo flag do módulo `wealth`
+    if (service('moduleRegistry')->enabled('wealth')) {
+        $routes->get('wealth', 'WealthAdminController::index');
+        $routes->get('wealth/settings', 'WealthAdminController::settings');
+        $routes->post('WealthManager/adminSettingsPost', 'WealthAdminController::settingsPost');
+        $routes->get('wealth/tokens', 'WealthAdminController::tokens');
+        $routes->post('WealthManager/adminTokensPost', 'WealthAdminController::tokensPost');
+        $routes->get('wealth/appointments', 'WealthAdminController::appointments');
+        $routes->post('WealthManager/adminAppointmentStatusPost', 'WealthAdminController::appointmentStatusPost');
+        $routes->get('wealth/cms', 'WealthAdminController::cms');
+        $routes->post('WealthManager/adminCMSPost', 'WealthAdminController::cmsPost');
+        $routes->get('wealth/export', 'WealthAdminController::export');
+        $routes->post('WealthManager/adminExportCsv', 'WealthAdminController::exportCsv');
+        $routes->get('wealth/view-result/(:num)', 'WealthAdminController::viewResult/$1');
+        $routes->get('wealth/logs', 'WealthAdminController::logs');
+        $routes->get('wealth/run-setup', 'WealthAdminController::runSetup');
+        $routes->get('wealth/diagnostics', 'WealthAdminController::diagnostics');
+        $routes->get('wealth/sessions', 'WealthAdminController::sessions');
+        $routes->get('wealth/session/(:num)', 'WealthAdminController::session/$1');
+    }
 
     // marketing home cms
     $routes->get('marketing/home-cms', 'MarketingAdminController::homeCms');
     $routes->post('marketing/home-cms', 'MarketingAdminController::homeCmsPost');
-    $routes->get('marketing/simulators-cms', 'MarketingAdminController::simulatorsCms');
-    $routes->post('marketing/simulators-cms', 'MarketingAdminController::simulatorsCmsPost');
-    $routes->get('marketing/consorcio-cms', 'MarketingAdminController::consorcioCms');
-    $routes->post('marketing/consorcio-cms', 'MarketingAdminController::consorcioCmsPost');
+    // Fase 3b: CMS de simuladores gated pelo flag do módulo `simulators`
+    if (service('moduleRegistry')->enabled('simulators')) {
+        $routes->get('marketing/simulators-cms', 'MarketingAdminController::simulatorsCms');
+        $routes->post('marketing/simulators-cms', 'MarketingAdminController::simulatorsCmsPost');
+        $routes->get('marketing/consorcio-cms', 'MarketingAdminController::consorcioCms');
+        $routes->post('marketing/consorcio-cms', 'MarketingAdminController::consorcioCmsPost');
+    }
 
     // CMS Pages (admin) - visual builder (avoid conflict with AdminController::pages)
     $routes->get('cms-pages', 'PagesAdminController::index');
