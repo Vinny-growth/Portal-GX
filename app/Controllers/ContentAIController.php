@@ -6,6 +6,7 @@ use App\Libraries\ContentAIService;
 use App\Libraries\TrendsFetcher;
 use App\Models\ContentAISettingsModel;
 use App\Models\ContentCalendarModel;
+use App\Models\PopularPostsControlModel;
 use App\Models\TrendItemModel;
 use App\Models\TrendSourceHealthModel;
 use App\Models\XPulseSnapshotModel;
@@ -15,6 +16,7 @@ class ContentAIController extends BaseAdminController
     protected $settingsModel;
     protected $calendarModel;
     protected $trendModel;
+    protected $popularControlModel;
     protected $service;
 
     public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
@@ -23,6 +25,7 @@ class ContentAIController extends BaseAdminController
         $this->settingsModel = new ContentAISettingsModel();
         $this->calendarModel = new ContentCalendarModel();
         $this->trendModel = new TrendItemModel();
+        $this->popularControlModel = new PopularPostsControlModel();
         $this->service = new ContentAIService();
     }
 
@@ -58,6 +61,11 @@ class ContentAIController extends BaseAdminController
             $data['xPulseItems'] = (new XPulseSnapshotModel())->getActive(24, 15);
         } catch (\Throwable $e) {
             $data['xPulseItems'] = [];
+        }
+        try {
+            $data['popularControl'] = $this->popularControlModel->getForAdmin(100);
+        } catch (\Throwable $e) {
+            $data['popularControl'] = [];
         }
         $data['categories'] = $this->categories;
         $data['panelSettings'] = panelSettings();
@@ -135,6 +143,10 @@ class ContentAIController extends BaseAdminController
             'popular_window_days' => $popularWindow,
             'popular_metric' => $popularMetric,
             'popular_min_pageviews' => max(0, (int) clrNum(inputPost('popular_min_pageviews'))),
+            'popular_max_derivations' => max(0, (int) clrNum(inputPost('popular_max_derivations'))),
+            'popular_cooldown_days' => max(0, (int) clrNum(inputPost('popular_cooldown_days'))),
+            'popular_diversity_enabled' => inputPost('popular_diversity_enabled') ? 1 : 0,
+            'popular_per_category_cap' => max(0, (int) clrNum(inputPost('popular_per_category_cap'))),
             'popular_editor_prompt' => $popularEditorPrompt,
             'trend_keywords_json' => $trendKeywordsJson,
             'x_pulse_enabled' => inputPost('x_pulse_enabled') ? 1 : 0,
@@ -143,6 +155,8 @@ class ContentAIController extends BaseAdminController
             'x_min_mentions' => max(0, (int) clrNum(inputPost('x_min_mentions'))),
             'x_grok_model' => cleanStr(inputPost('x_grok_model')) ?: 'grok-4-fast',
             'x_pulse_prompt' => trim((string) inputPost('x_pulse_prompt')),
+            'x_seed_enabled' => inputPost('x_seed_enabled') ? 1 : 0,
+            'x_seed_per_day' => max(0, (int) clrNum(inputPost('x_seed_per_day'))),
             'default_user_id' => clrNum(inputPost('default_user_id')) ?: 1,
             'voice_guidelines' => $voice,
             'seo_guidelines' => $seo,
@@ -361,6 +375,33 @@ class ContentAIController extends BaseAdminController
             setSuccessMessage('X Pulse: ' . (int) $res['snapshot_count'] . ' temas persistidos.');
         }
         return redirect()->to(adminUrl('content-ai'));
+    }
+
+    /** Exclui um post da esteira de populares (blocklist manual). */
+    public function blockPopularPostPost()
+    {
+        checkPermission('add_post');
+        $postId = (int) clrNum(inputPost('post_id'));
+        $title = trim((string) inputPost('title'));
+        if ($postId > 0 && $this->popularControlModel->block($postId, 'manual', $title !== '' ? $title : null)) {
+            setSuccessMessage('Post removido dos populares (blocklist).');
+        } else {
+            setErrorMessage('msg_error');
+        }
+        return redirect()->to(adminUrl('content-ai') . '#popular-control');
+    }
+
+    /** Reabilita um post excluído (remove da blocklist). */
+    public function unblockPopularPostPost()
+    {
+        checkPermission('add_post');
+        $postId = (int) clrNum(inputPost('post_id'));
+        if ($postId > 0 && $this->popularControlModel->unblock($postId)) {
+            setSuccessMessage('Post reabilitado nos populares.');
+        } else {
+            setErrorMessage('msg_error');
+        }
+        return redirect()->to(adminUrl('content-ai') . '#popular-control');
     }
 
     protected function splitKeywordTextarea(string $raw): array

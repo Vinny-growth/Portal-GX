@@ -34,6 +34,16 @@ class ContentAISettingsModel extends BaseModel
         'x_grok_model',
         'x_pulse_prompt',
         'last_run_x_pulse',
+        // Controle de populares (cap/cooldown/diversidade) + X seed como fonte de pauta.
+        // saveSettings() persiste via builder() cru, mas declarar aqui evita quebra silenciosa
+        // caso um save futuro passe pelos métodos do Model (que filtram por allowedFields).
+        'popular_max_derivations',
+        'popular_cooldown_days',
+        'popular_diversity_enabled',
+        'popular_per_category_cap',
+        'x_seed_enabled',
+        'x_seed_per_day',
+        'last_run_x_seed',
         'default_user_id',
         'voice_guidelines',
         'seo_guidelines',
@@ -137,6 +147,10 @@ class ContentAISettingsModel extends BaseModel
         if (!isset($row->x_window_hours) || (int) $row->x_window_hours <= 0) {
             $patch['x_window_hours'] = 6;
         }
+
+        // Integração idempotente e self-healing do assunto "Seguro de Vida" na linha viva.
+        $this->integrateSeguroInto($row, $patch);
+
         if (!empty($patch)) {
             $this->builder()->where('id', $row->id)->update($patch);
             foreach ($patch as $k => $v) {
@@ -144,6 +158,77 @@ class ContentAISettingsModel extends BaseModel
             }
         }
         return $row;
+    }
+
+    /**
+     * Garante que "Seguro de Vida" esteja presente na configuração viva: peso de tópico,
+     * palavras de relevância, guidelines/rules da categoria e escopo dos prompts.
+     * Só toca no que falta (idempotente). NÃO sobrescreve prompts que o usuário customizou
+     * — o str_replace só casa quando o texto ainda é o default conhecido.
+     */
+    protected function integrateSeguroInto($row, array &$patch): void
+    {
+        // 1) topic_weights: garante a chave 'seguro' (sem renormalizar — o usuário ajusta na UI).
+        $weights = json_decode((string) ($patch['topic_weights_json'] ?? ($row->topic_weights_json ?? '')), true);
+        if (is_array($weights) && !array_key_exists('seguro', $weights)) {
+            $weights['seguro'] = 15;
+            $patch['topic_weights_json'] = json_encode($weights);
+        }
+
+        // 2) trend keywords: garante termos de seguro no filtro de relevância.
+        $kw = json_decode((string) ($patch['trend_keywords_json'] ?? ($row->trend_keywords_json ?? '')), true);
+        if (is_array($kw)) {
+            $need = [
+                'phrases' => ['seguro de vida', 'seguro de vida resgatavel', 'planejamento sucessorio', 'previdencia privada'],
+                'words'   => ['seguro', 'seguros', 'seguradora', 'previdencia', 'susep', 'resgatavel', 'sucessao'],
+            ];
+            $changed = false;
+            foreach ($need as $bucket => $terms) {
+                $cur = array_map('strval', (array) ($kw[$bucket] ?? []));
+                foreach ($terms as $t) {
+                    if (!in_array($t, $cur, true)) { $cur[] = $t; $changed = true; }
+                }
+                $kw[$bucket] = $cur;
+            }
+            if ($changed) {
+                $patch['trend_keywords_json'] = json_encode($kw, JSON_UNESCAPED_UNICODE);
+            }
+        }
+
+        // 3) guidelines/rules da categoria seguro (precisa do id — só quando já migrada).
+        $seguroId = $this->getSeguroCategoryId();
+        if ($seguroId) {
+            $g = json_decode((string) ($patch['category_guidelines_json'] ?? ($row->category_guidelines_json ?? '')), true);
+            if (is_array($g) && !array_key_exists($seguroId, $g)) {
+                $g[$seguroId] = 'Seguro de Vida: seguro de vida resgatavel (whole life), protecao patrimonial, sucessao e previdencia para empresas e familias. Sempre YMYL/compliance — sem promessa de rentabilidade.';
+                $patch['category_guidelines_json'] = json_encode($g);
+            }
+            $r = json_decode((string) ($patch['category_rules_json'] ?? ($row->category_rules_json ?? '')), true);
+            if (is_array($r) && !array_key_exists($seguroId, $r)) {
+                $r[$seguroId] = ['seguro de vida', 'seguro resgatavel', 'whole life', 'vida inteira', 'previdencia', 'sucessao', 'holding familiar', 'protecao patrimonial', 'susep', 'apolice'];
+                $patch['category_rules_json'] = json_encode($r);
+            }
+        }
+
+        // 4) escopo dos prompts (str_replace cirúrgico — só se ainda for o texto default e sem 'seguro').
+        $pop = (string) ($patch['popular_editor_prompt'] ?? ($row->popular_editor_prompt ?? ''));
+        if ($pop !== '' && stripos($pop, 'seguro de vida') === false
+            && strpos($pop, 'consorcio, investimentos e economia/mercado financeiro') !== false) {
+            $patch['popular_editor_prompt'] = str_replace(
+                'consorcio, investimentos e economia/mercado financeiro',
+                'consorcio, seguro de vida, investimentos e economia/mercado financeiro',
+                $pop
+            );
+        }
+        $xp = (string) ($patch['x_pulse_prompt'] ?? ($row->x_pulse_prompt ?? ''));
+        if ($xp !== '' && stripos($xp, 'seguro de vida') === false
+            && strpos($xp, "- Consorcio (consorcio imobiliario, lance, contemplacao)\n") !== false) {
+            $patch['x_pulse_prompt'] = str_replace(
+                "- Consorcio (consorcio imobiliario, lance, contemplacao)\n",
+                "- Consorcio (consorcio imobiliario, lance, contemplacao)\n- Seguro de vida (resgatavel, whole life, previdencia privada, VGBL/PGBL, sucessao, holding familiar, protecao patrimonial)\n",
+                $xp
+            );
+        }
     }
 
     /**
@@ -163,6 +248,8 @@ class ContentAISettingsModel extends BaseModel
                 'politica monetaria', 'politica fiscal', 'comercio exterior',
                 'balanca de pagamentos', 'reserva cambial', 'fluxo cambial',
                 'operacao de credito', 'mercado de credito', 'mercado de capitais',
+                'seguro de vida', 'seguro de vida resgatavel', 'planejamento sucessorio',
+                'previdencia privada', 'holding familiar', 'protecao patrimonial',
             ],
             'words' => [
                 'cambio', 'cambial', 'dolar', 'forex', 'comex', 'exportacao', 'importacao',
@@ -170,6 +257,8 @@ class ContentAISettingsModel extends BaseModel
                 'credito', 'emprestimo', 'emprestimos', 'financiamento', 'juros',
                 'recebiveis', 'bndes', 'duplicata', 'fidc', 'debenture', 'inadimplencia',
                 'consorcio', 'consorcios',
+                'seguro', 'seguros', 'seguradora', 'apolice', 'previdencia', 'susep',
+                'resgatavel', 'sinistro', 'atuarial', 'vgbl', 'pgbl', 'sucessorio', 'sucessao',
                 'economia', 'economica', 'economico', 'inflacao', 'ipca', 'igpm',
                 'selic', 'bacen', 'copom', 'ibovespa', 'deficit', 'superavit',
                 'investimento', 'investimentos', 'investir', 'investidores',
@@ -219,6 +308,11 @@ class ContentAISettingsModel extends BaseModel
         return (bool) $this->builder()->set('last_run_x_pulse', $datetime)->update();
     }
 
+    public function updateLastRunXSeed(string $datetime): bool
+    {
+        return (bool) $this->builder()->set('last_run_x_seed', $datetime)->update();
+    }
+
     public function getDefaultXPulsePrompt(): string
     {
         return "Voce e um analista de pulso do mercado financeiro brasileiro.\n"
@@ -229,6 +323,7 @@ class ContentAISettingsModel extends BaseModel
             . "- Cambio e trade finance (dolar, ptax, exportadores, importadores, hedge, comex, 4131, FX loans)\n"
             . "- Credito empresarial (BNDES, capital de giro, FIDC, debentures, juros para PJ, recebiveis)\n"
             . "- Consorcio (consorcio imobiliario, lance, contemplacao)\n"
+            . "- Seguro de vida (resgatavel, whole life, previdencia privada, VGBL/PGBL, sucessao, holding familiar, protecao patrimonial)\n"
             . "- Investimentos (renda fixa, renda variavel, FII, cripto, ETF, tesouro direto, B3)\n"
             . "- Economia e politica monetaria (Copom, Selic, inflacao, IPCA, Bacen, Fed, decisoes regulatorias)\n"
             . "- Empresas listadas com impacto sistemico (Petrobras, Vale, bancos, Nubank, fintechs)\n\n"
@@ -298,37 +393,156 @@ class ContentAISettingsModel extends BaseModel
 
     private function getDefaultCategoryRulesJson(): string
     {
-        $rules = [
-            11 => ['o que e', 'entenda', 'guia', 'glossario', 'jargao', 'termos', 'explica', 'definicao', 'como funciona'],
-            6 => ['cambio', 'dolar', 'usd', 'forex', 'comex', 'exportacao', 'importacao', 'balanca comercial', 'swap', 'moeda'],
-            8 => ['credito', 'emprestimo', 'financiamento', 'capital de giro', 'juros empresariais', 'recebiveis', 'bndes', 'duplicatas'],
-            13 => ['investimento', 'carteira', 'renda fixa', 'acoes', 'fiis', 'fii', 'cripto', 'renda variavel', 'alocacao', 'portfolio', 'etf'],
-            7 => ['economia', 'mercado financeiro', 'inflacao', 'pib', 'selic', 'banco central', 'bolsa', 'tecnologia', 'mundo'],
+        // Regras por VERTICAL canônico — os IDs de categoria são resolvidos por slug
+        // (getVerticalSlugMap), não hardcoded, para suportar installs white-label.
+        $rulesByVertical = [
+            'gx-explica'    => ['o que e', 'entenda', 'guia', 'glossario', 'jargao', 'termos', 'explica', 'definicao', 'como funciona'],
+            'cambio'        => ['cambio', 'dolar', 'usd', 'forex', 'comex', 'exportacao', 'importacao', 'balanca comercial', 'swap', 'moeda'],
+            'credito'       => ['credito', 'emprestimo', 'financiamento', 'capital de giro', 'juros empresariais', 'recebiveis', 'bndes', 'duplicatas'],
+            'investimentos' => ['investimento', 'carteira', 'renda fixa', 'acoes', 'fiis', 'fii', 'cripto', 'renda variavel', 'alocacao', 'portfolio', 'etf'],
+            'economia'      => ['economia', 'mercado financeiro', 'inflacao', 'pib', 'selic', 'banco central', 'bolsa', 'tecnologia', 'mundo'],
+            'seguro'        => ['seguro de vida', 'seguro resgatavel', 'whole life', 'vida inteira', 'previdencia', 'sucessao', 'holding familiar', 'protecao patrimonial', 'susep', 'apolice'],
         ];
+        $rules = [];
+        foreach ($rulesByVertical as $vertical => $kws) {
+            $id = $this->categoryIdForVertical($vertical);
+            if ($id) {
+                $rules[$id] = $kws;
+            }
+        }
         return json_encode($rules);
     }
 
     private function getDefaultCategoryGuidelinesJson(): string
     {
-        $guidelines = [
-            7 => 'Radar Economico: noticias amplas de mercado financeiro, economia, mundo e tecnologia.',
-            11 => 'GX Explica: linha editorial educacional, explica termos e noticias com linguagem simples e acessivel.',
-            6 => 'Cambio: comex e noticias internacionais que impactam o cambio e o dolar.',
-            13 => 'Investimentos: conteudos praticos e analises para carteira (renda fixa, acoes, FIIs, cambio, cripto e alternativos).',
-            8 => 'Credito Empresarial: foco em credito, financiamento e capital de giro para empresas.',
+        // Diretrizes por VERTICAL canônico — IDs resolvidos por slug (getVerticalSlugMap).
+        // Ordem preservada (economia, gx-explica, cambio, investimentos, credito, seguro).
+        $guidelinesByVertical = [
+            'economia'      => 'Radar Economico: noticias amplas de mercado financeiro, economia, mundo e tecnologia.',
+            'gx-explica'    => 'GX Explica: linha editorial educacional, explica termos e noticias com linguagem simples e acessivel.',
+            'cambio'        => 'Cambio: comex e noticias internacionais que impactam o cambio e o dolar.',
+            'investimentos' => 'Investimentos: conteudos praticos e analises para carteira (renda fixa, acoes, FIIs, cambio, cripto e alternativos).',
+            'credito'       => 'Credito Empresarial: foco em credito, financiamento e capital de giro para empresas.',
+            'seguro'        => 'Seguro de Vida: seguro de vida resgatavel (whole life), protecao patrimonial, sucessao e previdencia para empresas e familias. Sempre YMYL/compliance — sem promessa de rentabilidade.',
         ];
+        $guidelines = [];
+        foreach ($guidelinesByVertical as $vertical => $text) {
+            $id = $this->categoryIdForVertical($vertical);
+            if ($id) {
+                $guidelines[$id] = $text;
+            }
+        }
         return json_encode($guidelines);
     }
 
     private function getDefaultTopicWeightsJson(): string
     {
         return json_encode([
-            'cambio' => 20,
-            'credito' => 20,
-            'consorcio' => 20,
-            'investimentos' => 15,
-            'economia' => 25,
+            'cambio' => 18,
+            'credito' => 18,
+            'consorcio' => 15,
+            'seguro' => 15,
+            'investimentos' => 12,
+            'economia' => 22,
         ]);
+    }
+
+    /** ID da categoria "Seguro de Vida" (por slug), com cache estático. Null se ainda não migrada. */
+    private function getSeguroCategoryId(): ?int
+    {
+        static $id = false;
+        if ($id !== false) {
+            return $id;
+        }
+        $id = null;
+        try {
+            $row = $this->db->table('categories')->select('id')->where('slug', 'seguro-de-vida')->get(1)->getFirstRow();
+            if (!empty($row)) {
+                $id = (int) $row->id;
+            }
+        } catch (\Throwable $e) {
+            $id = null;
+        }
+        return $id;
+    }
+
+    /**
+     * Mapa VERTICAL canônico → slug da categoria. É o PONTO DE CONFIGURAÇÃO por install
+     * (white-label): a GX Brasil mapeia para os slugs atuais; outro install sobrescreve
+     * aqui (futuro: mover para brand_settings/DB). Substitui o acoplamento a IDs fixos
+     * de categoria (6/8/7/13/11) que existia espalhado pelo pipeline de IA.
+     */
+    public function getVerticalSlugMap(): array
+    {
+        return [
+            'gx-explica'    => 'gx-explica',
+            'cambio'        => 'cambio-6',
+            'credito'       => 'credito-empresarial',
+            'investimentos' => 'investimentos',
+            'economia'      => 'economia',
+            'seguro'        => 'seguro-de-vida',
+        ];
+    }
+
+    /** ID da categoria a partir do slug (cache estático). Null se o slug não existir. */
+    public function categoryIdBySlug(string $slug): ?int
+    {
+        static $cache = [];
+        if (array_key_exists($slug, $cache)) {
+            return $cache[$slug];
+        }
+        $id = null;
+        try {
+            $row = $this->db->table('categories')->select('id')->where('slug', $slug)->get(1)->getFirstRow();
+            if (!empty($row)) {
+                $id = (int) $row->id;
+            }
+        } catch (\Throwable $e) {
+            $id = null;
+        }
+        return $cache[$slug] = $id;
+    }
+
+    /** ID da categoria de um vertical canônico (via getVerticalSlugMap). Null se não mapeado/inexistente. */
+    public function categoryIdForVertical(string $vertical): ?int
+    {
+        $map = $this->getVerticalSlugMap();
+        return isset($map[$vertical]) ? $this->categoryIdBySlug($map[$vertical]) : null;
+    }
+
+    /** IDs de categoria para uma lista de verticais canônicos (nulos/ausentes descartados). */
+    public function categoryIdsForVerticals(array $verticals): array
+    {
+        $ids = [];
+        foreach ($verticals as $vertical) {
+            $id = $this->categoryIdForVertical($vertical);
+            if ($id) {
+                $ids[] = $id;
+            }
+        }
+        return $ids;
+    }
+
+    /** Slug da categoria a partir do ID (cache estático). Null se não existir. */
+    public function categorySlugById(int $id): ?string
+    {
+        static $cache = [];
+        if ($id <= 0) {
+            return null;
+        }
+        if (array_key_exists($id, $cache)) {
+            return $cache[$id];
+        }
+        $slug = null;
+        try {
+            $row = $this->db->table('categories')->select('slug')->where('id', $id)->get(1)->getFirstRow();
+            if (!empty($row)) {
+                $slug = (string) $row->slug;
+            }
+        } catch (\Throwable $e) {
+            $slug = null;
+        }
+        return $cache[$id] = $slug;
     }
 
     public function getDefaultEditorPrompt(): string
@@ -427,7 +641,7 @@ class ContentAISettingsModel extends BaseModel
             . "=== RESTRICOES CRITICAS ===\n"
             . "- NUNCA copie nem parafraseie o titulo original. O titulo derivado deve ter angulo claramente diferente.\n"
             . "- NAO selecione temas ja publicados/agendados recentemente: {recent_titles}\n"
-            . "- ESCOPO RIGIDO: somente cambio, credito empresarial, consorcio, investimentos e economia/mercado financeiro brasileiro. NADA de entretenimento, esportes, celebridades, politica partidaria, religiao, opiniao pessoal.\n"
+            . "- ESCOPO RIGIDO: somente cambio, credito empresarial, consorcio, seguro de vida, investimentos e economia/mercado financeiro brasileiro. NADA de entretenimento, esportes, celebridades, politica partidaria, religiao, opiniao pessoal.\n"
             . "- DIVERSIDADE OBRIGATORIA: no maximo 1 derivado por tema/cluster. Se 3 posts populares falam de dolar, escolha o MELHOR e gere 1 unico derivado.\n"
             . "- YMYL/COMPLIANCE: NUNCA prometer rentabilidade, garantir retorno, dar recomendacao personalizada nem solicitar servico. Conteudo informativo.\n"
             . "- E-E-A-T: cada pauta deve permitir ao redator demonstrar experiencia pratica de mesa (cambio/credito/wealth) — evite temas onde nao temos autoridade.\n"

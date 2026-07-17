@@ -445,6 +445,72 @@ if (!empty($settings->allowed_category_ids)) {
                             </div>
                         </div>
                     <?php endif; ?>
+
+                    <div class="box box-solid" id="popular-control">
+                        <div class="box-header with-border">
+                            <h3 class="box-title"><i class="fa fa-shield"></i> Controle de Populares (anti-repeticao / blocklist)</h3>
+                        </div>
+                        <div class="box-body table-responsive">
+                            <p class="text-muted" style="margin-top:0;">Posts que ja alimentaram a esteira de populares. Quem passa do limite de derivacoes e <strong>auto-excluido</strong>; voce tambem pode excluir/reabilitar manualmente para dar espaco a outras verticais.</p>
+                            <form action="<?= adminUrl('content-ai/popular/block'); ?>" method="post" class="form-inline" style="margin-bottom:12px;" onsubmit="return confirm('Excluir este post da esteira de populares?');">
+                                <?= csrf_field(); ?>
+                                <div class="form-group">
+                                    <label>Excluir post por ID&nbsp;</label>
+                                    <input type="number" class="form-control input-sm" name="post_id" min="1" placeholder="ID do post" required>
+                                </div>
+                                <button class="btn btn-sm btn-warning"><i class="fa fa-ban"></i> Excluir dos populares</button>
+                            </form>
+                            <?php if (!empty($popularControl)): ?>
+                            <table class="table table-condensed table-hover" style="margin:0;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:70px;">Post</th>
+                                        <th>Titulo</th>
+                                        <th style="width:110px;">Derivacoes</th>
+                                        <th style="width:150px;">Ultima</th>
+                                        <th style="width:140px;">Status</th>
+                                        <th style="width:120px;">Acao</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($popularControl as $pc): ?>
+                                        <tr>
+                                            <td><code>#<?= (int) $pc->post_id; ?></code></td>
+                                            <td><?= esc($pc->title ?? '—'); ?></td>
+                                            <td><span class="badge"><?= (int) $pc->derived_count; ?></span></td>
+                                            <td><small><?= esc($pc->last_derived_at ?? '—'); ?></small></td>
+                                            <td>
+                                                <?php if (!empty($pc->blocked)): ?>
+                                                    <span class="label label-danger">Excluido<?= ($pc->blocked_reason ?? '') === 'auto_cap' ? ' (auto)' : ''; ?></span>
+                                                <?php else: ?>
+                                                    <span class="label label-success">Ativo</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <?php if (!empty($pc->blocked)): ?>
+                                                    <form action="<?= adminUrl('content-ai/popular/unblock'); ?>" method="post" style="display:inline;">
+                                                        <?= csrf_field(); ?>
+                                                        <input type="hidden" name="post_id" value="<?= (int) $pc->post_id; ?>">
+                                                        <button class="btn btn-xs btn-default"><i class="fa fa-undo"></i> Reabilitar</button>
+                                                    </form>
+                                                <?php else: ?>
+                                                    <form action="<?= adminUrl('content-ai/popular/block'); ?>" method="post" style="display:inline;" onsubmit="return confirm('Excluir este post da esteira de populares?');">
+                                                        <?= csrf_field(); ?>
+                                                        <input type="hidden" name="post_id" value="<?= (int) $pc->post_id; ?>">
+                                                        <input type="hidden" name="title" value="<?= esc($pc->title ?? '', 'attr'); ?>">
+                                                        <button class="btn btn-xs btn-warning"><i class="fa fa-ban"></i> Excluir</button>
+                                                    </form>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                            <?php else: ?>
+                            <p class="text-muted" style="margin:0;">Nenhum post derivado ainda. Assim que a esteira de populares rodar, o historico aparece aqui.</p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                     <div class="box">
                         <div class="box-header with-border">
                             <h3 class="box-title">Tendencias</h3>
@@ -814,6 +880,31 @@ if (!empty($settings->allowed_category_ids)) {
                                     <textarea class="form-control" name="x_pulse_prompt" rows="10" style="font-family:monospace;font-size:12px;"><?= esc($settings->x_pulse_prompt ?? ''); ?></textarea>
                                     <p class="help-block">Placeholders: <code>{themes_per_day}</code>, <code>{window_hours}</code>, <code>{min_mentions}</code>. Use para refinar escopo, fontes preferidas, criterios de relevancia.</p>
                                 </div>
+                                <p class="text-muted"><strong>X como fonte de pauta</strong> — alem de repriorizar tendencias, os temas quentes do X viram artigos proprios (o editor IA transforma cada tema em pauta).</p>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Habilitar X como fonte de pauta</label>
+                                            <select class="form-control" name="x_seed_enabled">
+                                                <option value="1" <?= !empty($settings->x_seed_enabled) ? 'selected' : ''; ?>>Sim</option>
+                                                <option value="0" <?= empty($settings->x_seed_enabled) ? 'selected' : ''; ?>>Nao</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Artigos do X por dia</label>
+                                            <input type="number" class="form-control" name="x_seed_per_day" min="0" max="20" value="<?= (int) ($settings->x_seed_per_day ?? 0); ?>">
+                                            <p class="help-block">Quantos artigos serao criados a partir dos temas quentes do X. 0 = desligado.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Ultima execucao (X seed)</label>
+                                            <input type="text" class="form-control" value="<?= esc($settings->last_run_x_seed ?? '—'); ?>" readonly>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <hr>
                                 <h4><i class="fa fa-fire"></i> Conteudos Populares (Derivados do Portal)</h4>
@@ -877,6 +968,40 @@ if (!empty($settings->allowed_category_ids)) {
                                         </div>
                                     </div>
                                 </div>
+                                <p class="text-muted" style="margin-top:6px;"><strong>Anti-repeticao / diversidade</strong> — evita minerar o mesmo hit infinitamente e da espaco as outras verticais.</p>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Max. derivacoes por post</label>
+                                            <input type="number" class="form-control" name="popular_max_derivations" min="0" value="<?= (int) ($settings->popular_max_derivations ?? 2); ?>">
+                                            <p class="help-block">Ao atingir, o post e auto-excluido dos populares. 0 = sem limite.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Cooldown (dias)</label>
+                                            <input type="number" class="form-control" name="popular_cooldown_days" min="0" value="<?= (int) ($settings->popular_cooldown_days ?? 14); ?>">
+                                            <p class="help-block">Nao re-derivar o mesmo post dentro dessa janela.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Diversidade por vertical</label>
+                                            <select class="form-control" name="popular_diversity_enabled">
+                                                <option value="1" <?= !empty($settings->popular_diversity_enabled) ? 'selected' : ''; ?>>Ligada</option>
+                                                <option value="0" <?= empty($settings->popular_diversity_enabled) ? 'selected' : ''; ?>>Desligada</option>
+                                            </select>
+                                            <p class="help-block">Aplica os pesos de topico aos populares.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Max. por categoria (cardapio)</label>
+                                            <input type="number" class="form-control" name="popular_per_category_cap" min="0" value="<?= (int) ($settings->popular_per_category_cap ?? 2); ?>">
+                                            <p class="help-block">Limita candidatos por vertical. 0 = sem limite.</p>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label>Prompt do Editor-Chefe IA (Populares)</label>
                                     <textarea class="form-control" name="popular_editor_prompt" rows="8"><?= esc($settings->popular_editor_prompt ?? ''); ?></textarea>
@@ -888,7 +1013,7 @@ if (!empty($settings->allowed_category_ids)) {
                                 <p class="text-muted">Configure o peso de cada topico. A IA editora vai distribuir os posts diarios respeitando esses percentuais.</p>
 
                                 <?php
-                                $topicWeights = ['cambio' => 20, 'credito' => 20, 'consorcio' => 20, 'investimentos' => 15, 'economia' => 25];
+                                $topicWeights = ['cambio' => 18, 'credito' => 18, 'consorcio' => 15, 'seguro' => 15, 'investimentos' => 12, 'economia' => 22];
                                 if (!empty($settings->topic_weights_json)) {
                                     $decoded = json_decode($settings->topic_weights_json, true);
                                     if (is_array($decoded)) $topicWeights = $decoded;
@@ -897,6 +1022,7 @@ if (!empty($settings->allowed_category_ids)) {
                                     'cambio' => 'Cambio e Trade Finance',
                                     'credito' => 'Credito Empresarial',
                                     'consorcio' => 'Consorcio',
+                                    'seguro' => 'Seguro de Vida',
                                     'investimentos' => 'Investimentos',
                                     'economia' => 'Economia e Mercado',
                                     'tecnologia' => 'Tecnologia para Negocios',

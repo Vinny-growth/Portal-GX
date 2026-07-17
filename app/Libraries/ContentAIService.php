@@ -8,6 +8,7 @@ use App\Models\ContentCalendarModel;
 use App\Models\ContentRunModel;
 use App\Models\DashboardModel;
 use App\Models\PopularPostsSnapshotModel;
+use App\Models\PopularPostsControlModel;
 use App\Models\TrendItemModel;
 use App\Models\UploadModel;
 use App\Models\XPulseSnapshotModel;
@@ -19,6 +20,7 @@ class ContentAIService
     protected $runModel;
     protected $trendModel;
     protected $popularModel;
+    protected $popularControlModel;
     protected $dashboardModel;
     protected $xPulseModel;
     protected $imageHelper;
@@ -30,6 +32,12 @@ class ContentAIService
         $this->runModel = new ContentRunModel();
         $this->trendModel = new TrendItemModel();
         $this->popularModel = new PopularPostsSnapshotModel();
+        try {
+            $this->popularControlModel = new PopularPostsControlModel();
+        } catch (\Throwable $e) {
+            // tabela popular_posts_control pode ainda não estar migrada
+            $this->popularControlModel = null;
+        }
         $this->dashboardModel = new DashboardModel();
         try {
             $this->xPulseModel = new XPulseSnapshotModel();
@@ -50,6 +58,7 @@ class ContentAIService
             'slots' => $dueSlots,
             'planned' => 0,
             'planned_popular' => 0,
+            'planned_x_seed' => 0,
             'generated' => 0,
             'errors' => [],
         ];
@@ -58,6 +67,8 @@ class ContentAIService
             $result['planned'] += $planned;
             $plannedPopular = $this->planDailyFromPopular($settings, $now);
             $result['planned_popular'] += $plannedPopular;
+            $plannedXSeed = $this->planDailyFromXPulse($settings, $now);
+            $result['planned_x_seed'] += $plannedXSeed;
             $this->settingsModel->updateLastRun($slot, $now->format('Y-m-d H:i:s'));
         }
         $generated = $this->processQueue();
@@ -223,7 +234,19 @@ class ContentAIService
         $metric = (string) ($settings->popular_metric ?? 'mixed');
         $minViews = max(0, (int) ($settings->popular_min_pageviews ?? 0));
 
-        $candidates = $this->fetchPopularCandidates($windowDays, $metric, max(20, $need * 6), $minViews);
+        // Anti-repetição/anti-canibalização: exclui blocklist + posts em cooldown; limita por categoria (diversidade).
+        $cooldownDays   = max(0, (int) ($settings->popular_cooldown_days ?? 0));
+        $diversityOn    = !empty($settings->popular_diversity_enabled);
+        $perCategoryCap = $diversityOn ? max(0, (int) ($settings->popular_per_category_cap ?? 0)) : 0;
+        $excludeIds = [];
+        if ($this->popularControlModel !== null) {
+            $excludeIds = array_values(array_unique(array_merge(
+                $this->popularControlModel->getBlockedIds(),
+                $this->popularControlModel->getCooldownIds($cooldownDays)
+            )));
+        }
+
+        $candidates = $this->fetchPopularCandidates($windowDays, $metric, max(20, $need * 6), $minViews, $excludeIds, $perCategoryCap);
         if (empty($candidates)) {
             log_message('info', 'ContentAI: no popular candidates found (window=' . $windowDays . 'd metric=' . $metric . ') - skipping popular plan');
             return 0;
@@ -269,11 +292,17 @@ class ContentAIService
             if ($this->calendarModel->builder()->insert($data)) {
                 $created++;
                 if (!empty($item['derived_from_post_id'])) {
-                    $this->popularModel->markUsedByPostId(
-                        (int) $item['derived_from_post_id'],
-                        $today,
-                        $windowDays
-                    );
+                    $srcId = (int) $item['derived_from_post_id'];
+                    $this->popularModel->markUsedByPostId($srcId, $today, $windowDays);
+                    if ($this->popularControlModel !== null) {
+                        // contador persistente + auto-block ao atingir o cap de derivações
+                        $this->popularControlModel->recordDerivation(
+                            $srcId,
+                            (string) ($item['source_title'] ?? ''),
+                            $now->format('Y-m-d H:i:s'),
+                            max(0, (int) ($settings->popular_max_derivations ?? 0))
+                        );
+                    }
                 }
             }
         }
@@ -286,7 +315,7 @@ class ContentAIService
      * Fetch the most popular posts in the requested window combining views and engagement.
      * Returns an array of normalized rows ready for snapshot insertion.
      */
-    protected function fetchPopularCandidates(int $windowDays, string $metric, int $limit, int $minViews = 0): array
+    protected function fetchPopularCandidates(int $windowDays, string $metric, int $limit, int $minViews = 0, array $excludeIds = [], int $perCategoryCap = 0): array
     {
         $limit = max(1, $limit);
         $rows = [];
@@ -385,6 +414,28 @@ class ContentAIService
         }
 
         usort($merged, fn($a, $b) => $b['score'] <=> $a['score']);
+
+        // Remove posts na blocklist / dentro do cooldown (anti-repetição).
+        if (!empty($excludeIds)) {
+            $ex = array_flip(array_map('intval', $excludeIds));
+            $merged = array_values(array_filter($merged, fn($r) => !isset($ex[(int) $r['post_id']])));
+        }
+
+        // Diversidade por vertical: no máximo $perCategoryCap candidatos por categoria, para
+        // o editor não receber um cardápio dominado por uma única vertical (dá espaço às outras).
+        if ($perCategoryCap > 0) {
+            $perCat = [];
+            $diverse = [];
+            foreach ($merged as $r) {
+                $cat = (int) ($r['category_id'] ?? 0);
+                $perCat[$cat] = ($perCat[$cat] ?? 0) + 1;
+                if ($perCat[$cat] <= $perCategoryCap) {
+                    $diverse[] = $r;
+                }
+            }
+            $merged = $diverse;
+        }
+
         $rows = array_slice($merged, 0, $limit);
         return $rows;
     }
@@ -402,10 +453,12 @@ class ContentAIService
         $candidateList = [];
         $sourceLookup = [];
         foreach ($snapshot as $i => $row) {
+            $catName = $this->getCategoryName((int) ($row->category_id ?? 0));
             $line = sprintf(
-                "#%d [post_id=%d] %s — pageviews=%d, unique=%d, interacoes=%d, score=%s",
+                "#%d [post_id=%d] (%s) %s — pageviews=%d, unique=%d, interacoes=%d, score=%s",
                 $i + 1,
                 (int) $row->post_id,
+                $catName !== '' ? $catName : 'sem categoria',
                 (string) ($row->title ?? '(sem titulo)'),
                 (int) $row->pageviews,
                 (int) $row->unique_visitors,
@@ -448,8 +501,30 @@ class ContentAIService
         ]);
 
         $userPrompt = "POSTS MAIS POPULARES (use post_id como referencia em derived_from_post_id):\n"
-            . implode("\n", $candidateList)
-            . "\n\nProponha exatamente " . $need . " NOVOS artigos derivados. Responda APENAS com JSON valido.";
+            . implode("\n", $candidateList);
+
+        // Balanceamento de verticais: injeta os mesmos pesos do editor-chefe para o editor de
+        // populares não concentrar todos os derivados na vertical dominante (dá espaço a crescer).
+        $weights = json_decode($settings->topic_weights_json ?? '{}', true) ?: [];
+        if (!empty($settings->popular_diversity_enabled) && !empty($weights)) {
+            $parts = [];
+            foreach ($weights as $topic => $pct) {
+                $parts[] = ucfirst($topic) . ': ' . $pct . '%';
+            }
+            $userPrompt .= "\n\n=== DISTRIBUICAO DE VERTICAIS (equilibrio editorial) ===\n"
+                . implode(', ', $parts)
+                . "\nNAO concentre os derivados numa unica vertical — priorize dar espaco as verticais sub-representadas. "
+                . "No maximo 1 derivado por vertical dominante quando possivel.";
+        }
+
+        // Sinal do X também no editor de populares: convergência = prioridade.
+        $xCtx = $this->buildXPulseContext($settings);
+        if ($xCtx !== '') {
+            $userPrompt .= "\n\n=== X PULSE (o que esta quente no X agora) ===\n" . $xCtx
+                . "\nSe um post popular converge com um tema do X, priorize deriva-lo — sinal duplo de demanda.";
+        }
+
+        $userPrompt .= "\n\nProponha exatamente " . $need . " NOVOS artigos derivados. Responda APENAS com JSON valido.";
 
         log_message('info', 'ContentAI: popular editor evaluating ' . count($snapshot) . ' posts for ' . $need . ' derivatives');
 
@@ -512,6 +587,190 @@ class ContentAIService
         }
 
         log_message('info', 'ContentAI: popular editor selected ' . count($selected) . ' derivative articles');
+        return $selected;
+    }
+
+    /**
+     * Plan articles seeded DIRECTLY from hot X (Twitter) themes — not just re-ranking trends.
+     * Turns fresh X Pulse themes into their own candidate pool and lets the editor pick.
+     */
+    public function planDailyFromXPulse($settings, \DateTimeImmutable $now): int
+    {
+        if (empty($settings->x_seed_enabled) || $this->xPulseModel === null) {
+            return 0;
+        }
+        $target = max(0, (int) ($settings->x_seed_per_day ?? 0));
+        if ($target <= 0) {
+            return 0;
+        }
+        $today = $now->format('Y-m-d');
+        $existing = $this->calendarModel->countForDateBySource($today, 'x_pulse');
+        $need = $target - $existing;
+        if ($need <= 0) {
+            return 0;
+        }
+
+        $hours = max(1, (int) ($settings->x_window_hours ?? 24));
+        try {
+            $themes = $this->xPulseModel->getActive(max(24, $hours), max(20, $need * 5));
+        } catch (\Throwable $e) {
+            return 0;
+        }
+        // só temas ainda NÃO usados como pauta
+        $themes = array_values(array_filter($themes, fn($t) => empty($t->used_in_calendar)));
+        if (empty($themes)) {
+            log_message('info', 'ContentAI: no fresh X Pulse themes to seed');
+            return 0;
+        }
+
+        $selected = $this->aiEditorSelectFromXPulse($themes, $settings, $need);
+        if (empty($selected)) {
+            log_message('warning', 'ContentAI: X seed editor returned empty');
+            return 0;
+        }
+
+        $slots = $this->buildPublishSlots($settings, count($selected), $now);
+        $created = 0;
+        foreach ($selected as $idx => $item) {
+            $publishAt = $slots[$idx] ?? $now->modify('+' . ($idx * 15) . ' minutes')->format('Y-m-d H:i:s');
+            $instructions = !empty($item['instructions'])
+                ? $item['instructions']
+                : 'Escreva um artigo a partir do tema em alta no X: "' . ($item['source_theme'] ?? '') . '". Contexto financeiro brasileiro, publico PJ/investidor.';
+            $data = [
+                'title' => $item['title'],
+                'instructions' => $instructions,
+                'category_id' => $item['category_id'],
+                'lang_id' => $settings->lang_id,
+                'user_id' => $settings->default_user_id,
+                'tone' => $settings->default_tone,
+                'length' => $settings->default_length,
+                'publish_at' => $publishAt,
+                'generate_at' => $now->format('Y-m-d H:i:s'),
+                'status' => 'queued',
+                'source_type' => 'x_pulse',
+                'source_url' => !empty($item['x_theme_id']) ? ('x_pulse_theme:' . (int) $item['x_theme_id']) : '',
+                'created_at' => $now->format('Y-m-d H:i:s'),
+                'updated_at' => $now->format('Y-m-d H:i:s'),
+            ];
+            if ($this->calendarModel->builder()->insert($data)) {
+                $created++;
+                if (!empty($item['x_theme_id'])) {
+                    $this->xPulseModel->markUsed((int) $item['x_theme_id']);
+                }
+            }
+        }
+        $this->settingsModel->updateLastRunXSeed($now->format('Y-m-d H:i:s'));
+        log_message('info', 'ContentAI: X seed planner created=' . $created . ' (target=' . $target . ' need=' . $need . ')');
+        return $created;
+    }
+
+    /**
+     * Editor for X-seeded content: receives fresh X themes and returns NEW article ideas.
+     */
+    protected function aiEditorSelectFromXPulse(array $themes, $settings, int $need): array
+    {
+        if (empty($themes)) {
+            return [];
+        }
+        $candidateList = [];
+        $sourceLookup = [];
+        foreach ($themes as $i => $row) {
+            $tickers = json_decode((string) ($row->tickers_json ?? '[]'), true) ?: [];
+            $candidateList[] = sprintf(
+                "#%d [x_id=%d] %s — sent=%s, mentions~%d, rel=%d%s\n    resumo: %s",
+                $i + 1,
+                (int) $row->id,
+                (string) $row->theme,
+                (string) $row->sentiment,
+                (int) $row->mentions_estimate,
+                (int) $row->relevance_score,
+                !empty($tickers) ? ' ($' . implode(' $', array_slice($tickers, 0, 4)) . ')' : '',
+                mb_substr((string) ($row->summary ?? ''), 0, 240)
+            );
+            $sourceLookup[(int) $row->id] = $row;
+        }
+
+        $recentTitles = [];
+        $recentPosts = $this->calendarModel->builder()
+            ->select('title')
+            ->whereIn('status', ['queued', 'generating', 'generated', 'needs_review'])
+            ->where('created_at >', date('Y-m-d H:i:s', time() - 172800))
+            ->get()->getResult();
+        foreach ($recentPosts as $rp) {
+            $recentTitles[] = $rp->title;
+        }
+
+        $categoriesText = '';
+        $guidelines = json_decode($settings->category_guidelines_json ?? '{}', true) ?: [];
+        foreach ($guidelines as $catId => $desc) {
+            $categoriesText .= 'ID ' . $catId . ': ' . $desc . "\n";
+        }
+
+        $systemPrompt = "Voce e o EDITOR-CHEFE da GX Capital (cambio, credito empresarial, consorcio, seguro de vida, investimentos e economia).\n"
+            . "Recebe os temas financeiros mais QUENTES agora no X (Twitter). Transforme os melhores em " . $need . " artigos SEO originais para o publico PJ/investidor brasileiro.\n\n"
+            . "=== CATEGORIAS (use o ID exato em category_id) ===\n" . $categoriesText . "\n"
+            . "=== REGRAS ===\n"
+            . "- ESCOPO: somente os pilares acima. IGNORE tema fora do escopo financeiro (esporte, politica partidaria, celebridade, entretenimento).\n"
+            . "- Titulo SEO ate 60 caracteres, declarativo, sem clickbait.\n"
+            . "- DIVERSIDADE: no maximo 1 artigo por tema/cluster; angulos distintos.\n"
+            . "- NAO repita temas ja publicados/agendados: {recent_titles}\n"
+            . "- YMYL/compliance: sem promessa de rentabilidade nem recomendacao personalizada.\n"
+            . "- Se houver menos temas de qualidade do que " . $need . ", retorne menos.\n"
+            . "- Para cada artigo, escreva 'instructions' acionaveis: angulo, 2-4 dados/contexto obrigatorios, 3-5 H2 sugeridos e tom.\n\n"
+            . "=== FORMATO (JSON valido, sem markdown, sem texto fora) ===\n"
+            . "{\"articles\":[{\"title\":\"...\",\"category_id\":N,\"x_theme_id\":N,\"instructions\":\"...\",\"reasoning\":\"...\"}]}";
+        $systemPrompt = strtr($systemPrompt, [
+            '{recent_titles}' => !empty($recentTitles) ? implode('; ', array_slice($recentTitles, 0, 20)) : 'Nenhum recente.',
+        ]);
+
+        $userPrompt = "TEMAS QUENTES NO X (use x_id em x_theme_id):\n"
+            . implode("\n", $candidateList)
+            . "\n\nProponha exatamente " . $need . " artigos. Responda APENAS com JSON valido.";
+
+        $response = $this->callEditorModel($systemPrompt, $userPrompt);
+        if (empty($response)) {
+            return [];
+        }
+        $text = $this->extractTextFromResponse($response);
+        $payload = $this->parseJsonPayload($text);
+        if (is_array($payload) && isset($payload['articles']) && is_array($payload['articles'])) {
+            $payload = $payload['articles'];
+        } elseif (is_array($payload) && isset($payload[0])) {
+            // flat array
+        } elseif (is_array($payload)) {
+            foreach ($payload as $v) {
+                if (is_array($v) && isset($v[0])) { $payload = $v; break; }
+            }
+        }
+        if (empty($payload) || !isset($payload[0])) {
+            log_message('warning', 'ContentAI: X seed editor returned invalid format - raw=' . substr($text ?? '', 0, 500));
+            return [];
+        }
+
+        $allowedCatIds = $this->decodeCategoryIds($settings->allowed_category_ids);
+        $selected = [];
+        foreach ($payload as $item) {
+            if (!is_array($item) || empty($item['title'])) {
+                continue;
+            }
+            $catId = (int) ($item['category_id'] ?? 0);
+            $xThemeId = (int) ($item['x_theme_id'] ?? 0);
+            $sourceTheme = ($xThemeId > 0 && isset($sourceLookup[$xThemeId])) ? (string) $sourceLookup[$xThemeId]->theme : '';
+            if ($catId <= 0 || (!empty($allowedCatIds) && !in_array($catId, $allowedCatIds))) {
+                $catId = $this->pickCategory($allowedCatIds);
+            }
+            $selected[] = [
+                'title' => $item['title'],
+                'category_id' => $catId,
+                'instructions' => $item['instructions'] ?? '',
+                'x_theme_id' => $xThemeId > 0 ? $xThemeId : null,
+                'source_theme' => $sourceTheme,
+            ];
+            if (count($selected) >= $need) {
+                break;
+            }
+        }
+        log_message('info', 'ContentAI: X seed editor selected ' . count($selected) . ' articles');
         return $selected;
     }
 
@@ -1222,8 +1481,11 @@ class ContentAIService
         $rules = $this->getCategoryRules($settings);
         if (!empty($rules)) {
             $normalized = $this->normalizeText($text);
-            // Priority order: GX explica, cambio, credito, investimentos, radar
-            $priority = [11, 6, 8, 13, 7];
+            // Ordem de prioridade por VERTICAL canônico (GX explica, cambio, credito,
+            // investimentos, radar) — IDs resolvidos por slug, não hardcoded.
+            $priority = $this->settingsModel->categoryIdsForVerticals(
+                ['gx-explica', 'cambio', 'credito', 'investimentos', 'economia']
+            );
             foreach ($priority as $catId) {
                 if (empty($rules[$catId]) || !is_array($rules[$catId])) {
                     continue;
@@ -1489,7 +1751,7 @@ class ContentAIService
                 'description' => 'Calcule a exposicao cambial da sua empresa e veja como proteger suas margens.',
                 'cta' => 'Simular risco cambial',
                 'keywords' => ['cambio', 'dolar', 'exporta', 'importa', 'hedge', 'comex', 'ptax', 'moeda', 'forex', 'remessa', 'trade finance'],
-                'categories' => [6], // Cambio
+                'categories' => $this->settingsModel->categoryIdsForVerticals(['cambio']),
             ],
             'fx-loan' => [
                 'url' => '/fx-loan',
@@ -1498,7 +1760,7 @@ class ContentAIService
                 'description' => 'Compare o custo de funding internacional vs credito local com hedge embutido.',
                 'cta' => 'Avaliar estrutura',
                 'keywords' => ['4131', 'funding', 'offshore', 'emprestimo internacional', 'fx loan'],
-                'categories' => [6],
+                'categories' => $this->settingsModel->categoryIdsForVerticals(['cambio']),
             ],
             'aurum' => [
                 'url' => '/aurum-simulador-de-custo-de-capital',
@@ -1507,7 +1769,7 @@ class ContentAIService
                 'description' => 'Compare custos de diferentes linhas de credito e descubra a estrutura ideal para sua operacao.',
                 'cta' => 'Calcular custo de capital',
                 'keywords' => ['credito', 'emprestimo', 'financiamento', 'capital de giro', 'bndes', 'juros', 'spread', 'custo de capital'],
-                'categories' => [8], // Credito
+                'categories' => $this->settingsModel->categoryIdsForVerticals(['credito']),
             ],
             'mercado-capitais' => [
                 'url' => '/simulador-mercado-de-capitais',
@@ -1516,7 +1778,7 @@ class ContentAIService
                 'description' => 'Teste cenarios para debentures, CRA, CRI e outras estruturas de captacao fora do credito bancario.',
                 'cta' => 'Explorar estruturas',
                 'keywords' => ['debenture', 'cra', 'cri', 'mercado de capitais', 'captacao', 'renda fixa', 'titulo'],
-                'categories' => [13], // Investimentos
+                'categories' => $this->settingsModel->categoryIdsForVerticals(['investimentos']),
             ],
             'antecipacao' => [
                 'url' => '/simulador-de-custo-de-antecipacao',
@@ -1525,7 +1787,7 @@ class ContentAIService
                 'description' => 'Compare desconto bancario vs FIDC e descubra a antecipacao de recebiveis mais eficiente.',
                 'cta' => 'Comparar custos',
                 'keywords' => ['fidc', 'recebive', 'antecipacao', 'duplicata', 'factoring', 'desconto'],
-                'categories' => [8],
+                'categories' => $this->settingsModel->categoryIdsForVerticals(['credito']),
             ],
             'consorcio' => [
                 'url' => '/simulador-consorcio',

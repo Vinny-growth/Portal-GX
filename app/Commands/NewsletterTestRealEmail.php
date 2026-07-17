@@ -29,7 +29,11 @@ class NewsletterTestRealEmail extends BaseCommand
         }
         $catList = isset($params[1]) ? array_filter(array_map('intval', explode(',', $params[1]))) : [];
         if (empty($catList)) {
-            $catList = [7, 6, 8, 11]; // Radar, Cambio, Credito, GX explica
+            // Verticais canônicos (Radar, Cambio, Credito, GX explica) resolvidos por slug — sem IDs fixos.
+            $catList = (new \App\Models\ContentAISettingsModel())->categoryIdsForVerticals(['economia', 'cambio', 'credito', 'gx-explica']);
+        }
+        if (empty($catList)) {
+            $catList = [7, 6, 8, 11]; // fallback: Radar, Cambio, Credito, GX explica
         }
         CLI::write("Target email: $email");
         CLI::write("Categories: " . implode(',', $catList));

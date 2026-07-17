@@ -4,30 +4,31 @@
 
 $categoryId = isset($post->category_id) ? (int) $post->category_id : 0;
 
-// Map category → editorial line slug + tailored copy
-$lineConfig = [
-    6 => [  // Cambio
+// Copy da CTA por VERTICAL canônico (não por ID fixo). O vertical da categoria do post
+// é resolvido por slug (getVerticalSlugMap), para funcionar em installs white-label.
+$verticalCopy = [
+    'cambio' => [
         'slug' => 'cambio',
         'eyebrow' => lang('Newsletter.cta_cambio_eyebrow'),
         'headline' => lang('Newsletter.cta_cambio_headline'),
         'subhead' => lang('Newsletter.cta_cambio_subhead'),
         'cta' => lang('Newsletter.cta_cambio_cta'),
     ],
-    7 => [  // Radar Econômico
+    'economia' => [
         'slug' => 'radar-economico',
         'eyebrow' => lang('Newsletter.cta_radar_eyebrow'),
         'headline' => lang('Newsletter.cta_radar_headline'),
         'subhead' => lang('Newsletter.cta_radar_subhead'),
         'cta' => lang('Newsletter.cta_radar_cta'),
     ],
-    8 => [  // Crédito Empresarial
+    'credito' => [
         'slug' => 'credito-empresarial',
         'eyebrow' => lang('Newsletter.cta_credito_eyebrow'),
         'headline' => lang('Newsletter.cta_credito_headline'),
         'subhead' => lang('Newsletter.cta_credito_subhead'),
         'cta' => lang('Newsletter.cta_credito_cta'),
     ],
-    11 => [ // GX explica
+    'gx-explica' => [
         'slug' => 'gx-explica',
         'eyebrow' => lang('Newsletter.cta_gx_eyebrow'),
         'headline' => lang('Newsletter.cta_gx_headline'),
@@ -44,7 +45,16 @@ $default = [
     'cta' => lang('Newsletter.cta_def_cta'),
 ];
 
-$cfg = $lineConfig[$categoryId] ?? $default;
+// Resolve o vertical da categoria do post por slug (1 query), sem IDs hardcoded.
+$cfg = $default;
+if ($categoryId) {
+    $settingsModel = new \App\Models\ContentAISettingsModel();
+    $catSlug = $settingsModel->categorySlugById($categoryId);
+    $vertical = $catSlug ? array_search($catSlug, $settingsModel->getVerticalSlugMap(), true) : false;
+    if ($vertical !== false && isset($verticalCopy[$vertical])) {
+        $cfg = $verticalCopy[$vertical];
+    }
+}
 $href = '/newsletter' . (!empty($cfg['slug']) ? '?linha=' . $cfg['slug'] : '');
 ?>
 <style>
