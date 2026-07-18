@@ -47,6 +47,8 @@ class Autoload extends AutoloadConfig
         // Fase 3 — retrofit de módulos reais (rotas gated por feature flag).
         'Modules\\Wealth' => ROOTPATH . 'modules/Wealth',
         'Modules\\Simulators' => ROOTPATH . 'modules/Simulators',
+        // Fase 4 — módulo greenfield Courses (LMS gamificado + jornada + comunidade).
+        'Modules\\Courses' => ROOTPATH . 'modules/Courses',
     ];
 
     /**
