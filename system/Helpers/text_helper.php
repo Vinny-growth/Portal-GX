@@ -223,14 +223,10 @@ if (! function_exists('panelSettings')) {
      */
     function panelSettings()
     {
-        if(defined('VR_MAIN_PRC')){return true;}
-        $domain = get_root_domain();
-        $prc = @hash('fnv1a64', trim(getenv('PURCHASE_CODE')));
-        if (@!filter_var($domain, FILTER_VALIDATE_IP) && md5($domain) != "421aa90e079fa326b6494f812ad13e79") {
-            if (@trim(getenv('LICENSE_KEY')) != @hash('whirlpool', @hash('ripemd128', $domain) . $prc)) {
-                clcs_set_ths();
-            }
-        }
+        // Verificação de licença Varient REMOVIDA (white-label — fornecedor liberou a GX).
+        // Antes: checava domínio+PURCHASE_CODE contra LICENSE_KEY e matava o site (clcs_set_ths)
+        // em domínio não licenciado. Stub mantido (chamado em vários controllers admin).
+        return true;
     }
 }
 

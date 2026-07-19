@@ -553,8 +553,8 @@ if (! function_exists('function_usable')) {
 if (!function_exists('clcs_set_ths')) {
     function clcs_set_ths()
     {
-        echo "Invalid License Code! Open the .env file and enter your purchase code and license code.";
-        exit();
+        // Kill-switch de licença Varient DESATIVADO (white-label). No-op.
+        return;
     }
 }
 
@@ -1149,8 +1149,8 @@ if (! function_exists('stringify_attributes')) {
 if (!function_exists('common_this_lcs')) {
     function common_this_lcs()
     {
-        echo "Invalid License Code! Open the .env file and enter your purchase code and license code.";
-        exit();
+        // Kill-switch de licença Varient DESATIVADO (white-label). No-op — não mata mais o site.
+        return;
     }
 }
 

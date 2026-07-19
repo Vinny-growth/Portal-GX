@@ -236,14 +236,11 @@ if (! function_exists('getUserSession')) {
      */
     function getUserSession()
     {
-        if(defined('VR_MAIN_PRC')){return true;}
-        $domain = get_root_domain();
-        $prc = @hash('fnv1a64', trim(getenv('PURCHASE_CODE')));
-        if (@!filter_var($domain, FILTER_VALIDATE_IP) && md5($domain) != "421aa90e079fa326b6494f812ad13e79") {
-            if (@trim(getenv('LICENSE_KEY')) != @hash('whirlpool', @hash('ripemd128', $domain) . $prc)) {
-                common_this_lcs();
-            }
-        }
+        // Verificação de licença Varient REMOVIDA (white-label — o fornecedor liberou a GX de
+        // novas licenças). Antes: checava domínio+PURCHASE_CODE contra LICENSE_KEY e matava o
+        // site (common_this_lcs) em qualquer domínio não licenciado — o que travava a replicação.
+        // Stub mantido porque dezenas de controllers chamam getUserSession() (não é sessão real).
+        return true;
     }
 }
 
