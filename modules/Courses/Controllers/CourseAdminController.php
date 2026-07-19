@@ -8,6 +8,8 @@ use Modules\Courses\Models\SectionModel;
 use Modules\Courses\Models\LessonModel;
 use Modules\Courses\Models\AccessLevelModel;
 use Modules\Courses\Models\MembershipModel;
+use Modules\Courses\Models\SpaceModel;
+use Modules\Courses\Models\CommunityPostModel;
 use Modules\Courses\Libraries\MembershipService;
 
 /**
@@ -285,6 +287,67 @@ class CourseAdminController extends BaseAdminController
         }
         (new MembershipService())->grantManual($document, $docType, $userId > 0 ? $userId : null, $months);
         return redirect()->to(adminUrl('cursos/assinaturas'))->with('success', 'Membership concedido ao documento ' . $document . '.');
+    }
+
+    // ── comunidade (Fase 4c — moderação + espaços) ───────────────────────────
+    public function community()
+    {
+        checkPermission('admin_panel');
+        $data = [
+            'title'  => 'Comunidade',
+            'spaces' => (new SpaceModel())->orderBy('sort', 'ASC')->findAll(),
+            'posts'  => (new CommunityPostModel())->feed(null, 40),
+        ];
+        echo view('admin/includes/_header', $data);
+        echo view('admin/courses/community', $data);
+        echo view('admin/includes/_footer');
+    }
+
+    public function saveSpace()
+    {
+        checkPermission('admin_panel');
+        $now = date('Y-m-d H:i:s');
+        $id = (int) $this->request->getPost('id');
+        $name = trim((string) $this->request->getPost('name'));
+        if ($name === '') {
+            return redirect()->back()->with('error', 'Informe o nome do espaço.');
+        }
+        $sm = new SpaceModel();
+        $payload = [
+            'name'      => $name,
+            'slug'      => url_title($this->request->getPost('slug') ?: $name, '-', true),
+            'description' => trim((string) $this->request->getPost('description')) ?: null,
+            'icon'      => trim((string) $this->request->getPost('icon')) ?: null,
+            'color'     => trim((string) $this->request->getPost('color')) ?: null,
+            'sort'      => (int) $this->request->getPost('sort'),
+            'is_active' => $this->request->getPost('is_active') ? 1 : 0,
+            'updated_at' => $now,
+        ];
+        if ($id > 0) {
+            $sm->update($id, $payload);
+        } else {
+            $payload['created_at'] = $now;
+            $sm->insert($payload);
+        }
+        return redirect()->to(adminUrl('cursos/comunidade'))->with('success', 'Espaço salvo.');
+    }
+
+    public function togglePinPost($id)
+    {
+        checkPermission('admin_panel');
+        $pm = new CommunityPostModel();
+        $p = $pm->find((int) $id);
+        if (!empty($p)) {
+            $pm->update((int) $id, ['is_pinned' => $p['is_pinned'] ? 0 : 1, 'updated_at' => date('Y-m-d H:i:s')]);
+        }
+        return redirect()->to(adminUrl('cursos/comunidade'))->with('success', 'Publicação atualizada.');
+    }
+
+    public function removePost($id)
+    {
+        checkPermission('admin_panel');
+        (new CommunityPostModel())->update((int) $id, ['is_removed' => 1, 'updated_at' => date('Y-m-d H:i:s')]);
+        return redirect()->to(adminUrl('cursos/comunidade'))->with('success', 'Publicação removida.');
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────

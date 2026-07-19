@@ -72,6 +72,8 @@ $xp = $totalXp ?? null;
     <div class="ac-navlinks">
         <a href="<?= site_url('cursos') ?>">Cursos</a>
         <?php if ($u): ?><a class="ac-hide" href="<?= site_url('meus-cursos') ?>">Meus cursos</a><?php endif; ?>
+        <?php if ($u): ?><a href="<?= site_url('comunidade') ?>">Comunidade</a><?php endif; ?>
+        <?php if ($u && !empty($unread)): ?><a class="ac-xp" href="<?= site_url('comunidade/notificacoes') ?>" title="Notificações">🔔 <b class="ac-mono"><?= (int) $unread ?></b></a><?php endif; ?>
         <?php if ($u && $xp !== null): ?><span class="ac-xp">XP <b class="ac-mono"><?= (int) $xp ?></b></span><?php endif; ?>
         <?php if ($u): ?><a class="ac-hide" href="<?= site_url('cursos') ?>"><?= esc($u->username ?? 'Aluno') ?></a>
         <?php else: ?><a class="ac-btn ac-btn--nav" href="<?= site_url('login') ?>">Entrar</a><?php endif; ?>

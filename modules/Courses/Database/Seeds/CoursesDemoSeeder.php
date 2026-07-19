@@ -43,6 +43,22 @@ class CoursesDemoSeeder extends Seeder
             }
         }
 
+        // espaços da comunidade (Fase 4c)
+        $spaces = [
+            ['Apresente-se', 'apresente-se', '👋', 1],
+            ['Dúvidas', 'duvidas', '❓', 2],
+            ['Vitórias', 'vitorias', '🏆', 3],
+            ['Networking', 'networking', '🤝', 4],
+        ];
+        foreach ($spaces as $sp) {
+            if ($this->db->table('community_spaces')->where('slug', $sp[1])->countAllResults() === 0) {
+                $this->db->table('community_spaces')->insert([
+                    'name' => $sp[0], 'slug' => $sp[1], 'icon' => $sp[2], 'sort' => $sp[3],
+                    'is_active' => 1, 'created_at' => $now, 'updated_at' => $now,
+                ]);
+            }
+        }
+
         // curso-trilha demo (idempotente por slug)
         $slug = 'jornada-financeira-essencial';
         if ($this->db->table('courses')->where('slug', $slug)->countAllResults() === 0) {

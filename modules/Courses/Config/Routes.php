@@ -35,6 +35,17 @@ if (service('moduleRegistry')->enabled('courses')) {
     $routes->post('courses/webhook/pagamento/(:segment)', '\Modules\Courses\Controllers\WebhookController::paymentWebhook/$1');
     $routes->post('courses/webhook/crm', '\Modules\Courses\Controllers\WebhookController::crmWebhook');
 
+    // ── Fase 4c: comunidade (tudo exige login) ───────────────────────────────
+    $routes->get('comunidade', '\Modules\Courses\Controllers\CommunityController::index', ['filter' => 'auth']);
+    $routes->get('comunidade/espaco/(:segment)', '\Modules\Courses\Controllers\CommunityController::space/$1', ['filter' => 'auth']);
+    $routes->get('comunidade/post/(:num)', '\Modules\Courses\Controllers\CommunityController::post/$1', ['filter' => 'auth']);
+    $routes->post('comunidade/post/criar', '\Modules\Courses\Controllers\CommunityController::createPost', ['filter' => 'auth']);
+    $routes->post('comunidade/comentar', '\Modules\Courses\Controllers\CommunityController::createComment', ['filter' => 'auth']);
+    $routes->post('comunidade/reagir', '\Modules\Courses\Controllers\CommunityController::react', ['filter' => 'auth']);
+    $routes->get('comunidade/membro/(:num)', '\Modules\Courses\Controllers\CommunityController::profile/$1', ['filter' => 'auth']);
+    $routes->get('comunidade/ranking', '\Modules\Courses\Controllers\CommunityController::leaderboard', ['filter' => 'auth']);
+    $routes->get('comunidade/notificacoes', '\Modules\Courses\Controllers\CommunityController::notifications', ['filter' => 'auth']);
+
     // ── Admin (course builder) — mesmo grupo/filtro do painel do core ─────────
     $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
         $routes->get('cursos', '\Modules\Courses\Controllers\CourseAdminController::index');
@@ -56,5 +67,10 @@ if (service('moduleRegistry')->enabled('courses')) {
         // Fase 4b: gestão de assinaturas/memberships
         $routes->get('cursos/assinaturas', '\Modules\Courses\Controllers\CourseAdminController::memberships');
         $routes->post('cursos/assinaturas/conceder', '\Modules\Courses\Controllers\CourseAdminController::grantMembership');
+        // Fase 4c: moderação da comunidade + espaços
+        $routes->get('cursos/comunidade', '\Modules\Courses\Controllers\CourseAdminController::community');
+        $routes->post('cursos/comunidade/espaco/salvar', '\Modules\Courses\Controllers\CourseAdminController::saveSpace');
+        $routes->post('cursos/comunidade/post/(:num)/fixar', '\Modules\Courses\Controllers\CourseAdminController::togglePinPost/$1');
+        $routes->post('cursos/comunidade/post/(:num)/remover', '\Modules\Courses\Controllers\CourseAdminController::removePost/$1');
     });
 }

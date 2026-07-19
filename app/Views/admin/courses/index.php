@@ -9,6 +9,7 @@
             <h1 class="gxc-title">Gestão de cursos</h1>
         </div>
         <div class="gxc-actions">
+            <a class="gxc-btn gxc-btn--ghost" href="<?= adminUrl('cursos/comunidade'); ?>">Comunidade</a>
             <a class="gxc-btn gxc-btn--ghost" href="<?= adminUrl('cursos/assinaturas'); ?>">Assinaturas</a>
             <a class="gxc-btn gxc-btn--ghost" href="<?= adminUrl('cursos/niveis'); ?>">Níveis de acesso</a>
             <a class="gxc-btn" href="<?= adminUrl('cursos/novo'); ?>">+ Novo curso</a>
