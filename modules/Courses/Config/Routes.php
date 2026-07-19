@@ -27,6 +27,14 @@ if (service('moduleRegistry')->enabled('courses')) {
     $routes->post('curso/aula/completar', '\Modules\Courses\Controllers\StudentController::completeLesson', ['filter' => 'auth']);
     $routes->get('certificado/(:segment)', '\Modules\Courses\Controllers\StudentController::certificate/$1');
 
+    // ── Fase 4b: assinatura/checkout (aluno) + webhooks (públicos, CSRF-exempt) ──────
+    $routes->get('minha-assinatura', '\Modules\Courses\Controllers\CheckoutController::assinatura', ['filter' => 'auth']);
+    $routes->post('assinatura/iniciar', '\Modules\Courses\Controllers\CheckoutController::iniciar', ['filter' => 'auth']);
+    $routes->get('courses/checkout/confirmar', '\Modules\Courses\Controllers\CheckoutController::confirmar', ['filter' => 'auth']);
+    // webhooks: sem auth; CSRF isento via Config\Security::$csrfExcludeURIs ('courses/webhook/.*')
+    $routes->post('courses/webhook/pagamento/(:segment)', '\Modules\Courses\Controllers\WebhookController::paymentWebhook/$1');
+    $routes->post('courses/webhook/crm', '\Modules\Courses\Controllers\WebhookController::crmWebhook');
+
     // ── Admin (course builder) — mesmo grupo/filtro do painel do core ─────────
     $routes->group($customRoutes->admin, ['filter' => 'auth'], function ($routes) {
         $routes->get('cursos', '\Modules\Courses\Controllers\CourseAdminController::index');
@@ -45,5 +53,8 @@ if (service('moduleRegistry')->enabled('courses')) {
         $routes->get('cursos/niveis', '\Modules\Courses\Controllers\CourseAdminController::accessLevels');
         $routes->post('cursos/niveis/salvar', '\Modules\Courses\Controllers\CourseAdminController::saveAccessLevel');
         $routes->post('cursos/acesso/conceder', '\Modules\Courses\Controllers\CourseAdminController::grantAccess');
+        // Fase 4b: gestão de assinaturas/memberships
+        $routes->get('cursos/assinaturas', '\Modules\Courses\Controllers\CourseAdminController::memberships');
+        $routes->post('cursos/assinaturas/conceder', '\Modules\Courses\Controllers\CourseAdminController::grantMembership');
     });
 }

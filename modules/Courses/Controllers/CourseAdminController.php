@@ -7,6 +7,8 @@ use Modules\Courses\Models\CourseModel;
 use Modules\Courses\Models\SectionModel;
 use Modules\Courses\Models\LessonModel;
 use Modules\Courses\Models\AccessLevelModel;
+use Modules\Courses\Models\MembershipModel;
+use Modules\Courses\Libraries\MembershipService;
 
 /**
  * Course builder do admin (Fase 4a). CRUD de curso → seções → aulas + níveis de acesso
@@ -254,6 +256,35 @@ class CourseAdminController extends BaseAdminController
         $adminId = (int) (session('id') ?? session('user_id') ?? 0) ?: null;
         $this->levels->grant($userId, $levelId, $adminId);
         return redirect()->to(adminUrl('cursos/niveis'))->with('success', 'Acesso concedido ao usuário #' . $userId . '.');
+    }
+
+    // ── assinaturas / memberships (Fase 4b) ──────────────────────────────────
+    public function memberships()
+    {
+        checkPermission('admin_panel');
+        $rows = (new MembershipModel())->forAdmin();
+        foreach ($rows as &$m) {
+            $m['_active'] = MembershipService::isActive($m);
+        }
+        unset($m);
+        $data = ['title' => 'Assinaturas', 'memberships' => $rows];
+        echo view('admin/includes/_header', $data);
+        echo view('admin/courses/memberships', $data);
+        echo view('admin/includes/_footer');
+    }
+
+    public function grantMembership()
+    {
+        checkPermission('admin_panel');
+        $document = preg_replace('/\D+/', '', (string) $this->request->getPost('document'));
+        $docType = (string) ($this->request->getPost('doc_type') ?: 'cpf');
+        $userId = (int) $this->request->getPost('user_id');
+        $months = max(1, (int) $this->request->getPost('months') ?: 12);
+        if (strlen($document) < 8) {
+            return redirect()->back()->with('error', 'Informe um documento (CPF/CURP) válido.');
+        }
+        (new MembershipService())->grantManual($document, $docType, $userId > 0 ? $userId : null, $months);
+        return redirect()->to(adminUrl('cursos/assinaturas'))->with('success', 'Membership concedido ao documento ' . $document . '.');
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────

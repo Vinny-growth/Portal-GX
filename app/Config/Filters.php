@@ -76,7 +76,8 @@ class Filters extends BaseFilters
                 'except' => [
                     'api/save-simulator-lead',
                     'api/quotation/preview',
-                    'api/quotation/unlock'
+                    'api/quotation/unlock',
+                    'courses/webhook/*', // módulo Courses (Fase 4b): webhooks de gateway/CRM (só existem com o módulo ligado)
                 ]
             ],
             // 'invalidchars',
@@ -117,7 +118,8 @@ class Filters extends BaseFilters
             'except' => [
                 'api/save-simulator-lead',
                 'api/quotation/preview',
-                'api/quotation/unlock'
+                'api/quotation/unlock',
+                'courses/webhook/*', // módulo Courses (Fase 4b): webhooks de gateway/CRM
             ]
         ]
     ];

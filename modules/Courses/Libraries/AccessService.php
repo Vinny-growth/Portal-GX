@@ -64,12 +64,19 @@ class AccessService
     }
 
     /**
-     * SEAM da Fase 4b: membership anual (paid|client_comp). Enquanto o sub-módulo de
-     * pagamento não existe, ninguém tem membership → acesso pago vem só de nível manual.
-     * A Fase 4b troca este corpo por uma checagem na tabela `memberships` (status ativo).
+     * Fase 4b: membership único ativo (paid|client_comp|manual) desbloqueia TODO o conteúdo
+     * pago. Delega ao MembershipService (isActive = client_active OU dentro do pago OU carência).
+     * Cache estático por request p/ não repetir a query a cada aula renderizada.
      */
     public function hasActiveMembership(int $userId): bool
     {
-        return false;
+        static $cache = [];
+        if ($userId <= 0) {
+            return false;
+        }
+        if (array_key_exists($userId, $cache)) {
+            return $cache[$userId];
+        }
+        return $cache[$userId] = (new MembershipService())->hasActiveForUser($userId);
     }
 }
