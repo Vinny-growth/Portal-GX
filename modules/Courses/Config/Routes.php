@@ -60,6 +60,8 @@ if (service('moduleRegistry')->enabled('courses')) {
         $routes->post('cursos/secao/(:num)/excluir', '\Modules\Courses\Controllers\CourseAdminController::deleteSection/$1');
         $routes->post('cursos/aula/salvar', '\Modules\Courses\Controllers\CourseAdminController::saveLesson');
         $routes->post('cursos/aula/(:num)/excluir', '\Modules\Courses\Controllers\CourseAdminController::deleteLesson/$1');
+        // geração de imagem por IA (capa de curso/aula, seguindo o design system)
+        $routes->post('cursos/gerar-imagem', '\Modules\Courses\Controllers\CourseAdminController::generateImage');
         // níveis de acesso (grant manual) + concessão a alunos
         $routes->get('cursos/niveis', '\Modules\Courses\Controllers\CourseAdminController::accessLevels');
         $routes->post('cursos/niveis/salvar', '\Modules\Courses\Controllers\CourseAdminController::saveAccessLevel');

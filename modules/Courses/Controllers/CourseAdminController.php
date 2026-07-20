@@ -11,6 +11,7 @@ use Modules\Courses\Models\MembershipModel;
 use Modules\Courses\Models\SpaceModel;
 use Modules\Courses\Models\CommunityPostModel;
 use Modules\Courses\Libraries\MembershipService;
+use Modules\Courses\Libraries\CourseImageService;
 
 /**
  * Course builder do admin (Fase 4a). CRUD de curso → seções → aulas + níveis de acesso
@@ -183,6 +184,7 @@ class CourseAdminController extends BaseAdminController
             'section_id'      => (int) $this->request->getPost('section_id'),
             'title'           => $title,
             'slug'            => $this->lessonSlug($title, $lessonId),
+            'cover_image'     => trim((string) $this->request->getPost('cover_image')) ?: null,
             'content_type'    => in_array($this->request->getPost('content_type'), ['video', 'text'], true) ? $this->request->getPost('content_type') : 'video',
             'video_url'       => trim((string) $this->request->getPost('video_url')) ?: null,
             'video_provider'  => trim((string) $this->request->getPost('video_provider')) ?: null,
@@ -287,6 +289,38 @@ class CourseAdminController extends BaseAdminController
         }
         (new MembershipService())->grantManual($document, $docType, $userId > 0 ? $userId : null, $months);
         return redirect()->to(adminUrl('cursos/assinaturas'))->with('success', 'Membership concedido ao documento ' . $document . '.');
+    }
+
+    // ── geração de imagem por IA (capa de curso/aula — design system) ─────────
+    public function generateImage()
+    {
+        checkPermission('admin_panel');
+        $type = $this->request->getPost('type') === 'lesson' ? 'lesson' : 'course';
+        $title = trim((string) $this->request->getPost('title'));
+        if ($title === '') {
+            return $this->response->setJSON(['ok' => false, 'error' => 'Preencha o título antes de gerar a imagem.']);
+        }
+        $url = (new CourseImageService())->generate(
+            $type,
+            $title,
+            trim((string) $this->request->getPost('subtitle')) ?: null,
+            trim((string) $this->request->getPost('category')) ?: null,
+            trim((string) $this->request->getPost('level')) ?: null
+        );
+        if (!$url) {
+            return $this->response->setJSON(['ok' => false, 'error' => 'Falha ao gerar a imagem. Verifique a chave OpenAI (OPENAI_API_KEY / IA do blog).']);
+        }
+        // persiste direto no registro, se já existir (edição)
+        $id = (int) $this->request->getPost('id');
+        if ($id > 0) {
+            $now = date('Y-m-d H:i:s');
+            if ($type === 'lesson') {
+                $this->lessons->update($id, ['cover_image' => $url, 'updated_at' => $now]);
+            } else {
+                $this->courses->update($id, ['cover_image' => $url, 'updated_at' => $now]);
+            }
+        }
+        return $this->response->setJSON(['ok' => true, 'url' => $url]);
     }
 
     // ── comunidade (Fase 4c — moderação + espaços) ───────────────────────────

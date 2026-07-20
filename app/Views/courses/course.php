@@ -87,6 +87,7 @@ $continueSlug = $continueSlug ?: $firstSlug;
             ?>
                 <<?= $href ? 'a href="' . $href . '"' : 'div' ?> class="jn-lesson <?= $locked ? 'jn-lesson--locked' : '' ?>">
                     <div class="jn-dot <?= $done ? 'jn-dot--done' : '' ?>"><?= $done ? '✓' : ($i + 1) ?></div>
+                    <?php if (!empty($l['cover_image'])): ?><img src="<?= esc($l['cover_image'], 'attr') ?>" alt="" style="width:72px;height:48px;object-fit:cover;flex:0 0 auto;border:1px solid rgba(219,199,162,.2)"><?php endif; ?>
                     <div class="jn-lesson__main">
                         <div class="jn-lesson__t"><?= esc($l['title']) ?><?= !empty($l['is_free_preview']) ? ' <span class="jn-tag">Amostra</span>' : '' ?></div>
                         <div class="jn-lesson__m"><?= esc($l['content_type'] === 'text' ? 'Leitura' : 'Vídeo') ?> · <?= (int) $l['xp_reward'] ?> XP<?= $done ? ' · Concluída' : ($l['_percent'] > 0 ? ' · ' . (int) $l['_percent'] . '%' : '') ?></div>

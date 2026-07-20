@@ -9,7 +9,7 @@ class LessonModel extends BaseModel
     protected $returnType    = 'array';
     protected $useTimestamps = false;
     protected $allowedFields = [
-        'course_id', 'section_id', 'title', 'slug', 'content_type', 'video_url',
+        'course_id', 'section_id', 'title', 'slug', 'cover_image', 'content_type', 'video_url',
         'video_provider', 'body_html', 'duration_seconds', 'access_level_id',
         'is_free_preview', 'xp_reward', 'lesson_order', 'created_at', 'updated_at',
     ];

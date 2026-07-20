@@ -37,7 +37,14 @@ $action = $isEdit ? adminUrl('cursos/' . $course['id'] . '/editar') : adminUrl('
                 </select>
             </div>
             <div class="gxc-field"><label class="gxc-label">Instrutor</label><input class="gxc-input" name="instructor" value="<?= $v('instructor'); ?>"></div>
-            <div class="gxc-field"><label class="gxc-label">Capa (URL da imagem)</label><input class="gxc-input" name="cover_image" value="<?= $v('cover_image'); ?>"></div>
+            <div class="gxc-field gxc-field--full"><label class="gxc-label">Capa (URL da imagem)</label>
+                <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+                    <input class="gxc-input" name="cover_image" value="<?= $v('cover_image'); ?>" style="flex:1;min-width:240px">
+                    <button type="button" class="gxc-btn gxc-btn--gold gxc-btn--sm gxc-genimg" data-type="course" data-id="<?= $isEdit ? (int) $course['id'] : ''; ?>">🎨 Gerar com IA</button>
+                </div>
+                <img class="gxc-genimg-preview" src="<?= $v('cover_image'); ?>" alt="" style="margin-top:8px;max-width:280px;border:1px solid var(--gx-border);<?= empty($course['cover_image']) ? 'display:none' : ''; ?>">
+                <span class="gxc-muted" style="display:block;margin-top:4px">Gera uma capa com IA seguindo o design system da marca (paisagem 3:2, sem texto). ~20-40s.</span>
+            </div>
             <div class="gxc-field"><label class="gxc-label">Trailer (URL embed)</label><input class="gxc-input" name="trailer_url" value="<?= $v('trailer_url'); ?>"></div>
             <div class="gxc-field"><label class="gxc-label">Nível de acesso exigido</label>
                 <select class="gxc-select" name="access_level_id">
@@ -130,3 +137,40 @@ $action = $isEdit ? adminUrl('cursos/' . $course['id'] . '/editar') : adminUrl('
     </div>
     <?php endif; ?>
 </div>
+
+<script>
+(function(){
+    var endpoint = <?= json_encode(adminUrl('cursos/gerar-imagem')) ?>;
+    var cn = <?= json_encode(csrf_token()) ?>, ch = <?= json_encode(csrf_hash()) ?>;
+    document.addEventListener('click', function(e){
+        var btn = e.target.closest('.gxc-genimg');
+        if (!btn) return;
+        e.preventDefault();
+        var form = btn.closest('form');
+        if (!form) return;
+        var val = function(n){ var el = form.querySelector('[name="'+n+'"]'); return el ? el.value : ''; };
+        if (!val('title').trim()) { alert('Preencha o título antes de gerar a imagem.'); return; }
+        var body = new URLSearchParams();
+        body.append('type', btn.dataset.type || 'course');
+        body.append('title', val('title'));
+        body.append('subtitle', val('subtitle'));
+        body.append('category', val('category'));
+        body.append('level', val('level'));
+        var id = btn.dataset.id || val('lesson_id') || '';
+        if (id) body.append('id', id);
+        body.append(cn, ch);
+        var orig = btn.textContent; btn.disabled = true; btn.textContent = '🎨 Gerando… (~30s)';
+        fetch(endpoint, {method:'POST', headers:{'X-Requested-With':'XMLHttpRequest'}, body: body})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+            btn.disabled = false; btn.textContent = orig;
+            if (!d.ok) { alert(d.error || 'Falha ao gerar a imagem.'); return; }
+            var input = form.querySelector('[name="cover_image"]');
+            if (input) input.value = d.url;
+            var prev = form.querySelector('.gxc-genimg-preview');
+            if (prev) { prev.src = d.url; prev.style.display = 'block'; }
+        })
+        .catch(function(){ btn.disabled = false; btn.textContent = orig; alert('Erro de rede ao gerar a imagem.'); });
+    });
+})();
+</script>

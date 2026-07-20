@@ -6,6 +6,13 @@
     <?php if ($isEdit): ?><input type="hidden" name="lesson_id" value="<?= (int) $l['id']; ?>"><?php endif; ?>
     <div class="gxc-grid">
         <div class="gxc-field gxc-field--full"><label class="gxc-label">Título da aula</label><input class="gxc-input" name="title" value="<?= esc($l['title'] ?? '', 'attr'); ?>" required></div>
+        <div class="gxc-field gxc-field--full"><label class="gxc-label">Capa da aula (URL)</label>
+            <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+                <input class="gxc-input" name="cover_image" value="<?= esc($l['cover_image'] ?? '', 'attr'); ?>" style="flex:1;min-width:200px">
+                <button type="button" class="gxc-btn gxc-btn--gold gxc-btn--sm gxc-genimg" data-type="lesson">🎨 Gerar com IA</button>
+            </div>
+            <img class="gxc-genimg-preview" src="<?= esc($l['cover_image'] ?? '', 'attr'); ?>" alt="" style="margin-top:8px;max-width:220px;border:1px solid var(--gx-border);<?= empty($l['cover_image']) ? 'display:none' : ''; ?>">
+        </div>
         <div class="gxc-field"><label class="gxc-label">Tipo</label>
             <select class="gxc-select" name="content_type">
                 <?php $ct = $l['content_type'] ?? 'video'; foreach (['video' => 'Vídeo', 'text' => 'Texto'] as $k => $lbl): ?>
