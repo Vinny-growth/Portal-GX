@@ -237,6 +237,17 @@
                             </ul>
                         </li>
                         <?php endif; ?>
+                        <?php if (service('moduleRegistry')->enabled('courses')): ?>
+                        <li class="treeview">
+                            <a href="#"><i class="fa fa-graduation-cap"></i> <span>Cursos &amp; Comunidade</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li class="nav-courses"><a href="<?= adminUrl('cursos'); ?>">Cursos</a></li>
+                                <li class="nav-courses-community"><a href="<?= adminUrl('cursos/comunidade'); ?>">Comunidade</a></li>
+                                <li class="nav-courses-memberships"><a href="<?= adminUrl('cursos/assinaturas'); ?>">Assinaturas</a></li>
+                                <li class="nav-courses-levels"><a href="<?= adminUrl('cursos/niveis'); ?>">Níveis de acesso</a></li>
+                            </ul>
+                        </li>
+                        <?php endif; ?>
                     <?php endif;
                     if (hasPermission('gallery')): ?>
                         <li class="treeview<?php isAdminNavActive(['gallery-images', 'gallery-albums', 'gallery-categories', 'update-gallery-image', 'update-gallery-album', 'update-gallery-category', 'gallery-add-image']); ?>">

@@ -22,8 +22,9 @@ return [
         ['label' => 'Cursos', 'url' => 'cursos'],
     ],
     // Item(ns) no sidebar do admin. Só aparece se o módulo estiver ligado.
+    // url relativo ao prefixo admin (consumido com adminUrl(); mesma convenção do Wealth).
     'admin_nav'       => [
-        ['label' => 'Cursos', 'url' => 'admin/cursos'],
+        ['label' => 'Cursos & Comunidade', 'url' => 'cursos'],
     ],
     'permissions'     => [],
     'settings'        => [],
