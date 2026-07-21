@@ -61,14 +61,35 @@ class StudentController extends BaseController
     public function catalog()
     {
         $userId = $this->userId();
-        $data = [
-            'featured'   => $this->courses->getFeatured(),
-            'grouped'    => $this->courses->getPublishedGroupedByCategory(),
-            'enrollMap'  => $this->enrollmentMap($userId),
-            'totalXp'    => $this->points->totalFor($userId),
-            'userId'     => $userId,
-        ];
-        return view('courses/catalog', $data);
+        $grouped = $this->courses->getPublishedGroupedByCategory();
+        $enrollMap = $this->enrollmentMap($userId);
+
+        // "Continuar assistindo": cursos iniciados e não concluídos, por atividade recente
+        // (enrollMap já vem ordenado por updated_at desc).
+        $byId = [];
+        foreach ($grouped as $cs) {
+            foreach ($cs as $c) {
+                $byId[(int) $c['id']] = $c;
+            }
+        }
+        $continue = [];
+        foreach ($enrollMap as $cid => $e) {
+            $pct = (int) ($e['progress_percent'] ?? 0);
+            if ($pct > 0 && $pct < 100 && isset($byId[$cid])) {
+                $c = $byId[$cid];
+                $c['_enroll'] = $e;
+                $continue[] = $c;
+            }
+        }
+
+        return view('courses/catalog', [
+            'featured'  => $this->courses->getFeatured(),
+            'grouped'   => $grouped,
+            'enrollMap' => $enrollMap,
+            'continue'  => $continue,
+            'totalXp'   => $this->points->totalFor($userId),
+            'userId'    => $userId,
+        ]);
     }
 
     public function myCourses()
