@@ -293,6 +293,13 @@ class HomeController extends BaseController
         'simulador-mercado-capitais'                => 'simulador-mercado-de-capitais',
         'mercado-de-capitais'                       => 'simulador-mercado-de-capitais',
         'simulador-fidc'                            => 'simulador-de-custo-de-antecipacao',
+        // 404s recorrentes no access log (auditoria 21/jul/2026): URLs antigas de
+        // glossário/landing ainda crawladas por bots e caches externos.
+        'trade-finance'               => 'simuladores/cambio',
+        'fechamento-de-cambio'        => 'fechamento-de-cambio-na-importacao-e-exportacao',
+        'hedge-cambial'               => 'hedge-cambial-guia-para-proteger-margem',
+        'hedge-ndf-termo-swap-opcoes' => 'tipos-de-hedge-cambial-termo-ndf-opcoes-e-swap',
+        '4131'                        => 'emprestimo-4131-custos-prazo-e-hedge',
     ];
 
     public function legacyRedirect()
