@@ -87,6 +87,17 @@ class AppSetup extends BaseCommand
         // ── 5) admin ──
         $this->createAdmin($in);
 
+        // ── 6) migrations (delta pós-schema) + seeds ──
+        // Só quando instalando no banco default do .env: spark migrate/db:seed usam a
+        // conexão default, então com --db/--host apontaria pro banco errado.
+        $sameDb = $cfg['database'] === $def['database'] && $cfg['hostname'] === $def['hostname'];
+        if (!$this->dry && $sameDb) {
+            $this->runMigrationsAndSeeds($in);
+        } elseif (!$this->dry) {
+            CLI::write('• Banco custom (--db/--host): aponte o .env pro novo banco e rode `spark migrate --all`, `spark db:seed ActuarialSheetSeeder`'
+                . ($in['demo'] ? ' e o seed demo do Courses' : '') . '.', 'yellow');
+        }
+
         // ── verificação ──
         if (!$this->dry) {
             $ok = $this->db->table('brand_settings')->where('id', 1)->countAllResults() > 0
@@ -96,7 +107,35 @@ class AppSetup extends BaseCommand
 
         CLI::write("\n=== " . ($this->dry ? 'DRY-RUN concluído (nada foi escrito).' : 'Instalação concluída!') . ' ===', 'yellow');
         CLI::write('Marca: ' . $in['brand_name'] . ' · locale ' . $in['locale'] . ' · admin ' . $in['admin_email']);
-        CLI::write('Próximos: rodar migrations dos módulos ligados (spark migrate -n "Modules\\<Nome>"), configurar .env (baseURL, gateway/CRM), apontar o vhost.');
+        CLI::write('Próximos: configurar .env (baseURL, gateway/CRM), apontar o vhost.');
+    }
+
+    /** Aplica migrations mais novas que o schema base e semeia dados operacionais (+ demo com --demo). */
+    private function runMigrationsAndSeeds(array $in): void
+    {
+        try {
+            command('migrate --all');
+            CLI::write('• Migrations: delta aplicado (todas as namespaces) ✓', 'green');
+        } catch (\Throwable $e) {
+            CLI::error('Migrations falharam: ' . $e->getMessage());
+        }
+        $seeder = Database::seeder();
+        try {
+            // dados atuariais (taxas/fatores da planilha) — obrigatórios p/ o simulador de seguro;
+            // NÃO estão no base_schema (são dados, não estrutura)
+            $seeder->call('App\Database\Seeds\ActuarialSheetSeeder');
+            CLI::write('• Seed: taxas atuariais (ActuarialSheetSeeder) ✓', 'green');
+        } catch (\Throwable $e) {
+            CLI::error('Seed atuarial falhou: ' . $e->getMessage());
+        }
+        if (!empty($in['demo'])) {
+            try {
+                $seeder->call('Modules\Courses\Database\Seeds\CoursesDemoSeeder');
+                CLI::write('• Seed: conteúdo demo do Courses (--demo) ✓', 'green');
+            } catch (\Throwable $e) {
+                CLI::error('Seed demo do Courses falhou: ' . $e->getMessage());
+            }
+        }
     }
 
     private function collect(): array

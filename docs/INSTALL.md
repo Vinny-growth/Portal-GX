@@ -89,19 +89,23 @@ existir (salvo `--force`).
 
 ## 5. Módulos: migrations e conteúdo
 
-O `base_schema.sql` já traz **todas** as tabelas dos módulos (Wealth, Simulators, Courses…) e
-marca as migrations atuais como aplicadas — então **não** é preciso rodar `spark migrate` numa
-instalação nova. Ao adicionar módulos/migrations **novos** depois, rode normalmente:
+O `base_schema.sql` traz as tabelas dos módulos (Wealth, Simulators, Courses…) e marca as
+migrations correspondentes como aplicadas. Desde 21/jul/2026, quando o `app:setup` roda contra
+o banco **default do `.env`**, ele mesmo aplica ao final o delta de migrations (`migrate --all`)
+e semeia os **dados atuariais** (`ActuarialSheetSeeder` — obrigatórios p/ o simulador de seguro;
+sem eles a API retorna "Sem taxas para idade"). Com `--demo`, semeia também o conteúdo demo do
+Courses. Se instalar num banco custom (`--db`/`--host`), aponte o `.env` pro novo banco e rode:
 
 ```bash
-php spark migrate                       # migrations do core (App)
-php spark migrate -n "Modules\Courses"  # migrations do módulo Courses (se ligado)
+php spark migrate --all                  # migrations de todas as namespaces
+php spark db:seed ActuarialSheetSeeder   # taxas/fatores da planilha atuarial
+php spark db:seed "Modules\Courses\Database\Seeds\CoursesDemoSeeder"  # (opcional) demo
 ```
 
-Conteúdo de exemplo (opcional):
+Cron recomendado com o módulo Courses ligado (reconciliação diária de status):
 
 ```bash
-php spark db:seed "Modules\Courses\Database\Seeds\CoursesDemoSeeder"  # cursos + espaços demo
+0 4 * * * cd /caminho/da/instalacao && php spark courses:expire-sweep
 ```
 
 ## 6. Configuração por módulo (se ligado)
@@ -110,6 +114,10 @@ php spark db:seed "Modules\Courses\Database\Seeds\CoursesDemoSeeder"  # cursos +
   `COURSES_MP_ACCESS_TOKEN` ou `COURSES_STRIPE_SECRET`), o preço do plano
   (`COURSES_PLAN_AMOUNT`/`COURSES_PLAN_CURRENCY`) e o segredo do webhook do CRM
   (`COURSES_CRM_WEBHOOK_SECRET`). Ligue o módulo em `--modules` ou depois pela tabela `modules`.
+  **Pagamentos reais exigem também os segredos de webhook**: `COURSES_STRIPE_WEBHOOK_SECRET`
+  (obrigatório com Stripe — sem ele todo webhook é rejeitado) e `COURSES_MP_WEBHOOK_SECRET`
+  (recomendado com MercadoPago — valida o header `x-signature`). O webhook só ativa pagamentos
+  com valor/moeda iguais ao plano e revoga o acesso em estorno (`charge.refunded`/`refunded`).
 
 ## 7. Verificar
 

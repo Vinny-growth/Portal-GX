@@ -345,6 +345,7 @@ CREATE TABLE `community_spaces` (
   `description` varchar(500) DEFAULT NULL,
   `icon` varchar(20) DEFAULT NULL,
   `color` varchar(20) DEFAULT NULL,
+  `cover_image` varchar(500) DEFAULT NULL,
   `sort` int(11) NOT NULL DEFAULT 0,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime DEFAULT NULL,
@@ -835,6 +836,7 @@ CREATE TABLE `lessons` (
   `section_id` int(11) unsigned NOT NULL,
   `title` varchar(255) NOT NULL,
   `slug` varchar(255) DEFAULT NULL,
+  `cover_image` varchar(500) DEFAULT NULL,
   `content_type` varchar(20) NOT NULL DEFAULT 'video',
   `video_url` varchar(1000) DEFAULT NULL,
   `video_provider` varchar(20) DEFAULT NULL,
@@ -2182,4 +2184,6 @@ INSERT INTO `migrations` VALUES (36,'2026-07-13-000001','App\\Database\\Migratio
 INSERT INTO `migrations` VALUES (37,'2026-07-17-000001','Modules\\Courses\\Database\\Migrations\\CreateCoursesLmsTables','default','Modules\\Courses',1784323003,19);
 INSERT INTO `migrations` VALUES (38,'2026-07-18-000001','Modules\\Courses\\Database\\Migrations\\CreateMembershipTables','default','Modules\\Courses',1784406251,20);
 INSERT INTO `migrations` VALUES (39,'2026-07-19-000001','Modules\\Courses\\Database\\Migrations\\CreateCommunityTables','default','Modules\\Courses',1784481444,21);
+INSERT INTO `migrations` VALUES (40,'2026-07-20-000001','Modules\\Courses\\Database\\Migrations\\AddLessonCoverImage','default','Modules\\Courses',1784565632,22);
+INSERT INTO `migrations` VALUES (41,'2026-07-21-000001','Modules\\Courses\\Database\\Migrations\\AddSpaceCoverImage','default','Modules\\Courses',1784644831,23);
 SET FOREIGN_KEY_CHECKS=1;
