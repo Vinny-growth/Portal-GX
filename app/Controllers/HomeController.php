@@ -884,10 +884,47 @@ class HomeController extends BaseController
                 if (!empty($post)) {
                     $this->post($post);
                 } else {
+                    // Recuperação determinística de URLs antigas/quebradas de post -> 301 p/ o canônico
+                    $legacyUrl = $this->legacyPostRedirect($slug);
+                    if (!empty($legacyUrl)) {
+                        return redirect()->to($legacyUrl, 301);
+                    }
                     $this->error404();
                 }
             }
         }
+    }
+
+    /**
+     * Recuperação determinística de URLs antigas de post:
+     *  - slug sem o sufixo numérico "-{id}"  (ex.: ".../credito-pj" -> ".../credito-pj-10")
+     *  - '&' escapado como 'amp'/'ampamp'    (ex.: ".../credito-amp-risco..." -> ".../credito-risco...")
+     * Retorna a URL canônica p/ redirect 301, ou null se não houver correspondência exata.
+     */
+    private function legacyPostRedirect($slug)
+    {
+        $slug = cleanSlug($slug);
+        if (empty($slug)) {
+            return null;
+        }
+        // candidatos: o próprio slug e a versão com '&' desfeito ('-amp-'/'-ampamp-' -> '-')
+        $candidates = [$slug];
+        $normalized = preg_replace('/-(?:ampamp|amp)-/', '-', $slug);
+        if (!empty($normalized) && $normalized !== $slug) {
+            $candidates[] = $normalized;
+        }
+        foreach ($candidates as $candidate) {
+            // match exato (útil quando só o 'amp' precisou ser removido)
+            $post = ($candidate === $slug) ? null : $this->postModel->getPostBySlug($candidate);
+            // ou recuperação do sufixo: slug canônico == candidate . '-' . id
+            if (empty($post)) {
+                $post = $this->postModel->getCanonicalPostForSuffixlessSlug($candidate);
+            }
+            if (!empty($post) && !empty($post->slug) && $post->slug !== $slug) {
+                return generatePostURL($post);
+            }
+        }
+        return null;
     }
 
     /**

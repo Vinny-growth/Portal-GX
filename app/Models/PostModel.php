@@ -170,6 +170,20 @@ class PostModel extends BaseModel
         return $this->builder->where('posts.slug', cleanSlug($slug))->get()->getRow();
     }
 
+    //recupera o post canônico cujo slug é "<slug>-<id>" (URLs antigas sem o sufixo numérico)
+    public function getCanonicalPostForSuffixlessSlug($slug)
+    {
+        $slug = cleanSlug($slug);
+        if (empty($slug)) {
+            return null;
+        }
+        $this->buildQuery(null, true);
+        return $this->builder
+            ->where("posts.slug = CONCAT(" . $this->db->escape($slug) . ", '-', posts.id)")
+            ->get()
+            ->getRow();
+    }
+
     //get post count by tag
     public function getPostCountByTag($tagId, $langId)
     {
