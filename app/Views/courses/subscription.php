@@ -19,6 +19,7 @@ $statusLabel = ['active' => 'Ativa', 'grace' => 'Em carência', 'expired' => 'Ex
     .sb-list{list-style:none;padding:0;margin:16px 0 0;font-size:14px;color:#cdd7e4}
     .sb-list li{padding:8px 0;border-bottom:1px solid rgba(219,199,162,.1);display:flex;justify-content:space-between;gap:12px}
     .sb-flash{padding:12px 16px;margin:var(--space-4) 0;background:rgba(22,163,74,.15);border-left:4px solid var(--gx-success);color:#d7ffe4;font-weight:600}
+    .sb-flash--error{background:rgba(220,38,38,.15);border-left-color:#dc2626;color:#ffd7d7}
     .sb-field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
     .sb-field label{font-size:11px;text-transform:uppercase;letter-spacing:var(--ls-wide);color:#9fb0c4;font-weight:700}
     .sb-field input,.sb-field select{padding:11px 13px;background:#06182f;border:1px solid rgba(219,199,162,.25);color:#eef2f7;font-family:var(--font-sans)}
@@ -29,6 +30,7 @@ $statusLabel = ['active' => 'Ativa', 'grace' => 'Em carência', 'expired' => 'Ex
 
 <div class="ac-eyebrow">Minha assinatura</div>
 <?php if (session()->getFlashdata('success')): ?><div class="sb-flash"><?= esc(session()->getFlashdata('success')) ?></div><?php endif; ?>
+<?php if (session()->getFlashdata('error')): ?><div class="sb-flash sb-flash--error"><?= esc(session()->getFlashdata('error')) ?></div><?php endif; ?>
 
 <div class="sb-grid">
     <!-- status atual -->
@@ -59,7 +61,7 @@ $statusLabel = ['active' => 'Ativa', 'grace' => 'Em carência', 'expired' => 'Ex
             <li>Acesso a todos os cursos e trilhas</li>
             <li>Certificados de conclusão</li>
             <li>Jornada gamificada com XP e conquistas</li>
-            <li>Comunidade (em breve)</li>
+            <li>Comunidade exclusiva de membros</li>
         </ul>
         <form method="post" action="<?= site_url('assinatura/iniciar') ?>">
             <?= csrf_field() ?>
@@ -73,6 +75,16 @@ $statusLabel = ['active' => 'Ativa', 'grace' => 'Em carência', 'expired' => 'Ex
             </div>
             <button class="ac-btn" type="submit" style="width:100%;justify-content:center">Assinar via <?= esc(ucfirst($gateway)) ?> →</button>
             <p style="font-size:11px;color:#7d8da5;margin:12px 0 0;text-transform:uppercase;letter-spacing:var(--ls-wide)">Cobrança anual · cancele quando quiser</p>
+        </form>
+        <form method="post" action="<?= site_url('assinatura/vincular') ?>" style="margin-top:22px;border-top:1px solid rgba(219,199,162,.2);padding-top:18px">
+            <?= csrf_field() ?>
+            <div style="text-transform:uppercase;letter-spacing:var(--ls-widest);font-size:11px;font-weight:800;color:var(--gx-gold)">Já é cliente GX?</div>
+            <p style="font-size:13px;color:#9fb0c4;line-height:1.5;margin:8px 0 12px">Clientes ativos têm acesso cortesia. Informe seu documento para vincular à sua conta.</p>
+            <div class="sb-field">
+                <label>Documento (CPF/CURP)</label>
+                <input name="document" inputmode="numeric" placeholder="Somente números" required>
+            </div>
+            <button class="ac-btn ac-btn--ghost" type="submit" style="width:100%;justify-content:center">Vincular acesso de cliente →</button>
         </form>
     </div>
     <?php else: ?>

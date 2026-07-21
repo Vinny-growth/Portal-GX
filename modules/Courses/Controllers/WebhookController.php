@@ -41,15 +41,35 @@ class WebhookController extends BaseController
 
         if ($event['event'] === 'payment_paid' && !empty($event['document'])) {
             $plan = GatewayFactory::plan();
+            // o valor/moeda do evento não é confiável p/ ativação: confere contra o plano
+            $expected = (float) $plan['amount'];
+            $paid = (float) ($event['amount'] ?? 0);
+            $sameCurrency = strcasecmp((string) ($event['currency'] ?? ''), (string) $plan['currency']) === 0;
+            if ($expected > 0 && ($paid + 0.01 < $expected || !$sameCurrency)) {
+                log_message('error', sprintf(
+                    'Courses: pagamento NÃO ativou o plano — pago %s %.2f, esperado %s %.2f (gateway %s, ref %s)',
+                    (string) ($event['currency'] ?? '?'), $paid, (string) $plan['currency'], $expected, $adapter->key(), $ref
+                ));
+                return $this->response->setStatusCode(200)->setBody('amount_mismatch');
+            }
             (new MembershipService())->activatePaid(
                 (string) $event['document'],
                 (string) ($event['doc_type'] ?? 'cpf'),
                 $event['user_id'] ?? null,
                 $adapter->key(),
                 (string) ($event['gateway_payment_id'] ?? ''),
-                (float) ($event['amount'] ?? 0),
+                $paid,
                 (string) ($event['currency'] ?? 'BRL'),
                 (int) $plan['months']
+            );
+            $db->table('payment_events')->where('gateway', $adapter->key())->where('gateway_ref', $ref)->update(['processed' => 1]);
+        }
+
+        if ($event['event'] === 'payment_refunded' && !empty($event['document'])) {
+            (new MembershipService())->refundPaid(
+                (string) $event['document'],
+                $adapter->key(),
+                (string) ($event['gateway_payment_id'] ?? '') ?: null
             );
             $db->table('payment_events')->where('gateway', $adapter->key())->where('gateway_ref', $ref)->update(['processed' => 1]);
         }

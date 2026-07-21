@@ -136,6 +136,33 @@ class MembershipService
         return $this->memberships->find((int) $m['id']);
     }
 
+    /** Estorno/chargeback: revoga o período pago imediatamente (comp de cliente, se houver, permanece). */
+    public function refundPaid(string $document, string $gateway, ?string $gatewayPaymentId = null): ?array
+    {
+        $m = $this->memberships->getByDocument($document);
+        if (empty($m)) {
+            return null;
+        }
+        $now = date('Y-m-d H:i:s');
+        if ($gatewayPaymentId) {
+            $pay = $this->payments->getByGatewayId($gateway, $gatewayPaymentId);
+            if (!empty($pay)) {
+                $this->payments->update((int) $pay['id'], ['status' => 'refunded', 'updated_at' => $now]);
+            }
+        }
+        $isClient = (int) ($m['client_active'] ?? 0) === 1;
+        $this->memberships->update((int) $m['id'], [
+            'paid_until'   => null,
+            'access_until' => null,
+            'source'       => $isClient ? 'client_comp' : $m['source'],
+            'status'       => $isClient ? 'active' : 'expired',
+            'canceled_at'  => $now,
+            'updated_at'   => $now,
+        ]);
+        log_message('warning', 'Courses: estorno processado — período pago revogado (documento mascarado ***' . substr($document, -4) . ').');
+        return $this->memberships->find((int) $m['id']);
+    }
+
     /** Concessão manual pelo admin (cortesia avulsa por N meses). */
     public function grantManual(string $document, string $docType, ?int $userId, int $months = 12): array
     {

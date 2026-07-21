@@ -52,7 +52,16 @@ class StripeGateway extends AbstractGateway
         $raw = $request->getBody() ?: '';
         $body = json_decode($raw, true) ?: [];
         if (!$this->cfg('COURSES_STRIPE_SECRET')) {
-            return $this->normalizeTestBody($body, 'stripe');
+            // sem credenciais não há pagamento real: o fluxo de teste ativa via
+            // CheckoutController::confirmar() (sessão autenticada), nunca por este
+            // endpoint público — aceitar POSTs aqui permitiria forjar membership
+            log_message('warning', 'Courses/Stripe: webhook ignorado — gateway sem credenciais (modo teste).');
+            return null;
+        }
+        // modo real: a rota é pública/CSRF-exempt, então só a assinatura prova a origem
+        if (!$this->verifySignature($raw, $request->getHeaderLine('Stripe-Signature'), $this->cfg('COURSES_STRIPE_WEBHOOK_SECRET'))) {
+            log_message('error', 'Courses/Stripe: webhook rejeitado — Stripe-Signature ausente/inválida (COURSES_STRIPE_WEBHOOK_SECRET é obrigatório em modo real).');
+            return null;
         }
         // evento real: checkout.session.completed / charge.refunded
         $type = $body['type'] ?? '';
@@ -77,5 +86,33 @@ class StripeGateway extends AbstractGateway
             'user_id'            => isset($meta['user_id']) && $meta['user_id'] !== '' ? (int) $meta['user_id'] : null,
             'event_ref'          => 'stripe_' . ($body['id'] ?? ($obj['id'] ?? '')),
         ];
+    }
+
+    /** Assinatura do webhook: header "t=<ts>,v1=<hmac>", HMAC-SHA256 de "<ts>.<payload>", tolerância 5 min. */
+    private function verifySignature(string $payload, string $header, ?string $secret): bool
+    {
+        if (empty($secret) || $header === '') {
+            return false;
+        }
+        $ts = 0;
+        $sigs = [];
+        foreach (explode(',', $header) as $part) {
+            [$k, $v] = array_pad(explode('=', trim($part), 2), 2, '');
+            if ($k === 't') {
+                $ts = (int) $v;
+            } elseif ($k === 'v1') {
+                $sigs[] = $v;
+            }
+        }
+        if ($ts <= 0 || empty($sigs) || abs(time() - $ts) > 300) {
+            return false;
+        }
+        $expected = hash_hmac('sha256', $ts . '.' . $payload, $secret);
+        foreach ($sigs as $sig) {
+            if (hash_equals($expected, $sig)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

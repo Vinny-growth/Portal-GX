@@ -62,6 +62,33 @@ class CheckoutController extends BaseController
         return redirect()->to($checkout['url']);
     }
 
+    /**
+     * Auto-serviço: vincula o documento do usuário logado a um membership existente.
+     * Fecha o gap do fluxo client_comp — o webhook do CRM cria membership por documento
+     * com user_id NULL (o CRM não conhece o login do LMS), e o gate de acesso resolve
+     * por user_id; sem este vínculo o cliente GX nunca vê a cortesia.
+     */
+    public function vincular()
+    {
+        $userId = $this->userId();
+        $document = preg_replace('/\D+/', '', (string) $this->request->getPost('document'));
+        if (strlen($document) < 8) {
+            return redirect()->to(site_url('minha-assinatura'))->with('error', 'Informe um documento (CPF/CURP) válido.');
+        }
+        $mModel = new MembershipModel();
+        $m = $mModel->getByDocument($document);
+        if (empty($m)) {
+            return redirect()->to(site_url('minha-assinatura'))->with('error', 'Nenhuma assinatura encontrada para este documento.');
+        }
+        if (!empty($m['user_id']) && (int) $m['user_id'] !== $userId) {
+            log_message('warning', 'Courses: user ' . $userId . ' tentou vincular documento já associado a outra conta (***' . substr($document, -4) . ').');
+            return redirect()->to(site_url('minha-assinatura'))->with('error', 'Este documento já está vinculado a outra conta. Fale com o suporte.');
+        }
+        $mModel->linkUser($document, $userId);
+        log_message('info', 'Courses: membership do documento ***' . substr($document, -4) . ' vinculado ao user ' . $userId . ' (auto-serviço).');
+        return redirect()->to(site_url('minha-assinatura'))->with('success', 'Documento vinculado! Seu acesso foi atualizado.');
+    }
+
     /** Retorno de teste (sem credenciais de gateway): simula pagamento aprovado e ativa. */
     public function confirmar()
     {

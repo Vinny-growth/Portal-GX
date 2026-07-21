@@ -30,6 +30,7 @@ if (service('moduleRegistry')->enabled('courses')) {
     // ── Fase 4b: assinatura/checkout (aluno) + webhooks (públicos, CSRF-exempt) ──────
     $routes->get('minha-assinatura', '\Modules\Courses\Controllers\CheckoutController::assinatura', ['filter' => 'auth']);
     $routes->post('assinatura/iniciar', '\Modules\Courses\Controllers\CheckoutController::iniciar', ['filter' => 'auth']);
+    $routes->post('assinatura/vincular', '\Modules\Courses\Controllers\CheckoutController::vincular', ['filter' => 'auth']);
     $routes->get('courses/checkout/confirmar', '\Modules\Courses\Controllers\CheckoutController::confirmar', ['filter' => 'auth']);
     // webhooks: sem auth; CSRF isento via Config\Security::$csrfExcludeURIs ('courses/webhook/.*')
     $routes->post('courses/webhook/pagamento/(:segment)', '\Modules\Courses\Controllers\WebhookController::paymentWebhook/$1');
