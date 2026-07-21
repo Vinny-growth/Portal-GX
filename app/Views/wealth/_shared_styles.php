@@ -561,496 +561,410 @@
     }
 }
 
-/* ══════════════════════════════════════════════════════════ */
-/* Vault Modernism — Wealth                                     */
-/* ══════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* Nexus Brutalist — Wealth                                                     */
+/* Alinha a /wealth ao design system GX (colors_and_type.css + ui_kits/nexus):  */
+/* cantos 0px, sombras hard-offset, Inter 900 UPPERCASE nos títulos, números    */
+/* em JetBrains Mono tabular, watermark GXC e tech-brackets. Substitui o antigo  */
+/* tema "Vault Modernism" (serifa/glass/soft). A base de marketing já é          */
+/* brutalista — aqui só reforçamos os componentes específicos do wealth e        */
+/* deixamos a base (hero-title, section-title, botões, labels) reaparecer.       */
+/* ══════════════════════════════════════════════════════════════════════════ */
 
+/* Página: fundo claro sóbrio, sem glow difuso */
 .gx-wealth {
-    font-family: var(--gx-font-sans-refined);
+    font-family: var(--gx-font-body);
     background:
-        radial-gradient(ellipse 900px 420px at 85% 12%, rgba(199,160,83,0.12) 0%, transparent 65%),
-        radial-gradient(ellipse 700px 500px at 10% 100%, rgba(0,42,85,0.04) 0%, transparent 70%),
-        linear-gradient(180deg, #FFFFFF 0%, var(--gx-vellum) 100%);
+        radial-gradient(ellipse 820px 360px at 90% 3%, rgba(201,169,106,0.08) 0%, transparent 58%),
+        linear-gradient(180deg, #ffffff 0%, var(--gx-bg-warm) 100%);
 }
 
+/* Hero: restaura o watermark "GXC" (o tema anterior o trocou por um gradiente) */
 .gx-wealth .gx-hero::before {
-    background:
-        linear-gradient(135deg, rgba(199,160,83,0.06), transparent 45%),
-        radial-gradient(circle at right top, rgba(199,160,83,0.14), transparent 28%);
+    content: "GXC";
+    inset: auto;
+    top: 56px;
+    right: -40px;
+    left: auto;
+    bottom: auto;
+    background: none;
+    font-family: var(--gx-font-heading);
+    font-size: clamp(180px, 22vw, 260px);
+    font-weight: 900;
+    letter-spacing: -0.06em;
+    line-height: 0.8;
+    color: var(--gx-navy);
+    opacity: 0.04;
+    white-space: nowrap;
+    z-index: 0;
 }
 
-.gx-wealth .gx-hero::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(199,160,83,0.35) 50%, transparent 100%);
-    z-index: 2;
-}
-
-/* Hero title — Instrument Serif */
-.gx-wealth .gx-hero-title {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: clamp(42px, 6vw, 72px);
-    line-height: 1;
-    letter-spacing: -0.02em;
-    color: var(--gx-navy-deep);
-}
-
-.gx-wealth .gx-hero-title em,
-.gx-wealth .gx-hero-title i {
-    font-style: italic;
-    color: var(--gx-gold-etched);
-}
-
-.gx-wealth .gx-hero-sub {
-    font-family: var(--gx-font-sans-refined);
-    font-size: 17px;
-    line-height: 1.6;
-    letter-spacing: -0.003em;
-    color: var(--gx-navy-70);
-}
-
-.gx-wealth .gx-label {
-    font-family: var(--gx-font-sans-refined);
-    font-size: 11px;
-    letter-spacing: 0.22em;
-    color: var(--gx-gold-etched);
-}
-
-.gx-wealth .gx-label::before {
-    width: 28px;
-    background: var(--gx-gold);
-}
-
-/* Panels — hairline frame em vez de rounded soft */
+/* ── Cartões e painéis: 0px, borda 1px, sombra hard-offset, sem blur ────────── */
 .gx-wealth-hero-panel,
 .gx-wealth-diagnostic-card,
 .gx-wealth-insights-card,
 .gx-wealth-deliverable-card,
-.gx-wealth-schedule-card,
-.gx-wealth-feature-card {
-    border-radius: 2px;
-    border: 1px solid rgba(0,42,85,0.08);
-    background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, var(--gx-ivory) 100%);
-    box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.85),
-        0 0 0 1px rgba(199,160,83,0.18),
-        0 32px 72px rgba(5,25,52,0.1);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-}
-
-.gx-wealth-hero-panel {
-    padding: 36px;
-}
-
-.gx-wealth-diagnostic-card,
-.gx-wealth-insights-card,
+.gx-wealth-feature-card,
 .gx-wealth-schedule-card {
-    padding: 36px;
+    position: relative;
+    border-radius: 0;
+    border: 1px solid var(--gx-border);
+    background: var(--gx-bg);
+    box-shadow: var(--gx-shadow-sm);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
+/* Tech-brackets (L 12×12) que acendem no hover — feature + entregáveis */
+.gx-wealth-feature-card::before,
+.gx-wealth-feature-card::after,
+.gx-wealth-deliverable-card::before,
+.gx-wealth-deliverable-card::after {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: transparent;
+    transition: border-color 0.25s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+.gx-wealth-feature-card::before,
+.gx-wealth-deliverable-card::before {
+    top: 0;
+    left: 0;
+    border-top: 2px solid;
+    border-left: 2px solid;
+}
+.gx-wealth-feature-card::after,
+.gx-wealth-deliverable-card::after {
+    bottom: 0;
+    right: 0;
+    border-bottom: 2px solid;
+    border-right: 2px solid;
+}
+.gx-wealth-feature-card:hover,
+.gx-wealth-deliverable-card:hover {
+    border-color: var(--gx-navy-15);
+    box-shadow: var(--gx-shadow-card-hover);
+    transform: translate(-2px, -2px);
+    transition: transform 0.2s var(--gx-ease), box-shadow 0.2s var(--gx-ease), border-color 0.2s ease;
+}
+.gx-wealth-feature-card:hover::before,
+.gx-wealth-feature-card:hover::after,
+.gx-wealth-deliverable-card:hover::before,
+.gx-wealth-deliverable-card:hover::after {
+    border-color: var(--gx-gold);
+}
+
+/* ── Hero panel: kicker / título / badge ────────────────────────────────────── */
 .gx-wealth-panel-kicker {
-    font-family: var(--gx-font-sans-refined);
-    font-size: 11px;
-    letter-spacing: 0.22em;
-    color: var(--gx-gold-etched);
+    font-family: var(--gx-font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
+    color: var(--gx-gold-hover);
 }
-
 .gx-wealth-panel-title {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: clamp(26px, 3.2vw, 36px);
-    line-height: 1.05;
-    letter-spacing: -0.015em;
-    color: var(--gx-navy-deep);
+    font-family: var(--gx-font-heading);
+    font-weight: 800;
+    font-size: clamp(22px, 3vw, 30px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--gx-navy);
 }
-
 .gx-wealth-panel-title em,
 .gx-wealth-panel-title i {
-    font-style: italic;
-    color: var(--gx-gold-etched);
+    font-style: normal;
+    color: var(--gx-gold-hover);
 }
-
 .gx-wealth-panel-badge {
-    border-radius: 2px;
-    background: rgba(199,160,83,0.12);
-    color: var(--gx-gold-etched);
-    border: 1px solid rgba(199,160,83,0.25);
-    font-family: var(--gx-font-sans-refined);
-    font-size: 10.5px;
-    font-weight: 600;
-    letter-spacing: 0.22em;
-    padding: 6px 12px;
+    border-radius: 0;
+    background: var(--gx-navy);
+    color: var(--gx-gold-soft);
+    border: none;
+    font-family: var(--gx-font-heading);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 7px 12px;
 }
 
-/* Mini cards — hairline */
+/* Mini-cards (hero panel) — rótulo uppercase + frase em Inter 800 (não é número) */
 .gx-wealth-mini-card {
-    padding: 22px 20px;
-    border-radius: 2px;
-    background: rgba(255,255,255,0.75);
-    border: 1px solid rgba(0,42,85,0.08);
-    box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.7),
-        0 1px 0 0 rgba(199,160,83,0.1);
+    border-radius: 0;
+    border: 1px solid var(--gx-border);
+    background: var(--gx-bg-warm);
+    box-shadow: none;
+    padding: 18px;
 }
-
 .gx-wealth-mini-card span {
-    font-family: var(--gx-font-sans-refined);
+    font-family: var(--gx-font-heading);
     font-size: 11px;
-    letter-spacing: 0.22em;
-    color: var(--gx-gold-etched);
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    color: var(--gx-gold-hover);
 }
-
 .gx-wealth-mini-card strong {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: 24px;
-    line-height: 1.1;
-    color: var(--gx-navy-deep);
-    font-feature-settings: "onum" 1;
-    font-variant-numeric: oldstyle-nums;
-    letter-spacing: -0.015em;
+    font-family: var(--gx-font-heading);
+    font-weight: 800;
+    font-size: 17px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--gx-navy);
 }
 
-/* KPI cards */
+/* ── KPI cards: números em JetBrains Mono tabular + acento navy no topo ──────── */
 .gx-wealth-kpi-card {
-    padding: 22px 20px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, #FFFFFF 0%, var(--gx-ivory) 100%);
-    border: 1px solid rgba(0,42,85,0.08);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
+    border-radius: 0;
+    border: 1px solid var(--gx-border);
+    border-top: 2px solid var(--gx-navy);
+    background: var(--gx-bg-warm);
+    box-shadow: none;
+    padding: 18px;
 }
-
 .gx-wealth-kpi-card span {
-    font-family: var(--gx-font-sans-refined);
+    font-family: var(--gx-font-heading);
     font-size: 11px;
-    letter-spacing: 0.22em;
-    color: var(--gx-gold-etched);
+    font-weight: 700;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    color: var(--gx-gold-hover);
 }
-
 .gx-wealth-kpi-card strong {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: 28px;
-    color: var(--gx-navy-deep);
-    font-feature-settings: "onum" 1;
-    font-variant-numeric: oldstyle-nums;
-    letter-spacing: -0.015em;
+    font-family: var(--gx-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    font-size: 26px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--gx-navy);
 }
 
-/* Path steps */
+.gx-wealth-insight-text { color: var(--gx-text-secondary); }
+.gx-wealth-insight-caption { color: var(--gx-text-tertiary); }
+
+/* ── Path steps: retângulo 0px (marcador em ponto — pill permitido p/ dot) ───── */
 .gx-wealth-path-step {
-    border-radius: 2px;
-    border: 1px solid rgba(0,42,85,0.08);
-    background: rgba(255,255,255,0.85);
-    font-family: var(--gx-font-sans-refined);
-    font-size: 14px;
-    padding: 14px 16px 14px 44px;
+    border-radius: 0;
+    border: 1px solid var(--gx-border);
+    background: var(--gx-bg);
+    font-family: var(--gx-font-body);
+    color: var(--gx-text-secondary);
 }
-
-.gx-wealth-path-step::before {
-    left: 18px;
-    width: 10px;
-    height: 10px;
-    background: rgba(0,42,85,0.18);
-    box-shadow: 0 0 0 3px rgba(0,42,85,0.06);
-}
-
 .gx-wealth-path-step.is-active {
-    background: linear-gradient(90deg, rgba(199,160,83,0.14), rgba(251,247,238,0.6));
-    border-color: rgba(199,160,83,0.35);
-    color: var(--gx-navy-deep);
-}
-
-.gx-wealth-path-step.is-active::before {
-    background: var(--gx-gold);
-    box-shadow: 0 0 0 3px rgba(199,160,83,0.2);
+    background: var(--gx-gold-light);
+    border-color: var(--gx-gold);
+    border-left: 2px solid var(--gx-gold);
+    color: var(--gx-navy);
+    font-weight: 600;
 }
 
 /* Member progress */
 .gx-wealth-member-progress {
-    padding: 22px 20px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, #FFFFFF 0%, var(--gx-ivory) 100%);
-    border: 1px solid rgba(0,42,85,0.08);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
+    border-radius: 0;
+    border: 1px solid var(--gx-border);
+    border-top: 2px solid var(--gx-navy);
+    background: var(--gx-bg-warm);
+    box-shadow: none;
 }
-
 .gx-wealth-member-progress strong {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: 26px;
-    letter-spacing: -0.015em;
-    color: var(--gx-navy-deep);
-    font-feature-settings: "onum" 1;
-    font-variant-numeric: oldstyle-nums;
+    font-family: var(--gx-font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 900;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    color: var(--gx-navy);
 }
-
 .gx-wealth-progress-bar {
-    height: 6px;
-    background: rgba(0,42,85,0.08);
-    border-radius: 999px;
+    border-radius: 0;
+    height: 8px;
+    background: var(--gx-navy-08);
 }
-
 .gx-wealth-progress-fill {
-    background: linear-gradient(90deg, var(--gx-gold-etched) 0%, var(--gx-gold) 100%);
+    border-radius: 0;
+    background: var(--gx-gold);
 }
 
 /* Auth note */
 .gx-wealth-auth-note {
-    border-radius: 2px;
-    border: 1px solid rgba(199,160,83,0.28);
-    background: rgba(199,160,83,0.08);
+    border-radius: 0;
+    border: 1px solid var(--gx-border);
     border-left: 2px solid var(--gx-gold);
-    padding: 18px 22px;
+    background: var(--gx-gold-light);
+    color: var(--gx-text-secondary);
 }
-
 .gx-wealth-auth-note strong {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-style: italic;
-    color: var(--gx-navy-deep);
+    font-family: var(--gx-font-heading);
+    font-style: normal;
+    font-weight: 800;
+    color: var(--gx-navy);
 }
 
-/* Objectives (chips) */
+/* ── Objectives: chips retangulares uppercase; ativo = navy sólido ──────────── */
 .gx-wealth-objective {
-    border-radius: 2px;
-    border: 1px solid rgba(0,42,85,0.14);
-    background: #FFFFFF;
-    color: var(--gx-navy-70);
-    font-family: var(--gx-font-sans-refined);
+    border-radius: 0;
+    border: 1px solid var(--gx-navy-15);
+    background: var(--gx-bg);
+    color: var(--gx-text-secondary);
+    font-family: var(--gx-font-heading);
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    padding: 0 18px;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
+    box-shadow: none;
+    transition: all 0.2s var(--gx-ease);
 }
-
 .gx-wealth-objective:hover,
 .gx-wealth-objective.is-active {
-    border-color: rgba(199,160,83,0.42);
-    background: rgba(251,247,238,0.8);
-    color: var(--gx-navy-deep);
-    box-shadow:
-        inset 0 0 0 1px rgba(199,160,83,0.18),
-        0 0 0 1px rgba(199,160,83,0.2);
+    border-color: var(--gx-navy);
+    background: var(--gx-navy);
+    color: var(--gx-gold-soft);
+    box-shadow: none;
 }
 
-/* Form fields — editorial minimal */
+/* ── Form fields: contorno brutalista 0px sobre fundo claro ─────────────────── */
 .gx-wealth-field span {
-    font-family: var(--gx-font-sans-refined);
+    font-family: var(--gx-font-heading);
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--gx-navy-70);
-    margin-bottom: 10px;
+    color: var(--gx-navy);
+    margin-bottom: 8px;
 }
-
 .gx-wealth-field input,
 .gx-wealth-field select,
 .gx-wealth-field textarea {
-    height: auto;
-    min-height: 42px;
-    padding: 10px 0 8px;
-    border: none;
-    border-bottom: 1px solid rgba(0,42,85,0.18);
     border-radius: 0;
-    background: transparent;
-    font-family: var(--gx-font-sans-refined);
-    font-size: 16px;
-    color: var(--gx-navy-deep);
+    border: 1px solid var(--gx-navy-15);
+    background: var(--gx-bg);
+    color: var(--gx-navy);
+    font-family: var(--gx-font-body);
+    font-size: 15px;
 }
-
+.gx-wealth-field input,
+.gx-wealth-field select {
+    height: 50px;
+    padding: 0 14px;
+}
 .gx-wealth-field textarea {
-    min-height: 96px;
-    padding: 12px 0;
+    min-height: 110px;
+    padding: 12px 14px;
 }
-
 .gx-wealth-field input:focus,
 .gx-wealth-field select:focus,
 .gx-wealth-field textarea:focus {
     outline: none;
-    border-bottom-color: var(--gx-gold);
-    box-shadow: 0 1px 0 0 var(--gx-gold);
+    border-color: var(--gx-navy);
+    box-shadow: var(--gx-shadow-sm);
 }
 
 /* Form title */
 .gx-wealth-form-title {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: 24px;
-    letter-spacing: -0.015em;
-    color: var(--gx-navy-deep);
+    font-family: var(--gx-font-heading);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--gx-navy);
 }
 
-.gx-wealth-form-copy {
-    font-family: var(--gx-font-sans-refined);
-}
-
-/* Feature + deliverable cards */
+/* ── Feature + deliverable: título de card (800, sentence-case p/ leitura) ───── */
 .gx-wealth-feature-card strong,
 .gx-wealth-deliverable-card h3 {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: 24px;
-    line-height: 1.1;
+    font-family: var(--gx-font-heading);
+    font-weight: 800;
+    font-size: 21px;
+    line-height: 1.15;
     letter-spacing: -0.01em;
-    color: var(--gx-navy-deep);
+    color: var(--gx-navy);
 }
-
 .gx-wealth-feature-card p,
 .gx-wealth-deliverable-card p {
-    font-family: var(--gx-font-sans-refined);
+    font-family: var(--gx-font-body);
     font-size: 14.5px;
-    line-height: 1.6;
-    color: var(--gx-navy-70);
+    line-height: 1.65;
+    color: var(--gx-text-secondary);
 }
 
-.gx-wealth-feature-card {
-    padding: 30px 26px;
-    transition: transform 0.35s var(--gx-ease), border-color 0.35s ease, box-shadow 0.35s ease;
-}
-
-.gx-wealth-feature-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(199,160,83,0.4);
-    box-shadow:
-        inset 0 0 0 1px rgba(255,255,255,0.9),
-        0 0 0 1px rgba(199,160,83,0.3),
-        0 40px 80px rgba(5,25,52,0.12);
-}
-
-/* Chip list */
+/* Chips: retângulo uppercase pequeno, champagne */
 .gx-wealth-chip {
-    border-radius: 2px;
-    background: rgba(199,160,83,0.08);
-    border: 1px solid rgba(199,160,83,0.2);
-    color: var(--gx-navy-70);
-    font-family: var(--gx-font-sans-refined);
-    font-size: 12px;
-    font-weight: 600;
+    border-radius: 0;
+    background: var(--gx-gold-light);
+    border: 1px solid rgba(201,169,106,0.30);
+    color: var(--gx-gold-hover);
+    font-family: var(--gx-font-heading);
+    font-size: 11px;
+    font-weight: 700;
     letter-spacing: 0.08em;
-    padding: 9px 16px;
+    text-transform: uppercase;
+    padding: 8px 14px;
 }
 
 /* FAQ */
 .gx-wealth-faq-item {
-    border-radius: 2px;
-    border: 1px solid rgba(0,42,85,0.08);
-    background: rgba(255,255,255,0.92);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
+    border-radius: 0;
+    border: 1px solid var(--gx-border);
+    background: var(--gx-bg);
+    box-shadow: none;
 }
-
 .gx-wealth-faq-item summary {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: 19px;
+    font-family: var(--gx-font-heading);
+    font-weight: 700;
+    font-size: 18px;
     letter-spacing: -0.01em;
-    color: var(--gx-navy-deep);
-    padding: 22px 26px;
+    color: var(--gx-navy);
 }
-
 .gx-wealth-faq-item p {
-    font-family: var(--gx-font-sans-refined);
-    padding: 0 26px 24px;
+    font-family: var(--gx-font-body);
+    color: var(--gx-text-secondary);
 }
 
-/* Sticky CTA */
+/* Sticky CTA (mobile) */
 .gx-wealth-sticky-cta .gx-btn {
-    border-radius: 2px;
-    font-family: var(--gx-font-sans-refined);
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-size: 12.5px;
-    box-shadow: 0 18px 40px rgba(199,160,83,0.25);
-}
-
-/* Section titles dentro wealth */
-.gx-wealth .gx-section-title {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: clamp(30px, 4.2vw, 52px);
-    line-height: 1.03;
-    letter-spacing: -0.015em;
-    color: var(--gx-navy-deep);
-}
-
-.gx-wealth .gx-section-title em,
-.gx-wealth .gx-section-title i {
-    font-style: italic;
-    color: var(--gx-gold-etched);
-}
-
-.gx-wealth .gx-section-desc {
-    font-family: var(--gx-font-sans-refined);
-    font-size: 16px;
-    line-height: 1.65;
-    color: var(--gx-navy-70);
-}
-
-/* Buttons — vault treatment */
-.gx-wealth .gx-btn {
-    font-family: var(--gx-font-sans-refined);
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-size: 12.5px;
-}
-
-.gx-wealth .gx-btn-lg {
-    height: 54px;
-    padding: 0 32px;
-    font-size: 13px;
-    letter-spacing: 0.14em;
-}
-
-.gx-wealth .gx-btn-primary {
-    background: var(--gx-gold-etched);
-    color: #FFFFFF;
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.25),
-        0 14px 30px rgba(199,160,83,0.22);
-}
-
-.gx-wealth .gx-btn-primary:hover {
-    background: var(--gx-navy-deep);
-    color: #FFFFFF;
-}
-
-.gx-wealth .gx-btn-ghost {
-    border: 1px solid rgba(0,42,85,0.22);
-    color: var(--gx-navy-deep);
-    box-shadow: inset 0 0 0 1px rgba(199,160,83,0.1);
-}
-
-.gx-wealth .gx-btn-ghost:hover {
-    border-color: var(--gx-gold);
-    background: rgba(251,247,238,0.8);
-    color: var(--gx-navy-deep);
+    border-radius: 0;
+    box-shadow: var(--gx-shadow-card-hover);
 }
 
 /* Form success */
 .gx-wealth-form-success {
-    border-radius: 2px;
-    border: 1px solid rgba(47,179,68,0.28);
-    background: rgba(47,179,68,0.08);
+    border-radius: 0;
+}
+.gx-wealth-form-success strong {
+    font-family: var(--gx-font-heading);
+    font-weight: 800;
+    font-size: 22px;
+    color: #176a2d;
 }
 
-.gx-wealth-form-success strong {
-    font-family: var(--gx-font-display);
-    font-weight: 400;
-    font-size: 24px;
-    color: #176a2d;
+/* ── Botões primários: legibilidade ────────────────────────────────────────────
+   Em superfície clara o padrão navy + champagne (#dbc7a2) lê como texto escuro/
+   marrom sobre navy — pouco funcional como CTA. Usamos navy + texto BRANCO no
+   claro, e mantemos o botão-comando dourado + texto navy nas superfícies navy
+   (cta-block / lead-aside), com especificidade maior para não colidir. */
+.gx-wealth .gx-btn-primary {
+    background: var(--gx-navy);
+    color: #FFFFFF;
+    border-color: var(--gx-navy);
+}
+.gx-wealth .gx-btn-primary:hover {
+    background: var(--gx-navy-deep);
+    color: #FFFFFF;
+    border-color: var(--gx-navy-deep);
+}
+.gx-wealth .gx-cta-block .gx-btn-primary,
+.gx-wealth .gx-lead-aside .gx-btn-primary {
+    background: var(--gx-gold);
+    color: var(--gx-navy-deep);
+    border-color: var(--gx-gold);
+}
+.gx-wealth .gx-cta-block .gx-btn-primary:hover,
+.gx-wealth .gx-lead-aside .gx-btn-primary:hover {
+    background: var(--gx-gold-soft);
+    color: var(--gx-navy-deep);
+    border-color: var(--gx-gold-soft);
 }
 </style>
