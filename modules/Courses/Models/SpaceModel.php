@@ -8,7 +8,7 @@ class SpaceModel extends BaseModel
     protected $primaryKey    = 'id';
     protected $returnType    = 'array';
     protected $useTimestamps = false;
-    protected $allowedFields = ['name', 'slug', 'description', 'icon', 'color', 'sort', 'is_active', 'created_at', 'updated_at'];
+    protected $allowedFields = ['name', 'slug', 'description', 'icon', 'color', 'cover_image', 'sort', 'is_active', 'created_at', 'updated_at'];
 
     public function active(): array
     {

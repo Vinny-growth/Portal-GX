@@ -3,6 +3,14 @@ echo view('courses/_head', ['pageTitle' => $pageTitle, 'totalXp' => $totalXp, 'u
 echo view('courses/community/_styles');
 $initial = fn($name) => strtoupper(mb_substr((string) $name, 0, 1) ?: '?');
 ?>
+<?php if ($space && !empty($space['cover_image'])): ?>
+<div style="margin-top:var(--space-6);height:180px;background:linear-gradient(180deg,rgba(0,13,35,.15),rgba(0,13,35,.78)),url('<?= esc($space['cover_image'], 'attr') ?>');background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:22px;border:1px solid rgba(219,199,162,.15)">
+    <div>
+        <div style="font-size:28px;font-weight:900;line-height:1"><?= esc($space['icon'] ?? '') ?> <?= esc($space['name']) ?></div>
+        <?php if (!empty($space['description'])): ?><div style="color:#cdd7e4;margin-top:6px"><?= esc($space['description']) ?></div><?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
 <div class="ac-eyebrow" style="justify-content:space-between">
     <span style="display:flex;align-items:center;gap:12px"><?= $space ? esc($space['name']) : 'Comunidade' ?></span>
     <a href="<?= site_url('comunidade/ranking') ?>" style="color:var(--gx-gold);font-size:12px">🏆 Ranking</a>

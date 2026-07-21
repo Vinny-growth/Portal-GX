@@ -138,39 +138,4 @@ $action = $isEdit ? adminUrl('cursos/' . $course['id'] . '/editar') : adminUrl('
     <?php endif; ?>
 </div>
 
-<script>
-(function(){
-    var endpoint = <?= json_encode(adminUrl('cursos/gerar-imagem')) ?>;
-    var cn = <?= json_encode(csrf_token()) ?>, ch = <?= json_encode(csrf_hash()) ?>;
-    document.addEventListener('click', function(e){
-        var btn = e.target.closest('.gxc-genimg');
-        if (!btn) return;
-        e.preventDefault();
-        var form = btn.closest('form');
-        if (!form) return;
-        var val = function(n){ var el = form.querySelector('[name="'+n+'"]'); return el ? el.value : ''; };
-        if (!val('title').trim()) { alert('Preencha o título antes de gerar a imagem.'); return; }
-        var body = new URLSearchParams();
-        body.append('type', btn.dataset.type || 'course');
-        body.append('title', val('title'));
-        body.append('subtitle', val('subtitle'));
-        body.append('category', val('category'));
-        body.append('level', val('level'));
-        var id = btn.dataset.id || val('lesson_id') || '';
-        if (id) body.append('id', id);
-        body.append(cn, ch);
-        var orig = btn.textContent; btn.disabled = true; btn.textContent = '🎨 Gerando… (~30s)';
-        fetch(endpoint, {method:'POST', headers:{'X-Requested-With':'XMLHttpRequest'}, body: body})
-        .then(function(r){ return r.json(); })
-        .then(function(d){
-            btn.disabled = false; btn.textContent = orig;
-            if (!d.ok) { alert(d.error || 'Falha ao gerar a imagem.'); return; }
-            var input = form.querySelector('[name="cover_image"]');
-            if (input) input.value = d.url;
-            var prev = form.querySelector('.gxc-genimg-preview');
-            if (prev) { prev.src = d.url; prev.style.display = 'block'; }
-        })
-        .catch(function(){ btn.disabled = false; btn.textContent = orig; alert('Erro de rede ao gerar a imagem.'); });
-    });
-})();
-</script>
+<?= view('admin/courses/_genimg_js'); ?>

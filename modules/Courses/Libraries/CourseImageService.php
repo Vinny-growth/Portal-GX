@@ -11,19 +11,23 @@ use App\Helpers\WebPConverter;
  */
 class CourseImageService
 {
+    /** Formatos suportados pelo gpt-image → tamanho. */
+    private const SIZES = ['landscape' => '1536x1024', 'square' => '1024x1024', 'portrait' => '1024x1536'];
+
     /**
-     * Gera e persiste a imagem. $type = 'course' | 'lesson'.
+     * Gera e persiste a imagem. $type = 'course' | 'lesson' | 'space'.
+     * $format = 'landscape' (padrão) | 'square' | 'portrait'.
      * @return string|null URL pública da imagem (ou null se falhar).
      */
-    public function generate(string $type, string $title, ?string $subtitle = null, ?string $category = null, ?string $level = null): ?string
+    public function generate(string $type, string $title, ?string $subtitle = null, ?string $category = null, ?string $level = null, string $format = 'landscape'): ?string
     {
         $prompt = $this->buildPrompt($type, $title, $subtitle, $category, $level);
 
         $helper  = new OpenAIImageHelper();
         $model   = getenv('OPENAI_DEFAULT_MODEL') ?: 'gpt-image-1-mini';
         $quality = getenv('OPENAI_DEFAULT_QUALITY') ?: 'high';
-        // Paisagem 3:2 — serve à capa do card (Netflix) e ao hero da trilha.
-        $result = $helper->generateImage($prompt, $model, '1536x1024', $quality, 1);
+        $size    = self::SIZES[$format] ?? self::SIZES['landscape'];
+        $result  = $helper->generateImage($prompt, $model, $size, $quality, 1);
 
         if (empty($result['data'][0])) {
             log_message('error', 'CourseImageService: geração de imagem falhou para ' . $type . ' "' . $title . '"');
@@ -35,8 +39,8 @@ class CourseImageService
         if (!is_dir($dir)) {
             @mkdir($dir, 0755, true);
         }
-        $base   = ($type === 'lesson' ? 'lesson_' : 'course_')
-                . (url_title($title, '-', true) ?: $type) . '_' . substr(md5(uniqid('', true)), 0, 8);
+        $prefix = ['course' => 'course_', 'lesson' => 'lesson_', 'space' => 'space_'][$type] ?? 'img_';
+        $base   = $prefix . (url_title($title, '-', true) ?: $type) . '_' . substr(md5(uniqid('', true)), 0, 8);
         $tmpPng = $dir . $base . '.png';
 
         // gpt-image-1* retornam b64_json; dall-e-3 (fallback) retorna url.
@@ -85,6 +89,9 @@ class CourseImageService
 
         if ($type === 'lesson') {
             $subject = 'Imagem editorial para a capa de uma AULA online intitulada "' . $title . '"';
+        } elseif ($type === 'space') {
+            $subject = 'Banner editorial para um ESPAÇO de comunidade online chamado "' . $title . '", '
+                . 'evocando conexão, pertencimento e conversa entre membros';
         } else {
             $subject = 'Capa editorial cinematográfica para um CURSO online intitulado "' . $title . '"';
             if ($category) {

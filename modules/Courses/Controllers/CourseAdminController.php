@@ -295,17 +295,19 @@ class CourseAdminController extends BaseAdminController
     public function generateImage()
     {
         checkPermission('admin_panel');
-        $type = $this->request->getPost('type') === 'lesson' ? 'lesson' : 'course';
+        $type = in_array($this->request->getPost('type'), ['lesson', 'space'], true) ? $this->request->getPost('type') : 'course';
+        $format = in_array($this->request->getPost('format'), ['square', 'portrait', 'landscape'], true) ? $this->request->getPost('format') : 'landscape';
         $title = trim((string) $this->request->getPost('title'));
         if ($title === '') {
-            return $this->response->setJSON(['ok' => false, 'error' => 'Preencha o título antes de gerar a imagem.']);
+            return $this->response->setJSON(['ok' => false, 'error' => 'Preencha o título/nome antes de gerar a imagem.']);
         }
         $url = (new CourseImageService())->generate(
             $type,
             $title,
             trim((string) $this->request->getPost('subtitle')) ?: null,
             trim((string) $this->request->getPost('category')) ?: null,
-            trim((string) $this->request->getPost('level')) ?: null
+            trim((string) $this->request->getPost('level')) ?: null,
+            $format
         );
         if (!$url) {
             return $this->response->setJSON(['ok' => false, 'error' => 'Falha ao gerar a imagem. Verifique a chave OpenAI (OPENAI_API_KEY / IA do blog).']);
@@ -316,6 +318,8 @@ class CourseAdminController extends BaseAdminController
             $now = date('Y-m-d H:i:s');
             if ($type === 'lesson') {
                 $this->lessons->update($id, ['cover_image' => $url, 'updated_at' => $now]);
+            } elseif ($type === 'space') {
+                (new SpaceModel())->update($id, ['cover_image' => $url, 'updated_at' => $now]);
             } else {
                 $this->courses->update($id, ['cover_image' => $url, 'updated_at' => $now]);
             }
@@ -353,6 +357,7 @@ class CourseAdminController extends BaseAdminController
             'description' => trim((string) $this->request->getPost('description')) ?: null,
             'icon'      => trim((string) $this->request->getPost('icon')) ?: null,
             'color'     => trim((string) $this->request->getPost('color')) ?: null,
+            'cover_image' => trim((string) $this->request->getPost('cover_image')) ?: null,
             'sort'      => (int) $this->request->getPost('sort'),
             'is_active' => $this->request->getPost('is_active') ? 1 : 0,
             'updated_at' => $now,

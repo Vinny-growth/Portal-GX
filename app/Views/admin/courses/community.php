@@ -12,10 +12,21 @@
         <div class="gxc-card__eyebrow">Espaços</div>
         <?php if (!empty($spaces)): ?>
         <table class="gxc-table" style="margin-bottom:var(--space-5)">
-            <thead><tr><th>Espaço</th><th>Slug</th><th>Ordem</th><th>Ativo</th></tr></thead>
+            <thead><tr><th>Espaço</th><th>Slug</th><th>Capa</th><th>Ordem</th><th>Ativo</th></tr></thead>
             <tbody>
             <?php foreach ($spaces as $s): ?>
-                <tr><td><?= esc($s['icon'] ?: '') ?> <strong><?= esc($s['name']); ?></strong></td><td class="gxc-muted"><?= esc($s['slug']); ?></td><td class="gxc-num"><?= (int) $s['sort']; ?></td><td><?= $s['is_active'] ? '<span class="gxc-badge gxc-badge--on">Sim</span>' : '<span class="gxc-badge gxc-badge--off">Não</span>'; ?></td></tr>
+                <tr>
+                    <td><?= esc($s['icon'] ?: '') ?> <strong><?= esc($s['name']); ?></strong></td>
+                    <td class="gxc-muted"><?= esc($s['slug']); ?></td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <img id="spc<?= (int) $s['id'] ?>" src="<?= esc($s['cover_image'] ?? '', 'attr') ?>" alt="" style="width:80px;height:44px;object-fit:cover;border:1px solid var(--gx-border);<?= empty($s['cover_image']) ? 'display:none' : '' ?>">
+                            <button type="button" class="gxc-btn gxc-btn--gold gxc-btn--sm gxc-genimg" data-type="space" data-id="<?= (int) $s['id'] ?>" data-title="<?= esc($s['name'], 'attr') ?>" data-subtitle="<?= esc($s['description'] ?? '', 'attr') ?>" data-preview="#spc<?= (int) $s['id'] ?>">🎨 Capa</button>
+                        </div>
+                    </td>
+                    <td class="gxc-num"><?= (int) $s['sort']; ?></td>
+                    <td><?= $s['is_active'] ? '<span class="gxc-badge gxc-badge--on">Sim</span>' : '<span class="gxc-badge gxc-badge--off">Não</span>'; ?></td>
+                </tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -28,6 +39,13 @@
                 <div class="gxc-field"><label class="gxc-label">Ordem</label><input class="gxc-input" type="number" name="sort" value="0"></div>
                 <div class="gxc-field"><label class="gxc-check" style="margin-top:24px"><input type="checkbox" name="is_active" value="1" checked> Ativo</label></div>
                 <div class="gxc-field gxc-field--full"><label class="gxc-label">Descrição</label><input class="gxc-input" name="description"></div>
+                <div class="gxc-field gxc-field--full"><label class="gxc-label">Capa do espaço (URL)</label>
+                    <div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">
+                        <input class="gxc-input" name="cover_image" style="flex:1;min-width:200px">
+                        <button type="button" class="gxc-btn gxc-btn--gold gxc-btn--sm gxc-genimg" data-type="space">🎨 Gerar com IA</button>
+                    </div>
+                    <img class="gxc-genimg-preview" src="" alt="" style="margin-top:8px;max-width:220px;border:1px solid var(--gx-border);display:none">
+                </div>
             </div>
             <div style="margin-top:var(--space-3)"><button class="gxc-btn" type="submit">+ Criar espaço</button></div>
         </form>
@@ -61,3 +79,4 @@
         <?php endif; ?>
     </div>
 </div>
+<?= view('admin/courses/_genimg_js'); ?>
