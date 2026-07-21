@@ -94,7 +94,7 @@ class PostController extends BaseAdminController
         $val = \Config\Services::validation();
         $val->setRule('title', trans("title"), 'required|max_length[500]');
         $val->setRule('category_id', trans("category"), 'required');
-        $val->setRule('optional_url', trans("cateoptional_urlgory"), 'max_length[1000]');
+        $val->setRule('optional_url', trans("optional_url"), 'max_length[1000]');
         if (!$this->validate(getValRules($val))) {
             $this->session->setFlashdata('errors', $val->getErrors());
             return redirect()->to(adminUrl('add-post?type=' . cleanStr($postType)))->withInput();
@@ -228,7 +228,7 @@ class PostController extends BaseAdminController
         $val = \Config\Services::validation();
         $val->setRule('title', trans("title"), 'required|max_length[500]');
         $val->setRule('category_id', trans("category"), 'required');
-        $val->setRule('optional_url', trans("cateoptional_urlgory"), 'max_length[1000]');
+        $val->setRule('optional_url', trans("optional_url"), 'max_length[1000]');
         if (!$this->validate(getValRules($val))) {
             $this->session->setFlashdata('errors', $val->getErrors());
             return redirect()->to(adminUrl('edit-post/' . clrNum($postId)));

@@ -428,7 +428,9 @@ if (!function_exists('trans')) {
         if (isset(Globals::$languageTranslations[$string])) {
             return Globals::$languageTranslations[$string];
         }
-        return "";
+        // sem tradução cadastrada: devolve o termo humanizado em vez de string vazia
+        // (chave ausente apagava nomes de menu, labels e placeholders no painel)
+        return ucfirst(str_replace('_', ' ', (string) $string));
     }
 }
 
@@ -2458,7 +2460,7 @@ if (!function_exists('getPermissionsArray')) {
     function getPermissionsArray()
     {
         return ['admin_panel', 'add_post', 'manage_all_posts', 'navigation', 'pages', 'rss_feeds', 'categories', 'tags', 'widgets', 'polls', 'gallery', 'comments_contact', 'newsletter',
-            'ad_spaces', 'users', 'roles_permissions', 'seo_tools', 'settings', 'reward_system', 'ai_writer'];
+            'ad_spaces', 'users', 'roles_permissions', 'seo_tools', 'settings', 'reward_system', 'ai_writer', 'seo_analysis'];
     }
 }
 
