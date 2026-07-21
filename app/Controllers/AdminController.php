@@ -1272,28 +1272,45 @@ class AdminController extends BaseAdminController
     {
         checkSuperAdmin();
         $sitemapModel = new SitemapModel();
-        $data = $sitemapModel->generateSitemap(0);
-        $data["baseURL"] = base_url();
-        $xml = view('admin/generate_sitemap', $data);
-        $url = base_url();
-        $url = trim($url, '/');
-        $urlParts = parse_url($url);
-        $baseUrl = isset($urlParts['path']) ? str_replace($urlParts['path'], '', $url) : $url;
-        if (strpos($baseUrl, 'http://localhost') !== false) {
-            $baseUrl = str_replace('http://localhost', '', $baseUrl);
-        }
-        $baseUrl = trim($baseUrl, '/');
-        $baseUrl = !empty($baseUrl) ? $baseUrl . '/' : '';
-        if (!empty($xml)) {
-            $data['formatted_xml'] = format_sitemap($xml);
-            if (write_file(FCPATH . $baseUrl . "sitemap.xml", $data['formatted_xml'])) {
-                $this->settingsModel->updateSettings('sitemap_last_update', date('Y-m-d H:i:s'));
-                setSuccessMessage("sitemap_generated");
-            } else {
-                setErrorMessage("sitemap_not_generated");
-            }
+        $sitemapModel->generateSitemap(0);
+        if (is_file(FCPATH . 'sitemap.xml')) {
+            $this->settingsModel->updateSettings('sitemap_last_update', date('Y-m-d H:i:s'));
+            setSuccessMessage("sitemap_generated");
+        } else {
+            setErrorMessage("sitemap_not_generated");
         }
         return redirect()->to(adminUrl('seo-tools'));
+    }
+
+    /**
+     * Set Active Language Post (idioma do painel — seletor no header admin)
+     */
+    public function setActiveLanguagePost()
+    {
+        $language = (new LanguageModel())->getLanguage(inputPost('lang_id'));
+        if (!empty($language)) {
+            $this->session->set('vr_control_panel_lang', $language->id);
+        }
+        $backUrl = inputPost('back_url');
+        if (empty($backUrl) || strpos($backUrl, trim(base_url(), '/')) !== 0) {
+            $backUrl = adminUrl();
+        }
+        return redirect()->to($backUrl);
+    }
+
+    /**
+     * Delete Subscriber Post
+     */
+    public function deleteSubscriberPost()
+    {
+        checkPermission('newsletter');
+        $newsletterModel = new NewsletterModel();
+        if ($newsletterModel->deleteSubscriber(inputPost('id'))) {
+            setSuccessMessage("msg_deleted");
+        } else {
+            setErrorMessage("msg_error");
+        }
+        exit();
     }
 
     /**
@@ -1703,7 +1720,7 @@ class AdminController extends BaseAdminController
         $data['fontUpdate'] = $data['font'];
 
         echo view('admin/includes/_header', $data);
-        echo view('admin/edit_font', $data);
+        echo view('admin/font/edit', $data);
         echo view('admin/includes/_footer');
     }
 
