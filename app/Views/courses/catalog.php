@@ -76,22 +76,6 @@ $row = function (string $title, array $courses) use ($enrollMap) {
     } ?>
 <?php endif; ?>
 
-<script>
-(function(){
-    document.querySelectorAll('.ac-row').forEach(function(row){
-        var track = row.querySelector('.ac-track'); if (!track) return;
-        var step = function(){ return Math.max(280, track.clientWidth * 0.82); };
-        var l = row.querySelector('.ac-arrow--l'), r = row.querySelector('.ac-arrow--r');
-        if (l) l.addEventListener('click', function(){ track.scrollBy({left:-step(), behavior:'smooth'}); });
-        if (r) r.addEventListener('click', function(){ track.scrollBy({left:step(), behavior:'smooth'}); });
-        // esconde a seta esquerda no início / direita no fim
-        var upd = function(){
-            if (l) l.style.visibility = track.scrollLeft > 8 ? 'visible' : 'hidden';
-            if (r) r.style.visibility = (track.scrollLeft + track.clientWidth) < (track.scrollWidth - 8) ? 'visible' : 'hidden';
-        };
-        upd(); track.addEventListener('scroll', upd, {passive:true}); window.addEventListener('resize', upd);
-    });
-})();
-</script>
+<?= view('courses/_carousel_js'); ?>
 
 <?php echo view('courses/_foot'); ?>
