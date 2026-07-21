@@ -55,16 +55,19 @@ class ContentAIController extends BaseAdminController
         try {
             $data['sourceHealth'] = (new TrendSourceHealthModel())->getHealthSummary(24);
         } catch (\Throwable $e) {
+            log_message('error', 'ContentAI dashboard: falha ao carregar sourceHealth — ' . $e->getMessage());
             $data['sourceHealth'] = [];
         }
         try {
             $data['xPulseItems'] = (new XPulseSnapshotModel())->getActive(24, 15);
         } catch (\Throwable $e) {
+            log_message('error', 'ContentAI dashboard: falha ao carregar xPulseItems — ' . $e->getMessage());
             $data['xPulseItems'] = [];
         }
         try {
             $data['popularControl'] = $this->popularControlModel->getForAdmin(100);
         } catch (\Throwable $e) {
+            log_message('error', 'ContentAI dashboard: falha ao carregar popularControl — ' . $e->getMessage());
             $data['popularControl'] = [];
         }
         $data['categories'] = $this->categories;

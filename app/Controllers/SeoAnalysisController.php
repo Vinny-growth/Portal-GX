@@ -193,6 +193,7 @@ class SeoAnalysisController extends BaseAdminController
                 return is_array($c) ? (object) $c : $c;
             }, $rows);
         } catch (\Throwable $e) {
+            log_message('error', 'SeoAnalysis: falha ao carregar categorias — ' . $e->getMessage());
             return [];
         }
     }

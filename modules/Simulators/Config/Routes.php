@@ -27,8 +27,8 @@ if (service('moduleRegistry')->enabled('simulators')) {
     $routes->get('playbook/importacao-blindada', '\App\Controllers\HomeController::playbookImportacaoBlindada');
     $routes->get('playbook/exportacao-premium', '\App\Controllers\HomeController::playbookExportacaoPremium');
     $routes->post('api/save-simulator-lead', '\App\Controllers\ApiController::saveSimulatorLead');
-    $routes->match(['post', 'options'], 'api/quotation/preview', '\App\Controllers\ApiController::quotationPreview');
-    $routes->match(['post', 'options'], 'api/quotation/unlock', '\App\Controllers\ApiController::quotationUnlock');
+    $routes->match(['POST', 'OPTIONS'], 'api/quotation/preview', '\App\Controllers\ApiController::quotationPreview');
+    $routes->match(['POST', 'OPTIONS'], 'api/quotation/unlock', '\App\Controllers\ApiController::quotationUnlock');
 
     foreach (array_keys(\App\Controllers\HomeController::LEGACY_SIMULATOR_REDIRECTS) as $legacySlug) {
         $routes->get($legacySlug, '\App\Controllers\HomeController::legacyRedirect');

@@ -50,6 +50,12 @@ Options -Indexes
     Deny from all
 </Files>
 
+# GX hardening (auditoria 21/jul/2026): bloqueia artefatos sensiveis no docroot
+RedirectMatch 404 (?i)\.(sh|sql|key|zip|xlsx|md|bak|lock|yml|yaml)$
+RedirectMatch 404 (?i)^/(github_deploy_key|get_page\.php|Web\.config|spark|version\.txt|aurum-simulador\.php)$
+RedirectMatch 404 (?i)^/(app|system|writable|docs|tmp|preview|ui_kits)/
+RedirectMatch 404 (?i)^/uploads/.*\.php$
+
 <IfModule mod_deflate.c>
     # Enable compression for common text-based assets
     AddOutputFilterByType DEFLATE text/plain
