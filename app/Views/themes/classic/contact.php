@@ -53,7 +53,7 @@
                                         <div class="form-group">
                                             <textarea class="form-control form-input form-textarea" name="message" placeholder="<?= trans("message"); ?>" maxlength="4970" minlength="5" required><?= old('message'); ?></textarea>
                                         </div>
-                                        <input type="text" name="message_content" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off">
+                                        <input type="text" name="message_content" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
                                         <div class="form-group">
                                             <label class="custom-checkbox">
                                                 <input type="checkbox" class="checkbox_terms_conditions" required>

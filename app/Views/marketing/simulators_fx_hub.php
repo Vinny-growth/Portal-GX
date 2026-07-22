@@ -34,10 +34,12 @@ $numberValue = static function ($value) {
 };
 
 $navLinks = [
+    ['label' => lang('Fx.nav_inicio'), 'href' => $homeUrl ?? langBaseUrl()],
     ['label' => lang('Fx.nav_mesa'), 'href' => '#quem-somos'],
     ['label' => lang('Fx.nav_indicadores'), 'href' => '#indicadores-cambio'],
     ['label' => lang('Fx.nav_ferramentas'), 'href' => '#ferramentas-cambio'],
     ['label' => lang('Fx.nav_laboratorio'), 'href' => '#laboratorio-cambio'],
+    ['label' => lang('Fx.nav_hub'), 'href' => langBaseUrl('simuladores')],
     ['label' => lang('Fx.nav_especialista'), 'href' => '#lead-cambio'],
 ];
 
@@ -731,7 +733,7 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
                                 <label for="gx-fx-lead-message"><?= lang('Fx.lead_complemento'); ?> <span class="gx-form-optional"><?= lang('Fx.lead_complemento_opt'); ?></span></label>
                                 <textarea id="gx-fx-lead-message" name="message" maxlength="4970" rows="3" placeholder="<?= esc(lang('Fx.lead_msg_ph')); ?>"></textarea>
                             </div>
-                            <input type="text" name="message_content" class="gx-hp" tabindex="-1" autocomplete="off">
+                            <input type="text" name="message_content" class="gx-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
                             <label class="gx-check">
                                 <input type="checkbox" required>
                                 <span>
@@ -909,7 +911,12 @@ $toolOrder = ['import', 'export', 'hedge', 'funding4131', 'trade'];
             });
         }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
         revealNodes.forEach(function(node) {
-            revealObserver.observe(node);
+            if (node.getBoundingClientRect().top > window.innerHeight * 0.85) {
+                node.classList.add('gx-reveal-armed');
+                revealObserver.observe(node);
+            } else {
+                node.classList.add('is-visible');
+            }
         });
     } else {
         revealNodes.forEach(function(node) {

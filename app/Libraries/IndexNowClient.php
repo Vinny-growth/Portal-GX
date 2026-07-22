@@ -48,6 +48,12 @@ class IndexNowClient
             return $this->errorResponse('No URLs provided.');
         }
 
+        //a single foreign-host URL makes IndexNow reject the whole batch (HTTP 422)
+        $urls = array_filter($urls, fn ($url) => parse_url($url, PHP_URL_HOST) === $this->host);
+        if (empty($urls)) {
+            return $this->errorResponse('No URLs matching host ' . $this->host . '.');
+        }
+
         $keyLocation = base_url($this->apiKey . '.txt');
 
         $payload = json_encode([
@@ -57,7 +63,26 @@ class IndexNowClient
             'urlList'     => array_values($urls),
         ]);
 
-        return $this->sendRequest($payload);
+        $result = $this->sendRequest($payload);
+        $this->auditLog($result, $urls);
+        return $result;
+    }
+
+    /**
+     * Appends every submission attempt to writable/logs/indexnow.log
+     * (production log threshold hides info-level, so success would be invisible otherwise).
+     */
+    private function auditLog(array $result, array $urls): void
+    {
+        $line = sprintf(
+            "[%s] %s http=%s urls=%d | %s\n",
+            date('Y-m-d H:i:s'),
+            !empty($result['success']) ? 'OK' : 'FAIL',
+            $result['http_code'] ?? ($result['code'] ?? '-'),
+            count($urls),
+            implode(' ', array_slice(array_values($urls), 0, 5)) . (count($urls) > 5 ? ' ...' : '')
+        );
+        @file_put_contents(WRITEPATH . 'logs/indexnow.log', $line, FILE_APPEND | LOCK_EX);
     }
 
     /**

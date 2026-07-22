@@ -32,33 +32,6 @@
          url("<?= base_url('assets/fonts/inter/inter-700.woff'); ?>") format("woff");
 }
 
-@font-face {
-    font-family: "Open Sans";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("<?= base_url('assets/fonts/open-sans/open-sans-400.woff2'); ?>") format("woff2"),
-         url("<?= base_url('assets/fonts/open-sans/open-sans-400.woff'); ?>") format("woff");
-}
-
-@font-face {
-    font-family: "Open Sans";
-    font-style: normal;
-    font-weight: 600;
-    font-display: swap;
-    src: url("<?= base_url('assets/fonts/open-sans/open-sans-600.woff2'); ?>") format("woff2"),
-         url("<?= base_url('assets/fonts/open-sans/open-sans-600.woff'); ?>") format("woff");
-}
-
-@font-face {
-    font-family: "Open Sans";
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url("<?= base_url('assets/fonts/open-sans/open-sans-700.woff2'); ?>") format("woff2"),
-         url("<?= base_url('assets/fonts/open-sans/open-sans-700.woff'); ?>") format("woff");
-}
-
 :root {
     /* Nexus design system — brutalist financial.
        Single source of truth: /colors_and_type.css.
@@ -2007,10 +1980,14 @@ body.gx-marketing-home > #overlay_bg {
     font-weight: 600;
 }
 
+/* visível por padrão: LCP não pode esperar JS; o script "arma" só o below-the-fold */
 [data-gx-reveal] {
+    transition: opacity 0.7s var(--gx-ease), transform 0.7s var(--gx-ease);
+}
+
+[data-gx-reveal].gx-reveal-armed {
     opacity: 0;
     transform: translateY(24px);
-    transition: opacity 0.7s var(--gx-ease), transform 0.7s var(--gx-ease);
 }
 
 [data-gx-reveal].is-visible {

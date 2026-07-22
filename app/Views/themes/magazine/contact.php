@@ -43,7 +43,7 @@
                                 <div class="mb-3">
                                     <textarea class="form-control form-input" name="message" placeholder="<?= trans("message"); ?>" maxlength="4970" minlength="5" required><?= old('message'); ?></textarea>
                                 </div>
-                                <input type="text" name="message_content" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off">
+                                <input type="text" name="message_content" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
                                 <div class="mb-3 form-check display-flex">
                                     <input type="checkbox" class="form-check-input flex-shrink-0" id="checkboxContactTerms" required>
                                     <label class="form-check-label" for="checkboxContactTerms">

@@ -2,6 +2,15 @@
 Options -Indexes
 
 # ----------------------------------------------------------------------
+# Compression: Brotli para navegadores que suportam, fallback gzip.
+# (sobrescreve o SetOutputFilter DEFLATE do vhost; sem mod_brotli cai no gzip)
+# ----------------------------------------------------------------------
+<IfModule mod_brotli.c>
+	SetOutputFilter BROTLI_COMPRESS;DEFLATE
+	SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp|avif|ico|woff2?|ttf|eot|mp4|webm|zip|gz|br|pdf)$ no-gzip no-brotli
+</IfModule>
+
+# ----------------------------------------------------------------------
 # Rewrite engine
 # ----------------------------------------------------------------------
 

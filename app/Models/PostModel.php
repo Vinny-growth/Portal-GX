@@ -431,11 +431,13 @@ class PostModel extends BaseModel
             }
         }
         $isUpdated = false;
+        $publishedIds = [];
         if (!empty($posts)) {
             foreach ($posts as $post) {
                 if (strtotime($post->created_at) <= strtotime($date)) {
                     $this->builder->where('id', $post->id)->update(['is_scheduled' => 0, 'created_at' => $date]);
                     $isUpdated = true;
+                    $publishedIds[] = $post->id;
                 }
             }
         }
@@ -443,6 +445,32 @@ class PostModel extends BaseModel
             resetCacheDataOnChange();
             @unlink(WRITEPATH . 'cache/cstable_scheduled_posts');
             $this->setScheduledPostsCache();
+            $this->submitPublishedPostsToIndexNow($publishedIds);
+        }
+    }
+
+    //notify IndexNow (Bing etc.) about posts that just left the scheduled state
+    public function submitPublishedPostsToIndexNow(array $postIds)
+    {
+        if (empty($postIds)) {
+            return;
+        }
+        $client = new \App\Libraries\IndexNowClient();
+        if (!$client->isEnabled()) {
+            return;
+        }
+        $posts = $this->builder->select('id, lang_id, slug, post_url')
+            ->whereIn('id', $postIds)->where('status', 1)->where('visibility', 1)->where('is_scheduled', 0)
+            ->get()->getResult();
+        $urls = [];
+        foreach ($posts as $post) {
+            $url = generatePostURL($post, generateBaseURLByLangId($post->lang_id));
+            if (!empty($url) && $url !== '#') {
+                $urls[] = $url;
+            }
+        }
+        if (!empty($urls)) {
+            $client->submitUrls($urls);
         }
     }
 

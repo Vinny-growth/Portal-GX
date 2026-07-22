@@ -12,6 +12,7 @@ $whatsAppMessage = $whatsAppMessage ?? '';
 $whatsAppIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20.52 3.48A11.8 11.8 0 0 0 12.08 0C5.55 0 .24 5.31.24 11.84c0 2.08.54 4.11 1.58 5.89L0 24l6.46-1.69a11.8 11.8 0 0 0 5.62 1.43h.01c6.53 0 11.84-5.31 11.84-11.84 0-3.16-1.23-6.13-3.41-8.42Zm-8.44 18.26h-.01a9.84 9.84 0 0 1-5.01-1.37l-.36-.22-3.84 1 1.03-3.74-.24-.38a9.8 9.8 0 0 1-1.51-5.2C2.14 6.42 6.66 1.9 12.08 1.9c2.63 0 5.1 1.02 6.96 2.88a9.78 9.78 0 0 1 2.89 6.97c0 5.42-4.42 9.99-9.85 9.99Zm5.39-7.41c-.29-.14-1.71-.84-1.98-.94-.26-.1-.45-.14-.64.14-.19.29-.74.94-.91 1.13-.17.19-.34.22-.63.07-.29-.14-1.21-.45-2.31-1.45-.85-.76-1.42-1.69-1.59-1.98-.17-.29-.02-.44.13-.58.13-.13.29-.34.43-.5.14-.17.19-.29.29-.48.1-.19.05-.36-.02-.5-.07-.14-.64-1.55-.87-2.12-.23-.55-.47-.48-.64-.49h-.55c-.19 0-.5.07-.76.36-.26.29-.99.97-.99 2.37s1.01 2.75 1.15 2.94c.14.19 1.98 3.03 4.79 4.25.67.29 1.2.47 1.61.6.68.22 1.3.19 1.79.12.55-.08 1.71-.7 1.95-1.37.24-.67.24-1.24.17-1.37-.07-.12-.26-.19-.55-.34Z"/></svg>';
 
 $navLinks = [
+    ['label' => 'Início', 'href' => $homeUrl],
     ['label' => 'Frentes', 'href' => '#frentes-simuladores'],
     ['label' => 'Catálogo', 'href' => '#catalogo-completo'],
     ['label' => 'Destaques', 'href' => '#destaques-cambio'],
@@ -335,7 +336,12 @@ $navLinks = [
             });
         }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
         nodes.forEach(function(node) {
-            obs.observe(node);
+            if (node.getBoundingClientRect().top > window.innerHeight * 0.85) {
+                node.classList.add('gx-reveal-armed');
+                obs.observe(node);
+            } else {
+                node.classList.add('is-visible');
+            }
         });
     } else {
         nodes.forEach(function(node) {

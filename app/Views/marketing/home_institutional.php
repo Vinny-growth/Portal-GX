@@ -73,6 +73,7 @@ $navLinks = array_values(array_filter($navLinks, static function ($item) use ($s
     }
     return !empty($item['label']) && $href !== '';
 }));
+$navLinks[] = ['label' => 'Blog', 'href' => $blogUrl ?? langBaseUrl('blog')];
 if (service('moduleRegistry')->enabled('wealth')) {
     $navLinks[] = ['label' => 'Wealth', 'href' => $wealthUrl];
 }
@@ -678,7 +679,15 @@ $trustIcons = [
                 obs.unobserve(e.target);
             });
         }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
-        nodes.forEach(function(n) { obs.observe(n); });
+        nodes.forEach(function(n) {
+            /* acima da dobra fica visível direto — LCP não pode esperar animação */
+            if (n.getBoundingClientRect().top > window.innerHeight * 0.85) {
+                n.classList.add('gx-reveal-armed');
+                obs.observe(n);
+            } else {
+                n.classList.add('is-visible');
+            }
+        });
     } else {
         nodes.forEach(function(n) { n.classList.add('is-visible'); });
     }

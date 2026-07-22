@@ -250,6 +250,10 @@ class ContentAIController extends BaseAdminController
                     'created_at' => $publishAt,
                 ]);
                 $this->calendarModel->markStatus($id, 'generated');
+                if (!$isFuture) {
+                    $postModel = new \App\Models\PostModel();
+                    $postModel->submitPublishedPostsToIndexNow([(int) $item->post_id]);
+                }
                 setSuccessMessage("msg_updated");
             } else {
                 setErrorMessage("msg_error");

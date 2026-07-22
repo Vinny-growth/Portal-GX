@@ -37,9 +37,6 @@
         });
     }
 
-    document.querySelectorAll('[data-gx-reveal]').forEach(function(node) {
-        node.classList.remove('is-visible');
-    });
     if ('IntersectionObserver' in window) {
         var observer = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
@@ -55,7 +52,12 @@
             });
         }, {threshold: 0.1, rootMargin: '0px 0px -40px 0px'});
         document.querySelectorAll('[data-gx-reveal]').forEach(function(node) {
-            observer.observe(node);
+            if (node.getBoundingClientRect().top > window.innerHeight * 0.85) {
+                node.classList.add('gx-reveal-armed');
+                observer.observe(node);
+            } else {
+                node.classList.add('is-visible');
+            }
         });
     } else {
         document.querySelectorAll('[data-gx-reveal]').forEach(function(node) {

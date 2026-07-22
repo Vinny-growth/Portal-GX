@@ -70,7 +70,7 @@ $termsUrl = getPageLinkByDefaultName('terms_conditions', $activeLang->id);
         <input type="hidden" name="utm_campaign" value="">
         <input type="hidden" name="utm_term" value="">
         <input type="hidden" name="utm_content" value="">
-        <input type="text" name="company_website" class="gx-hp" tabindex="-1" autocomplete="off">
+        <input type="text" name="company_website" class="gx-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
 
         <div class="gx-wealth-form-grid">
             <label class="gx-wealth-field">

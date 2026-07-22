@@ -88,20 +88,18 @@ else:
     endif; ?>
 <link rel="alternate" href="<?= esc(generateBaseURLByLangId($generalSettings->site_lang)); ?>" hreflang="x-default">
 <?php endif; ?>
+<?php // Marketing usa só Inter (+ JetBrains Mono via Google): não preloadar Open Sans aqui. ?>
 <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/inter/inter-400.woff2'); ?>">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/inter/inter-600.woff2'); ?>">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/inter/inter-700.woff2'); ?>">
-<link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/open-sans/open-sans-400.woff2'); ?>">
-<link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/open-sans/open-sans-600.woff2'); ?>">
-<link rel="preload" as="font" type="font/woff2" crossorigin href="<?= base_url('assets/fonts/open-sans/open-sans-700.woff2'); ?>">
-<?php // Fase 4 (perf): Google Fonts (JetBrains Mono + pesos extras de Inter) fora do
-      // caminho crítico. Inter 400/600/700 é local (@font-face em _shared_styles +
-      // preload acima), então o corpo pinta sem esperar a rede. preconnect + media=print
+<?php // Fase 4 (perf): Google Fonts fora do caminho crítico. Inter 400/600/700 é local
+      // (@font-face em _shared_styles + preload acima) — a Google só supre os pesos que
+      // não temos localmente (Inter 500/800/900) + JetBrains Mono. preconnect + media=print
       // onload torna o CSS remoto NÃO render-blocking; noscript garante fallback. ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"></noscript>
 <?php if (!empty($pageHeadView)): ?>
 <?= view($pageHeadView); ?>
 <?php endif; ?>

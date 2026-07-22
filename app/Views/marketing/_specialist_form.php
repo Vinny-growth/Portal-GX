@@ -67,7 +67,7 @@ $leadOrigin = $leadOrigin ?? (lang('Marketing.form_origin_prefix') . ((string) p
                 placeholder="<?= esc($messagePlaceholder); ?>"
                 required><?= old('message'); ?></textarea>
         </div>
-        <input type="text" name="message_content" class="gx-hp" tabindex="-1" autocomplete="off">
+        <input type="text" name="message_content" class="gx-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <label class="gx-check">
             <input type="checkbox" required>
             <span>

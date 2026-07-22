@@ -248,10 +248,15 @@ class MarketingHomeDefaults
 
         $items = [];
         $alwaysAvailable = ['simulador-de-risco-cambial', 'fx-loan', 'simulador-seguro-resgatavel'];
+        //fx tools moved into the FX hub; their old slugs are 301s — link the canonical URL directly
+        $canonicalUrls = [
+            'simulador-de-risco-cambial' => $this->langUrl('simuladores/cambio'),
+            'fx-loan' => $this->langUrl('simuladores/cambio') . '#laboratorio-cambio',
+        ];
         foreach ($definitions as $slug => $item) {
             if (in_array($slug, $alwaysAvailable, true)) {
                 $item['slug'] = $slug;
-                $item['url'] = $this->langUrl($slug);
+                $item['url'] = $canonicalUrls[$slug] ?? $this->langUrl($slug);
                 $items[] = $item;
                 continue;
             }

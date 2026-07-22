@@ -3,7 +3,7 @@
     <input type="hidden" name="landing_page" value="<?= esc(current_url()); ?>">
     <input type="hidden" name="lead_origin" value="Bloco de formulário CMS">
     <input type="hidden" name="message" value="Contato iniciado pelo formulário rápido da página CMS.">
-    <input type="text" name="message_content" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off">
+    <input type="text" name="message_content" style="position:absolute;left:-9999px;" tabindex="-1" autocomplete="off" aria-hidden="true">
     <div class="gx-inline-contact-grid">
         <input type="text" class="form-control" name="name" placeholder="Seu nome" value="<?= esc(old('name')); ?>" required>
         <input type="email" class="form-control" name="email" placeholder="Seu e-mail" value="<?= esc(old('email')); ?>" required>

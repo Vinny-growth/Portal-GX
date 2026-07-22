@@ -19,6 +19,8 @@ return [
     // ===================================================================
 
     // navegação
+    'nav_inicio'      => 'Início',
+    'nav_simuladores' => 'Simuladores',
     'nav_mesa'        => 'A Mesa',
     'nav_estrategias' => 'Estratégias',
     'nav_simulador'   => 'Simulador',
