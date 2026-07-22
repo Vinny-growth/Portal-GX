@@ -89,7 +89,7 @@ class HomeController extends BaseController
     {
         $this->cachePage(300);
         $data = $this->buildEditorialHomeData([
-            'title' => brandLang('Home.blog_title'),
+            'title' => brandLang('Home.blog_seo_title'),
             'description' => brandLang('Home.blog_description'),
             'keywords' => trim($this->settings->keywords . ', blog gx capital, conteúdo técnico, mercado financeiro', ' ,'),
             'homeTitle' => brandLang('Home.blog_title')
@@ -481,7 +481,10 @@ class HomeController extends BaseController
      */
     public function posts()
     {
-        $data = setPageMeta(trans("posts"));
+        $data = setPageMeta(brandLang('Home.posts_seo_title'));
+        $data['description'] = brandLang('Home.posts_seo_description');
+        $data['postsH1'] = brandLang('Home.posts_h1');
+        $data['postsIntro'] = brandLang('Home.posts_intro');
         $data['userSession'] = getUserSession();
         $numRows = $this->postModel->getPostCount($this->activeLang->id);
         $data['pager'] = paginate($this->postsPerPage, $numRows);
@@ -880,7 +883,7 @@ class HomeController extends BaseController
         $data['userSession'] = getUserSession();
         $page = $pageModel->getPageByLang($slug, $this->activeLang->id);
         if (!empty($page)) {
-            $this->page($page);
+            return $this->page($page);
         } else {
             $categoryModel = new CategoryModel();
             $category = $categoryModel->getCategoryBySlug($slug);
@@ -1039,6 +1042,11 @@ class HomeController extends BaseController
         if ($page->visibility == 0) {
             $this->error404();
         } else {
+            // Páginas cadastradas só para gerar item de menu (campo link preenchido)
+            // não devem responder 200 com conteúdo fino duplicando o destino.
+            if (!empty($page->link)) {
+                return redirect()->to($page->link, 301);
+            }
             $this->checkPageAuth($page);
 
             if (($page->slug ?? '') === 'simulador-consorcio') {
@@ -1050,6 +1058,16 @@ class HomeController extends BaseController
             $data['description'] = $page->description;
             $data['keywords'] = $page->keywords;
             $data['page'] = $page;
+
+            // Overrides de SEO por slug (title/description) sem alterar o título
+            // da página usado no menu. Ver Config\SeoCategoryMeta.
+            $seoMeta = (new \Config\SeoCategoryMeta())->forPageSlug((string) ($page->slug ?? ''));
+            if (!empty($seoMeta['title'])) {
+                $data['title'] = $seoMeta['title'];
+            }
+            if (!empty($seoMeta['description'])) {
+                $data['description'] = $seoMeta['description'];
+            }
             $seoFaq = new \Config\SeoFaq();
             $simulatorFaq = $seoFaq->forSlug((string) ($page->slug ?? ''));
             $simulatorSchema = $this->buildSimulatorPageSchema($page, $simulatorFaq);
@@ -1219,6 +1237,19 @@ class HomeController extends BaseController
             $data['description'] = $category->description;
             $data['keywords'] = $category->keywords;
             $data['category'] = $category;
+
+            // Overrides de SEO da página-pilar (title/description/intro) sem
+            // alterar o nome da categoria usado em menus. Ver Config\SeoCategoryMeta.
+            $seoMeta = (new \Config\SeoCategoryMeta())->forCategoryId((int) $category->id);
+            if (!empty($seoMeta['title'])) {
+                $data['title'] = $seoMeta['title'];
+            }
+            if (!empty($seoMeta['description'])) {
+                $data['description'] = $seoMeta['description'];
+            }
+            if (!empty($seoMeta['intro'])) {
+                $data['categoryIntro'] = $seoMeta['intro'];
+            }
 
             // og:image própria por categoria (Fase 5): usa a imagem gerada se existir,
             // senão o header cai no logo. Ver command seo:gen-category-og.
@@ -1541,7 +1572,7 @@ class HomeController extends BaseController
     public function rssFeeds()
     {
         if ($this->generalSettings->show_rss == 1) {
-            $data = setPageMeta(trans("rss_feeds"));
+            $data = setPageMeta(lang('Home.rss_seo_title'));
             $data['userSession'] = getUserSession();
             echo loadView('partials/_header', $data);
             echo loadView('rss_feeds', $data);

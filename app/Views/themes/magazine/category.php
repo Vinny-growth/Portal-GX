@@ -19,6 +19,9 @@
                 </ol>
             </nav>
             <h1 class="page-title"><?= esc($category->name); ?></h1>
+            <?php if (!empty($categoryIntro)): ?>
+                <div class="col-12 mb-4 category-intro"><?= $categoryIntro; ?></div>
+            <?php endif; ?>
             <div class="col-sm-12 col-md-12 col-lg-8">
                 <div class="row">
                     <?php $i = 0;

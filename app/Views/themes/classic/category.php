@@ -21,6 +21,9 @@
             <div id="content" class="col-sm-8">
                 <div class="row">
                     <div class="col-sm-12"><h1 class="page-title"><?= esc($category->name); ?></h1></div>
+                    <?php if (!empty($categoryIntro)): ?>
+                        <div class="col-sm-12 mb-4 category-intro"><?= $categoryIntro; ?></div>
+                    <?php endif; ?>
                     <?php $count = 0;
                     foreach ($posts as $post):
                         if ($count != 0 && $count % 2 == 0): ?>

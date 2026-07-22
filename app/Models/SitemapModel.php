@@ -58,6 +58,7 @@ class SitemapModel extends BaseModel
                 $baseUrl = $this->generateBaseURLByLang($lang->id, $lang->short_form);
                 $this->add($baseUrl, 'always', $now, 1.0);
                 $this->add($baseUrl . 'blog', 'hourly', $now, 0.9);
+                $this->add($baseUrl . Globals::$customRoutes->posts, 'daily', $now, 0.6);
                 $this->add($baseUrl . 'simuladores', 'weekly', $now, 0.9);
                 $this->add($baseUrl . 'simuladores/cambio', 'weekly', $now, 0.85);
                 $this->add($baseUrl . 'newsletter', 'weekly', $now, 0.85);
@@ -66,6 +67,7 @@ class SitemapModel extends BaseModel
             $baseUrl = base_url() . '/';
             $this->add($baseUrl, 'always', $now, 1.0);
             $this->add($baseUrl . 'blog', 'hourly', $now, 0.9);
+            $this->add($baseUrl . Globals::$customRoutes->posts, 'daily', $now, 0.6);
             $this->add($baseUrl . 'simuladores', 'weekly', $now, 0.9);
             $this->add($baseUrl . 'simuladores/cambio', 'weekly', $now, 0.85);
             $this->add($baseUrl . 'newsletter', 'weekly', $now, 0.85);

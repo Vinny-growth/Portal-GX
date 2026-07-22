@@ -234,6 +234,8 @@ class AuthController extends BaseController
             return redirect()->to(langBaseUrl());
         }
         $data = setPageMeta(trans("register"));
+        // página utilitária sem intenção de busca — fora do índice
+        $data['metaRobots'] = 'noindex, follow';
         $data['userSession'] = getUserSession();
 
         echo loadView('partials/_header', $data);
@@ -297,6 +299,8 @@ class AuthController extends BaseController
             return redirect()->to(langBaseUrl());
         }
         $data = setPageMeta(trans("forgot_password"));
+        // página utilitária sem intenção de busca — fora do índice
+        $data['metaRobots'] = 'noindex, follow';
         $data['userSession'] = getUserSession();
 
         echo loadView('partials/_header', $data);
@@ -333,6 +337,7 @@ class AuthController extends BaseController
             return redirect()->to(langBaseUrl());
         }
         $data = setPageMeta(trans("reset_password"));
+        $data['metaRobots'] = 'noindex, follow';
         $token = cleanStr(inputGet('token'));
         $data['user'] = $this->authModel->getUserByToken($token);
         $data['passResetCompleted'] = $this->session->getFlashdata('pass_reset_completed');

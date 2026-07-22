@@ -460,7 +460,7 @@ ob_start();
             <div class="form-row">
                 <label for="nl-email"><?= lang('Newsletter.nll_form_email'); ?></label>
                 <input type="email" id="nl-email" name="email" required placeholder="voce@empresa.com">
-                <input type="text" name="url" tabindex="-1" autocomplete="off">
+                <input type="text" name="url" tabindex="-1" autocomplete="off" aria-hidden="true">
             </div>
 
             <?php if (!empty($lines)): ?>
@@ -801,7 +801,8 @@ $jsonLd = json_encode([
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 
 echo view('newsletter/_layout', [
-    'title' => $settings->landing_headline ?? 'Newsletter',
+    // <title> com keyword de busca; o H1/hero segue usando landing_headline
+    'title' => lang('Newsletter.landing_seo_title'),
     'description' => $settings->landing_subheadline ?? '',
     'canonical' => $canonicalUrl,
     'ogImage' => $heroOgImage,

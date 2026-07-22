@@ -26,7 +26,7 @@ if (document.cookie.indexOf('gx_cookie_consent=accepted') !== -1) {
 <title><?= escMeta(seoTitle($title, $baseSettings->site_title)); ?></title>
 <meta name="description" content="<?= escMeta($description); ?>"/>
 <meta name="author" content="<?= escMeta($baseSettings->application_name); ?>"/>
-<meta name="robots" content="max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta name="robots" content="<?= escMeta($metaRobots ?? 'max-image-preview:large, max-snippet:-1, max-video-preview:-1'); ?>">
 <meta property="og:locale" content="<?= escMeta($activeLang->language_code); ?>"/>
 <meta property="og:site_name" content="<?= escMeta($baseSettings->application_name); ?>"/>
 <?= csrf_meta(); ?>

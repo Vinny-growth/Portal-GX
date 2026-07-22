@@ -7,7 +7,10 @@
                     <li class="breadcrumb-item active"><?= trans("posts"); ?></li>
                 </ol>
             </nav>
-            <h1 class="page-title"><?= trans("posts"); ?></h1>
+            <h1 class="page-title"><?= esc($postsH1 ?? trans("posts")); ?></h1>
+            <?php if (!empty($postsIntro)): ?>
+                <div class="col-12 mb-4 category-intro"><?= $postsIntro; ?></div>
+            <?php endif; ?>
             <div class="col-sm-12 col-md-12 col-lg-8">
                 <div class="row">
                     <?php $i = 0;

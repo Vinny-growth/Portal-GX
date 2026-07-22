@@ -12,6 +12,9 @@ return [
     // compartilhada (_layout title fallback + _status eyebrow default)
     'nl_brand_title' => 'Newsletter {brand}',
 
+    // <title> da landing /newsletter (landing.php) — keyword em vez do headline conceitual
+    'landing_seo_title' => 'Newsletter de Economia e Mercado para Executivos',
+
     // ===================================================================
     // newsletter/_layout.php
     // ===================================================================

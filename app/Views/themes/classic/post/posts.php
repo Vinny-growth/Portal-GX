@@ -9,7 +9,10 @@
             </div>
             <div id="content" class="col-sm-8">
                 <div class="row">
-                    <div class="col-sm-12"><h1 class="page-title"><?= trans("posts"); ?></h1></div>
+                    <div class="col-sm-12"><h1 class="page-title"><?= esc($postsH1 ?? trans("posts")); ?></h1></div>
+                    <?php if (!empty($postsIntro)): ?>
+                        <div class="col-sm-12 mb-4 category-intro"><?= $postsIntro; ?></div>
+                    <?php endif; ?>
                     <?php $count = 0;
                     if (!empty($posts)):
                         foreach ($posts as $post):

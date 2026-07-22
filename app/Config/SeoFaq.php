@@ -71,6 +71,10 @@ class SeoFaq extends BaseConfig
                 'a' => 'Entre os principais estão a Selic e as decisões do Copom, o IPCA (inflação), o PIB (atividade econômica), a taxa de câmbio e o resultado fiscal. Juntos, eles ajudam a antecipar o custo do crédito, a exposição cambial e o ambiente de negócios. O conteúdo do Radar Econômico da GX Capital acompanha esses indicadores com foco em decisões corporativas de câmbio e crédito.',
             ],
             [
+                'q' => 'Onde acompanhar as notícias de economia e o cenário econômico do Brasil?',
+                'a' => 'Além das fontes oficiais (Banco Central, IBGE e Tesouro Nacional), vale acompanhar uma curadoria que traduza os dados em impacto prático. O Radar Econômico da GX Capital publica diariamente notícias de economia com análise do cenário econômico brasileiro — juros, inflação, câmbio e atividade — sempre conectando o movimento da economia brasileira hoje às decisões de crédito, câmbio e caixa das empresas.',
+            ],
+            [
                 'q' => 'As análises do Radar Econômico são recomendação de investimento?',
                 'a' => 'Não. O Radar Econômico traz análises informativas sobre a conjuntura econômica para apoiar decisões de câmbio e crédito das empresas. Não constitui recomendação de investimento, previsão garantida nem oferta; cada operação deve passar por análise dedicada às condições da empresa.',
             ],

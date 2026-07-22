@@ -47,9 +47,9 @@ class WebStoriesController extends BaseController
      */
     public function index()
     {
-        $data['title'] = 'Web Stories';
-        $data['description'] = 'Explore our web stories collection';
-        $data['keywords'] = 'web stories, visual content';
+        $data['title'] = lang('Home.webstories_seo_title');
+        $data['description'] = brandLang('Home.webstories_seo_desc');
+        $data['keywords'] = 'web stories, economia, câmbio, finanças, conteúdo visual';
         
         $data['webStories'] = $this->webStoriesModel->getActiveWebStories($this->activeLang->id);
         $data['activeLanguages'] = $this->activeLanguages;

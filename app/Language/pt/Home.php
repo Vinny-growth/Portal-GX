@@ -35,6 +35,19 @@ return [
     // Blog institucional (HomeController::blog + buildEditorialHomeData default)
     'blog_title'            => 'Blog {brand}',
     'blog_description'      => 'Conteúdo técnico sobre câmbio, crédito estruturado, mercado de capitais, consórcios e investimentos.',
+    // <title> do /blog — o blog_title segue no H1/menu; aqui evita "Blog GX Capital - GX Capital"
+    'blog_seo_title'        => 'Blog {brand}: análises de câmbio, crédito e economia',
+
+    // /rss-feeds e /web-stories (titles descritivos p/ auditoria de title curto)
+    'rss_seo_title'         => 'Feeds RSS: acompanhe câmbio, crédito e economia por editoria',
+    'webstories_seo_title'  => 'Web Stories: economia, câmbio e finanças em formato visual',
+    'webstories_seo_desc'   => 'Histórias visuais rápidas sobre economia, câmbio, crédito e investimentos — o conteúdo da {brand} em formato web story.',
+
+    // Arquivo de matérias /posts (HomeController::posts) — alvo: "blog de finanças" / "blog de economia"
+    'posts_seo_title'       => 'Blog de Economia e Finanças Empresariais',
+    'posts_seo_description' => 'Todas as matérias do blog de economia e finanças da {brand}: câmbio, crédito empresarial, consórcio e cenário macro em um arquivo atualizado diariamente.',
+    'posts_h1'              => 'Blog de economia e finanças empresariais',
+    'posts_intro'           => '<p>Este é o arquivo completo do blog de economia e finanças da {brand}: notícias de economia, câmbio, crédito empresarial, consórcio e investimentos em ordem cronológica, com novas matérias todos os dias. Para navegar por tema, visite as editorias de <a href="/cambio-6">Câmbio</a>, <a href="/credito-empresarial">Crédito Empresarial</a> e o <a href="/economia">Radar Econômico</a>.</p>',
 
     // Simulador de consórcio (HomeController::simuladorConsorcio)
     'consorcio_description' => 'Simule seu consórcio grátis. Compare com financiamento, planeje sua compra e descubra a rota de contemplação mais rápida com IA. 20+ administradoras analisadas pela {brand}.',
